@@ -822,6 +822,7 @@ Interessiert an kommerzieller Nutzung? Kontaktiere mich für individuelle Lizenz
 - Home Assistant Community für Inspiration und Feedback
 - Alle Contributor und Tester
 - Entwickler der genutzten Custom Cards und Integrationen
+- [js-yaml](https://github.com/nodeca/js-yaml) (MIT-Lizenz) — YAML-Parser für den Custom Views Editor
 
 ## 📞 Support & Kontakt
 
