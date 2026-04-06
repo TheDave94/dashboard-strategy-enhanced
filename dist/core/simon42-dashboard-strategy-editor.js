@@ -12,6 +12,7 @@ import {
   attachGroupByFloorsCheckboxListener,
   attachCoversSummaryCheckboxListener,
   attachHideMobileAppBatteriesCheckboxListener,
+  attachShowLocksInRoomsCheckboxListener,
   attachAreaCheckboxListeners,
   attachDragAndDropListeners,
   attachExpandButtonListeners,
@@ -71,6 +72,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const groupByFloors = this._config.group_by_floors === true; // NEU
     const showCoversSummary = this._config.show_covers_summary !== false;
     const hideMobileAppBatteries = this._config.hide_mobile_app_batteries === true;
+    const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const summariesColumns = this._config.summaries_columns || 2;
     const alarmEntity = this._config.alarm_entity || '';
     const favoriteEntities = this._config.favorite_entities || [];
@@ -120,7 +122,8 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         allEntities,
         groupByFloors,
         showCoversSummary,
-        hideMobileAppBatteries
+        hideMobileAppBatteries,
+        showLocksInRooms
       })}
     `;
 
@@ -133,6 +136,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachGroupByFloorsCheckboxListener(this, (groupByFloors) => this._groupByFloorsChanged(groupByFloors)); // NEU
     attachCoversSummaryCheckboxListener(this, (showCoversSummary) => this._showCoversSummaryChanged(showCoversSummary));
     attachHideMobileAppBatteriesCheckboxListener(this, (hide) => this._hideMobileAppBatteriesChanged(hide));
+    attachShowLocksInRoomsCheckboxListener(this, (show) => this._showLocksInRoomsChanged(show));
     this._attachSummariesColumnsListener();
     this._attachAlarmEntityListener();
     this._attachFavoritesListeners();
@@ -912,6 +916,25 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     // Wenn der Standardwert (false) gesetzt ist, entfernen wir die Property
     if (hide === false) {
       delete newConfig.hide_mobile_app_batteries;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _showLocksInRoomsChanged(show) {
+    if (!this._config || !this._hass) {
+      return;
+    }
+
+    const newConfig = {
+      ...this._config,
+      show_locks_in_rooms: show
+    };
+
+    // Wenn der Standardwert (false) gesetzt ist, entfernen wir die Property
+    if (show === false) {
+      delete newConfig.show_locks_in_rooms;
     }
 
     this._config = newConfig;

@@ -77,6 +77,15 @@ export function attachHideMobileAppBatteriesCheckboxListener(element, callback) 
   }
 }
 
+export function attachShowLocksInRoomsCheckboxListener(element, callback) {
+  const checkbox = element.querySelector('#show-locks-in-rooms');
+  if (checkbox) {
+    checkbox.addEventListener('change', (e) => {
+      callback(e.target.checked);
+    });
+  }
+}
+
 export function attachAreaCheckboxListeners(element, callback) {
   const areaCheckboxes = element.querySelectorAll('.area-checkbox');
   areaCheckboxes.forEach(checkbox => {
@@ -392,9 +401,10 @@ async function getAreaGroupedEntities(areaId, hass) {
     media_player: [],
     vacuum: [],
     fan: [],
-    switches: []
+    switches: [],
+    locks: []
   };
-  
+
   // Labels für Filterung
   const excludeLabels = entities
     .filter(e => e.labels?.includes("no_dboard"))
@@ -450,6 +460,9 @@ async function getAreaGroupedEntities(areaId, hass) {
     }
     else if (domain === 'switch') {
       roomEntities.switches.push(entity.entity_id);
+    }
+    else if (domain === 'lock') {
+      roomEntities.locks.push(entity.entity_id);
     }
   }
   

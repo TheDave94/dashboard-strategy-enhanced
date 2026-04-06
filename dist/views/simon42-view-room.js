@@ -34,7 +34,8 @@ class Simon42ViewRoomStrategy {
       vacuum: [],
       fan: [],
       switches: [],
-      cameras: [] // NEU: Kameras
+      locks: [],
+      cameras: []
     };
 
     // Sensor-Kategorien für Badges
@@ -159,8 +160,13 @@ class Simon42ViewRoomStrategy {
         roomEntities.switches.push(entityId);
         continue;
       }
-      
-      // NEU: Kamera-Erkennung
+
+      if (domain === 'lock' && dashboardConfig.show_locks_in_rooms) {
+        roomEntities.locks.push(entityId);
+        continue;
+      }
+
+      // Kamera-Erkennung
       if (domain === 'camera') {
         roomEntities.cameras.push(entityId);
         continue;
@@ -265,7 +271,8 @@ class Simon42ViewRoomStrategy {
     roomEntities.vacuum = applyGroupFilter('vacuum');
     roomEntities.fan = applyGroupFilter('fan');
     roomEntities.switches = applyGroupFilter('switches');
-    roomEntities.cameras = applyGroupFilter('cameras'); // NEU
+    roomEntities.locks = applyGroupFilter('locks');
+    roomEntities.cameras = applyGroupFilter('cameras');
 
     // === BADGES ERSTELLEN ===
     const badges = [];
@@ -515,6 +522,30 @@ class Simon42ViewRoomStrategy {
             features: [{ type: "light-brightness" }],
             vertical: false,
             features_position: "inline",
+            state_content: "last_changed"
+          }))
+        ]
+      });
+    }
+
+    // Schlösser-Section
+    if (roomEntities.locks.length > 0) {
+      sections.push({
+        type: "grid",
+        cards: [
+          {
+            type: "heading",
+            heading: "Schlösser",
+            heading_style: "title",
+            icon: "mdi:lock"
+          },
+          ...roomEntities.locks.map(entity => ({
+            type: "tile",
+            entity: entity,
+            name: stripAreaName(entity, area, hass),
+            features: [{ type: "lock-commands" }],
+            features_position: "inline",
+            vertical: false,
             state_content: "last_changed"
           }))
         ]

@@ -3,7 +3,7 @@
 // ====================================================================
 // HTML-Template für den Dashboard Strategy Editor
 
-export function renderEditorHTML({ allAreas, hiddenAreas, areaOrder, showEnergy, showWeather, showSummaryViews, showRoomViews, showSearchCard, hasSearchCardDeps, summariesColumns, alarmEntity, alarmEntities, favoriteEntities, roomPinEntities, allEntities, groupByFloors, showCoversSummary, hideMobileAppBatteries }) {
+export function renderEditorHTML({ allAreas, hiddenAreas, areaOrder, showEnergy, showWeather, showSummaryViews, showRoomViews, showSearchCard, hasSearchCardDeps, summariesColumns, alarmEntity, alarmEntities, favoriteEntities, roomPinEntities, allEntities, groupByFloors, showCoversSummary, hideMobileAppBatteries, showLocksInRooms }) {
   return `
     <div class="card-config">
       <div class="section">
@@ -137,6 +137,17 @@ export function renderEditorHTML({ allAreas, hiddenAreas, areaOrder, showEnergy,
         </div>
         <div class="description">
           Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.
+        </div>
+        <div class="form-row">
+          <input
+            type="checkbox"
+            id="show-locks-in-rooms"
+            ${showLocksInRooms ? 'checked' : ''}
+          />
+          <label for="show-locks-in-rooms">Schlösser in Raum-Ansichten anzeigen</label>
+        </div>
+        <div class="description">
+          Zeigt Schlösser (z.B. Nuki) in den jeweiligen Raum-Ansichten an. Schlösser erscheinen unabhängig davon immer in der Sicherheits-Übersicht.
         </div>
       </div>
 
@@ -332,7 +343,8 @@ export function renderAreaEntitiesHTML(areaId, groupedEntities, hiddenEntities, 
     { key: 'scenes', label: 'Szenen', icon: 'mdi:palette' },
     { key: 'vacuum', label: 'Staubsauger', icon: 'mdi:robot-vacuum' },
     { key: 'fan', label: 'Ventilatoren', icon: 'mdi:fan' },
-    { key: 'switches', label: 'Schalter', icon: 'mdi:light-switch' }
+    { key: 'switches', label: 'Schalter', icon: 'mdi:light-switch' },
+    { key: 'locks', label: 'Schlösser', icon: 'mdi:lock' }
   ];
 
   let html = '<div class="entity-groups">';
