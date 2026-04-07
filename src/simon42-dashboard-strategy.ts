@@ -1,43 +1,60 @@
 // ====================================================================
 // SIMON42 DASHBOARD STRATEGY — Main Entry Point
 // ====================================================================
-// TypeScript rewrite with Webpack bundling for performance + type safety.
-// Single bundled output file replaces 14+ ES module HTTP requests.
+// Minimal entry point for fast custom element registration.
+// Cards, views, and heavy dependencies are lazy-loaded in generate().
+// This ensures customElements.define() runs before HA's 5s timeout.
 // ====================================================================
 
 import type { HomeAssistant } from './types/homeassistant';
 import type { Simon42StrategyConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
-import { getVisibleAreasFromHass } from './utils/name-utils';
-import { createUtilityViews, createAreaViews } from './utils/view-builder';
-import { Registry } from './Registry';
-import { timeStart, timeEnd, debugLog } from './utils/debug';
-
-// Import custom cards (side-effect: registers custom elements)
-import './cards/SummaryCard';
-import './cards/LightsGroupCard';
-import './cards/CoversGroupCard';
-
-// Import view strategies (side-effect: registers custom elements)
-import './views/OverviewViewStrategy';
-import './views/LightsViewStrategy';
-import './views/CoversViewStrategy';
-import './views/SecurityViewStrategy';
-import './views/BatteriesViewStrategy';
-import './views/RoomViewStrategy';
 
 const STRATEGY_VERSION = '1.2.0-beta.2';
+
+// Track whether lazy modules have been loaded (only once)
+let modulesLoaded = false;
+
+async function ensureModulesLoaded(): Promise<void> {
+  if (modulesLoaded) return;
+
+  // Load all cards, views, and heavy dependencies in parallel.
+  // Webpack automatically creates separate chunks for these dynamic imports.
+  await Promise.all([
+    // Custom cards (side-effect: registers custom elements)
+    import('./cards/SummaryCard'),
+    import('./cards/LightsGroupCard'),
+    import('./cards/CoversGroupCard'),
+    // View strategies (side-effect: registers custom elements)
+    import('./views/OverviewViewStrategy'),
+    import('./views/LightsViewStrategy'),
+    import('./views/CoversViewStrategy'),
+    import('./views/SecurityViewStrategy'),
+    import('./views/BatteriesViewStrategy'),
+    import('./views/RoomViewStrategy'),
+  ]);
+
+  modulesLoaded = true;
+}
 
 class Simon42DashboardStrategy extends HTMLElement {
   static async generate(
     config: Simon42StrategyConfig,
     hass: HomeAssistant
   ): Promise<LovelaceConfig> {
+    // Lazy-load cards, views, and dependencies on first generate() call
+    await ensureModulesLoaded();
+
+    // These imports are now available (loaded above)
+    const { Registry } = await import('./Registry');
+    const { getVisibleAreasFromHass } = await import('./utils/name-utils');
+    const { createUtilityViews, createAreaViews } = await import('./utils/view-builder');
+    const { timeStart, timeEnd, debugLog } = await import('./utils/debug');
+
     timeStart('strategy-generate');
 
     // Initialize Registry BEFORE returning views — ensures it's ready when
     // view strategies and custom cards start receiving hass updates.
-    // This is idempotent; subsequent calls in view strategies are no-ops.
     Registry.initialize(hass, config);
 
     // Read areas synchronously from hass (no WebSocket needed)
@@ -91,7 +108,8 @@ class Simon42DashboardStrategy extends HTMLElement {
   }
 }
 
-// Register strategy custom element
+// Register strategy custom element IMMEDIATELY — no heavy imports needed.
+// This ensures HA's 5-second timeout is satisfied even on slow networks.
 customElements.define('ll-strategy-simon42-dashboard', Simon42DashboardStrategy);
 
 console.log(`Simon42 Dashboard Strategy v${STRATEGY_VERSION} loaded`);

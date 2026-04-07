@@ -26,6 +26,46 @@ const config: webpack.Configuration = {
       },
     ],
   },
+  optimization: {
+    splitChunks: {
+      // Chunk architecture:
+      //   main (entry)  → tiny, registers custom element instantly
+      //   lit           → Lit framework, shared by core + views + editor
+      //   core          → Registry, Utils, OverviewViewStrategy, Cards (home screen)
+      //   views         → LightsView, CoversView, SecurityView, BatteriesView, RoomView
+      //   editor        → StrategyEditor + js-yaml (on-demand only)
+      cacheGroups: {
+        lit: {
+          test: /[\\/]node_modules[\\/](?:lit|@lit|lit-html|lit-element)[\\/]/,
+          name: 'lit',
+          chunks: 'async',
+          enforce: true,
+          priority: 20,
+        },
+        core: {
+          test: /[\\/]src[\\/](?:Registry|utils|sections|cards|views[\\/]OverviewViewStrategy)/,
+          name: 'core',
+          chunks: 'async',
+          enforce: true,
+          priority: 10,
+        },
+        views: {
+          test: /[\\/]src[\\/]views[\\/](?!OverviewViewStrategy)/,
+          name: 'views',
+          chunks: 'async',
+          enforce: true,
+          priority: 10,
+        },
+        editor: {
+          test: /[\\/](?:src[\\/]editor|node_modules[\\/]js-yaml)[\\/]/,
+          name: 'editor',
+          chunks: 'async',
+          enforce: true,
+          priority: 15,
+        },
+      },
+    },
+  },
   plugins: [
     new CompressionPlugin({
       algorithm: 'gzip',
