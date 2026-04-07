@@ -8,6 +8,9 @@ import { Registry } from '../Registry';
 
 class Simon42ViewBatteriesStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
+    // Ensure Registry is initialized (idempotent — no-op if already done)
+    await Registry.initialize(hass, config.config || {});
+
     // Use pre-filtered visible entity IDs from Registry (no hidden/disabled/excluded)
     const sensorIds = Registry.getVisibleEntityIdsForDomain('sensor');
     const binarySensorIds = Registry.getVisibleEntityIdsForDomain('binary_sensor');

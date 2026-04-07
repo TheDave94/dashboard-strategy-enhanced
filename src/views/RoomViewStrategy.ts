@@ -15,6 +15,9 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     const area: AreaRegistryEntry = config.area;
     timeStart(`room-generate-${area.area_id}`);
     const dashboardConfig = config.dashboardConfig || {};
+
+    // Ensure Registry is initialized (idempotent — no-op if already done)
+    await Registry.initialize(hass, dashboardConfig);
     const groupsOptions: Record<string, any> = config.groups_options || {};
 
     const roomEntities: RoomEntities = {

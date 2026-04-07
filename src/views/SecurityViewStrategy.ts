@@ -8,6 +8,9 @@ import { Registry } from '../Registry';
 
 class Simon42ViewSecurityStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
+    // Ensure Registry is initialized (idempotent — no-op if already done)
+    await Registry.initialize(hass, config.config || {});
+
     // Use pre-filtered visible entities from Registry
     // Covers lock, cover, binary_sensor domains across all areas
     const allVisibleByDomain = (domain: string) => Registry.getVisibleEntityIdsForDomain(domain);

@@ -154,6 +154,18 @@ export function getVisibleAreas(
 }
 
 /**
+ * Like getVisibleAreas but reads from hass.areas (synchronous Record)
+ * instead of Registry.areas (requires WebSocket init).
+ * Used by the dashboard entry point to avoid blocking on Registry.
+ */
+export function getVisibleAreasFromHass(
+  hass: HomeAssistant,
+  displayConfig?: AreasDisplay,
+): AreaRegistryEntry[] {
+  return getVisibleAreas(Object.values(hass.areas), displayConfig);
+}
+
+/**
  * Checks whether an entity should be excluded from the dashboard based on
  * its registry flags: hidden, hidden_by, disabled_by, or entity_category.
  *

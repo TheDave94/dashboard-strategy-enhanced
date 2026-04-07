@@ -87,17 +87,30 @@ class Registry {
   /** Initialization flag */
   private static _initialized: boolean = false;
 
+  /** Deduplication promise for concurrent initialize() calls */
+  private static _initPromise: Promise<void> | null = null;
+
   // =====================================================================
   // Initialization
   // =====================================================================
 
   /**
    * Initialize the registry from HA data and strategy config.
-   * Fetches full registry data via WebSocket (like Mushroom Strategy),
-   * then builds pre-computed lookup maps and exclusion sets.
-   * Must be called once before accessing any other Registry members.
+   * Idempotent: skips if already initialized, deduplicates concurrent calls.
    */
   static async initialize(hass: HomeAssistant, config: Simon42StrategyConfig): Promise<void> {
+    if (Registry._initialized) return;
+    if (Registry._initPromise) return Registry._initPromise;
+
+    Registry._initPromise = Registry._doInitialize(hass, config);
+    try {
+      await Registry._initPromise;
+    } finally {
+      Registry._initPromise = null;
+    }
+  }
+
+  private static async _doInitialize(hass: HomeAssistant, config: Simon42StrategyConfig): Promise<void> {
     timeStart('registry-init');
     Registry._hass = hass;
     Registry._config = config;

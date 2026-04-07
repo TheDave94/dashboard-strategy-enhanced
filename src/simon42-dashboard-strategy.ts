@@ -7,15 +7,9 @@
 
 import type { HomeAssistant } from './types/homeassistant';
 import type { Simon42StrategyConfig } from './types/strategy';
-import type { LovelaceConfig, LovelaceViewConfig, LovelaceSectionConfig } from './types/lovelace';
-import { Registry } from './Registry';
-import { collectPersons, findWeatherEntity, findDummySensor } from './utils/entity-filter';
-import { getVisibleAreas } from './utils/name-utils';
-import { createPersonBadges } from './utils/badge-builder';
-import { createOverviewSection } from './sections/OverviewSection';
-import { createAreasSection } from './sections/AreasSection';
-import { createWeatherEnergySection } from './sections/WeatherEnergySection';
-import { createOverviewView, createUtilityViews, createAreaViews } from './utils/view-builder';
+import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
+import { getVisibleAreasFromHass } from './utils/name-utils';
+import { createUtilityViews, createAreaViews } from './utils/view-builder';
 import { timeStart, timeEnd, debugLog } from './utils/debug';
 
 // Import custom cards (side-effect: registers custom elements)
@@ -24,6 +18,7 @@ import './cards/LightsGroupCard';
 import './cards/CoversGroupCard';
 
 // Import view strategies (side-effect: registers custom elements)
+import './views/OverviewViewStrategy';
 import './views/LightsViewStrategy';
 import './views/CoversViewStrategy';
 import './views/SecurityViewStrategy';
@@ -39,46 +34,24 @@ class Simon42DashboardStrategy extends HTMLElement {
   ): Promise<LovelaceConfig> {
     timeStart('strategy-generate');
 
-    // Initialize Registry — fetches registries via WebSocket, builds Maps/Sets
-    await Registry.initialize(hass, config);
+    // Read areas synchronously from hass (no WebSocket needed)
+    const visibleAreas = getVisibleAreasFromHass(hass, config.areas_display);
 
-    timeStart('strategy-build-views');
-    // Visible areas (filtered + sorted by config)
-    const visibleAreas = getVisibleAreas(Registry.areas, config.areas_display);
-
-    // Collect data for overview (only what generate() needs — summary cards are self-reactive)
-    const persons = collectPersons(hass, config);
-    const weatherEntity = findWeatherEntity(hass);
-    const someSensorId = findDummySensor(hass);
-
-    // Person badges
-    const personBadges = createPersonBadges(persons, hass);
-
-    // Config flags
-    const showWeather = config.show_weather !== false;
-    const showEnergy = config.show_energy !== false;
-    const showSearchCard = config.show_search_card === true;
     const showSummaryViews = config.show_summary_views === true;
     const showRoomViews = config.show_room_views === true;
-    const groupByFloors = config.group_by_floors === true;
 
-    // Build sections
-    const areasSections = createAreasSection(visibleAreas, groupByFloors, hass);
-    const weatherEnergySection = createWeatherEnergySection(
-      weatherEntity ?? null, showWeather, showEnergy, groupByFloors
-    );
-
-    const overviewSections: LovelaceSectionConfig[] = [
-      createOverviewSection({ someSensorId, showSearchCard, config, hass }),
-      ...(Array.isArray(areasSections) ? areasSections : [areasSections]),
-      ...(weatherEnergySection
-        ? (Array.isArray(weatherEnergySection) ? weatherEnergySection : [weatherEnergySection])
-        : [])
-    ];
-
-    // Build all views
+    // Return lightweight view stubs — HA resolves all view strategies
+    // concurrently via Promise.all, enabling progressive rendering
     const views: LovelaceViewConfig[] = [
-      createOverviewView(overviewSections, personBadges),
+      {
+        title: 'Übersicht',
+        path: 'home',
+        icon: 'mdi:home',
+        strategy: {
+          type: 'custom:simon42-view-overview',
+          dashboardConfig: config,
+        },
+      },
       ...createUtilityViews(showSummaryViews, config),
       ...createAreaViews(visibleAreas, showRoomViews, config.areas_options || {}, config),
     ];
@@ -96,8 +69,7 @@ class Simon42DashboardStrategy extends HTMLElement {
       }
     }
 
-    timeEnd('strategy-build-views');
-    debugLog(`Generated ${views.length} views for ${visibleAreas.length} areas`);
+    debugLog(`Generated ${views.length} view stubs for ${visibleAreas.length} areas`);
     timeEnd('strategy-generate');
 
     return {
