@@ -36,6 +36,17 @@ class Registry {
   private static _hass: HomeAssistant;
   private static _config: Simon42StrategyConfig;
 
+  // === Fetched registry arrays (from WebSocket) ===
+
+  /** Full entity registry entries fetched via callWS */
+  private static _fetchedEntities: EntityRegistryDisplayEntry[];
+
+  /** Full device registry entries fetched via callWS */
+  private static _fetchedDevices: DeviceRegistryEntry[];
+
+  /** Full area registry entries fetched via callWS */
+  private static _fetchedAreas: AreaRegistryEntry[];
+
   // === Pre-computed Maps for O(1) lookups ===
 
   /** Entity registry entry by entity_id */
@@ -70,13 +81,18 @@ class Registry {
 
   /**
    * Initialize the registry from HA data and strategy config.
-   * Builds all lookup maps and exclusion sets. Must be called once
-   * before accessing any other Registry members.
+   * Fetches full registry data via WebSocket (like Mushroom Strategy),
+   * then builds pre-computed lookup maps and exclusion sets.
+   * Must be called once before accessing any other Registry members.
    */
-  static initialize(hass: HomeAssistant, config: Simon42StrategyConfig): void {
+  static async initialize(hass: HomeAssistant, config: Simon42StrategyConfig): Promise<void> {
     Registry._hass = hass;
     Registry._config = config;
 
+    // Fetch full registries via WebSocket API (official HA approach)
+    await Registry._fetchRegistries();
+
+    // Build pre-computed Maps/Sets for O(1) lookups
     Registry._buildEntityMaps();
     Registry._buildDeviceMaps();
     Registry._buildExclusionSets();
@@ -85,11 +101,46 @@ class Registry {
   }
 
   // =====================================================================
+  // WebSocket registry fetch (like Mushroom Strategy)
+  // =====================================================================
+
+  /**
+   * Fetch entity, device, and area registries from HA via WebSocket API.
+   * This is the official approach used by Mushroom Strategy and HA frontend.
+   * Falls back to hass object properties if WebSocket calls fail.
+   */
+  private static async _fetchRegistries(): Promise<void> {
+    try {
+      [Registry._fetchedEntities, Registry._fetchedDevices, Registry._fetchedAreas] =
+        await Promise.all([
+          Registry._hass.callWS<EntityRegistryDisplayEntry[]>({
+            type: 'config/entity_registry/list',
+          }),
+          Registry._hass.callWS<DeviceRegistryEntry[]>({
+            type: 'config/device_registry/list',
+          }),
+          Registry._hass.callWS<AreaRegistryEntry[]>({
+            type: 'config/area_registry/list',
+          }),
+        ]);
+    } catch (e) {
+      console.warn(
+        'Simon42 Strategy: WebSocket registry fetch failed, falling back to hass objects',
+        e
+      );
+      // Fallback to hass object properties (pre-loaded by HA frontend)
+      Registry._fetchedEntities = Object.values(Registry._hass.entities || {});
+      Registry._fetchedDevices = Object.values(Registry._hass.devices || {});
+      Registry._fetchedAreas = Object.values(Registry._hass.areas || {});
+    }
+  }
+
+  // =====================================================================
   // Map building (private)
   // =====================================================================
 
   /**
-   * Build entity lookup maps from hass.entities and hass.states.
+   * Build entity lookup maps from fetched registry data and hass.states.
    *
    * - _entityById: O(1) lookup by entity_id
    * - _entitiesByDomain: entity IDs grouped by domain (from hass.states keys)
@@ -97,7 +148,7 @@ class Registry {
    * - _entitiesByArea: entity entries grouped by resolved area_id
    */
   private static _buildEntityMaps(): void {
-    const entities = Object.values(Registry._hass.entities || {});
+    const entities = Registry._fetchedEntities;
 
     // Entity by ID
     Registry._entityById = new Map();
@@ -129,9 +180,8 @@ class Registry {
 
     // Entities by area (resolving device->area for entities without direct area_id)
     Registry._entitiesByArea = new Map();
-    const devices = Object.values(Registry._hass.devices || {});
     const deviceAreaMap = new Map<string, string>();
-    for (const d of devices) {
+    for (const d of Registry._fetchedDevices) {
       if (d.area_id) deviceAreaMap.set(d.id, d.area_id);
     }
 
@@ -147,11 +197,10 @@ class Registry {
     }
   }
 
-  /** Build device lookup map from hass.devices. */
+  /** Build device lookup map from fetched device registry. */
   private static _buildDeviceMaps(): void {
-    const devices = Object.values(Registry._hass.devices || {});
     Registry._deviceById = new Map();
-    for (const d of devices) {
+    for (const d of Registry._fetchedDevices) {
       Registry._deviceById.set(d.id, d);
     }
   }
@@ -166,7 +215,7 @@ class Registry {
   private static _buildExclusionSets(): void {
     // no_dboard label exclusion
     Registry._excludeSet = new Set();
-    for (const e of Object.values(Registry._hass.entities || {})) {
+    for (const e of Registry._fetchedEntities) {
       if (e.labels?.includes('no_dboard')) {
         Registry._excludeSet.add(e.entity_id);
       }
@@ -250,12 +299,12 @@ class Registry {
   // Area / Floor accessors
   // =====================================================================
 
-  /** All area registry entries. */
+  /** All area registry entries (from WebSocket fetch). */
   static get areas(): AreaRegistryEntry[] {
-    return Object.values(Registry._hass.areas || {});
+    return Registry._fetchedAreas || [];
   }
 
-  /** All floor registry entries. */
+  /** All floor registry entries (from hass — no WS endpoint needed). */
   static get floors(): FloorRegistryEntry[] {
     return Object.values(Registry._hass.floors || {});
   }

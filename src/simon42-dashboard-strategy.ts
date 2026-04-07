@@ -36,8 +36,8 @@ class Simon42DashboardStrategy extends HTMLElement {
     config: Simon42StrategyConfig,
     hass: HomeAssistant
   ): Promise<LovelaceConfig> {
-    // Initialize Registry — builds all Maps and Sets once
-    Registry.initialize(hass, config);
+    // Initialize Registry — fetches registries via WebSocket, builds Maps/Sets
+    await Registry.initialize(hass, config);
 
     const entities = Object.values(hass.entities || {});
     const devices = Object.values(hass.devices || {});
