@@ -3,7 +3,6 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { EntityRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
 
 declare global {
@@ -14,7 +13,6 @@ declare global {
 }
 
 interface LightsGroupConfig {
-  entities: EntityRegistryEntry[];
   config?: any;
   group_type: 'on' | 'off';
 }
@@ -22,16 +20,13 @@ interface LightsGroupConfig {
 class Simon42LightsGroupCard extends HTMLElement {
   private _hass: HomeAssistant | null = null;
   private _config!: LightsGroupConfig;
-  private _entities!: EntityRegistryEntry[];
   private _cachedFilteredIds: Set<string> | null = null;
   private _lastLightsList = '';
   private _card: any = null;
 
   setConfig(config: LightsGroupConfig): void {
-    if (!config.entities) throw new Error('You need to define entities');
     if (!config.group_type) throw new Error('You need to define group_type (on/off)');
     this._config = config;
-    this._entities = config.entities;
   }
 
   set hass(hass: HomeAssistant) {
@@ -70,17 +65,9 @@ class Simon42LightsGroupCard extends HTMLElement {
 
   private _getFilteredLightEntities(): string[] {
     if (!this._hass) return [];
-    return this._entities
-      .filter(e => {
-        const id = e.entity_id;
-        if (!id.startsWith('light.')) return false;
-        if (this._hass!.states[id] === undefined) return false;
-        // Single Registry call: no_dboard + config hidden + hidden_by +
-        // disabled_by + entity_category
-        if (Registry.isEntityExcluded(id)) return false;
-        return true;
-      })
-      .map(e => e.entity_id);
+    // Use pre-filtered Registry data: already excludes hidden/disabled/labeled entities
+    return Registry.getVisibleEntityIdsForDomain('light')
+      .filter(id => this._hass!.states[id] !== undefined);
   }
 
   private _getRelevantLights(): string[] {

@@ -7,8 +7,6 @@
 // ====================================================================
 
 import type {
-  EntityRegistryEntry,
-  DeviceRegistryEntry,
   AreaRegistryEntry,
 } from '../types/registries';
 import type { Simon42StrategyConfig } from '../types/strategy';
@@ -56,7 +54,6 @@ export function createOverviewView(
  * (hidden from the navigation bar).
  */
 export function createUtilityViews(
-  entities: EntityRegistryEntry[],
   showSummaryViews: boolean = false,
   config: Simon42StrategyConfig = {},
 ): LovelaceViewConfig[] {
@@ -66,11 +63,7 @@ export function createUtilityViews(
       path: 'lights',
       icon: 'mdi:lamps',
       subview: !showSummaryViews,
-      strategy: {
-        type: 'custom:simon42-view-lights',
-        entities,
-        config,
-      },
+      strategy: { type: 'custom:simon42-view-lights', config },
     },
     {
       title: 'Rollos & Vorhänge',
@@ -79,7 +72,6 @@ export function createUtilityViews(
       subview: !showSummaryViews,
       strategy: {
         type: 'custom:simon42-view-covers',
-        entities,
         device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
         config,
       },
@@ -89,22 +81,14 @@ export function createUtilityViews(
       path: 'security',
       icon: 'mdi:security',
       subview: !showSummaryViews,
-      strategy: {
-        type: 'custom:simon42-view-security',
-        entities,
-        config,
-      },
+      strategy: { type: 'custom:simon42-view-security', config },
     },
     {
       title: 'Batterien',
       path: 'batteries',
       icon: 'mdi:battery-alert',
       subview: !showSummaryViews,
-      strategy: {
-        type: 'custom:simon42-view-batteries',
-        entities,
-        config,
-      },
+      strategy: { type: 'custom:simon42-view-batteries', config },
     },
   ];
 }
@@ -119,8 +103,6 @@ export function createUtilityViews(
  */
 export function createAreaViews(
   visibleAreas: AreaRegistryEntry[],
-  devices: DeviceRegistryEntry[],
-  entities: EntityRegistryEntry[],
   showRoomViews: boolean = false,
   areasOptions: Record<string, { groups_options?: Record<string, any> }> = {},
   dashboardConfig: Simon42StrategyConfig = {},
@@ -136,8 +118,6 @@ export function createAreaViews(
       strategy: {
         type: 'custom:simon42-view-room',
         area,
-        devices,
-        entities,
         groups_options: areaOptions.groups_options || {},
         dashboardConfig,
       },

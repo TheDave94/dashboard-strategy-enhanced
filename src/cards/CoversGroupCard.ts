@@ -3,7 +3,6 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { EntityRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
 
 declare global {
@@ -13,7 +12,6 @@ declare global {
 }
 
 interface CoversGroupConfig {
-  entities: EntityRegistryEntry[];
   config?: any;
   group_type: 'open' | 'closed';
   device_classes?: string[];
@@ -34,16 +32,13 @@ const DEFAULT_DEVICE_CLASSES = ['awning', 'blind', 'curtain', 'shade', 'shutter'
 class Simon42CoversGroupCard extends HTMLElement {
   private _hass: HomeAssistant | null = null;
   private _config!: CoversGroupConfig;
-  private _entities!: EntityRegistryEntry[];
   private _deviceClasses!: string[];
   private _cachedFilteredIds: Set<string> | null = null;
   private _lastCoversList = '';
 
   setConfig(config: CoversGroupConfig): void {
-    if (!config.entities) throw new Error('You need to define entities');
     if (!config.group_type) throw new Error('You need to define group_type (open/closed)');
     this._config = config;
-    this._entities = config.entities;
     this._deviceClasses = config.device_classes || DEFAULT_DEVICE_CLASSES;
   }
 
@@ -100,21 +95,13 @@ class Simon42CoversGroupCard extends HTMLElement {
 
   private _getFilteredCoverEntities(): string[] {
     if (!this._hass) return [];
-    return this._entities
-      .filter(e => {
-        const id = e.entity_id;
-        if (!id.startsWith('cover.')) return false;
-        if (this._hass!.states[id] === undefined) return false;
-        // Single Registry call: no_dboard + config hidden + hidden_by +
-        // disabled_by + entity_category
-        if (Registry.isEntityExcluded(id)) return false;
-        return true;
-      })
-      .map(e => e.entity_id)
-      .filter(entityId => {
-        // Domain-specific: device_class filter for cover types
-        const state = this._hass!.states[entityId];
-        const deviceClass = (state?.attributes as any)?.device_class as string | undefined;
+    // Use pre-filtered Registry data: already excludes hidden/disabled/labeled entities
+    return Registry.getVisibleEntityIdsForDomain('cover')
+      .filter(id => {
+        const state = this._hass!.states[id];
+        if (!state) return false;
+        // Device class filter for cover types (awning, blind, curtain, etc.)
+        const deviceClass = (state.attributes as any)?.device_class as string | undefined;
         return this._deviceClasses.includes(deviceClass!) || !deviceClass;
       });
   }

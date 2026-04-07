@@ -39,8 +39,6 @@ class Simon42DashboardStrategy extends HTMLElement {
     // Initialize Registry — fetches registries via WebSocket, builds Maps/Sets
     await Registry.initialize(hass, config);
 
-    const entities = Object.values(hass.entities || {});
-    const devices = Object.values(hass.devices || {});
 
     // Visible areas (filtered + sorted by config)
     const visibleAreas = getVisibleAreas(Registry.areas, config.areas_display);
@@ -78,8 +76,8 @@ class Simon42DashboardStrategy extends HTMLElement {
     // Build all views
     const views: LovelaceViewConfig[] = [
       createOverviewView(overviewSections, personBadges),
-      ...createUtilityViews(entities, showSummaryViews, config),
-      ...createAreaViews(visibleAreas, devices, entities, showRoomViews, config.areas_options || {}, config),
+      ...createUtilityViews(showSummaryViews, config),
+      ...createAreaViews(visibleAreas, showRoomViews, config.areas_options || {}, config),
     ];
 
     // Custom Views (user-defined YAML views)

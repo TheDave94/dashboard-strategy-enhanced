@@ -4,7 +4,7 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceCardConfig, LovelaceSectionConfig, LovelaceBadgeConfig } from '../types/lovelace';
-import type { EntityRegistryEntry, DeviceRegistryEntry, AreaRegistryEntry } from '../types/registries';
+import type { AreaRegistryEntry } from '../types/registries';
 import type { RoomEntities, SensorEntities } from '../types/strategy';
 import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
@@ -12,33 +12,8 @@ import { Registry } from '../Registry';
 class Simon42ViewRoomStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
     const area: AreaRegistryEntry = config.area;
-    const devices: DeviceRegistryEntry[] = config.devices;
-    const entities: EntityRegistryEntry[] = config.entities;
     const dashboardConfig = config.dashboardConfig || {};
     const groupsOptions: Record<string, any> = config.groups_options || {};
-
-    // Area devices for O(1) lookup
-    const areaDevices = new Set<string>();
-    for (const device of devices) {
-      if (device.area_id === area.area_id) areaDevices.add(device.id);
-    }
-
-    // Entity ID → Entity map for O(1) lookup
-    const entityIdMap = new Map<string, EntityRegistryEntry>();
-    for (const e of entities) entityIdMap.set(e.entity_id, e);
-
-    // Device ID → Device map for O(1) lookup
-    const deviceIdMap = new Map<string, DeviceRegistryEntry>();
-    for (const d of devices) deviceIdMap.set(d.id, d);
-
-    // Device ID → Entity IDs (for Reolink camera grouping)
-    const entityDeviceMap = new Map<string, string[]>();
-    for (const entity of entities) {
-      if (entity.device_id) {
-        if (!entityDeviceMap.has(entity.device_id)) entityDeviceMap.set(entity.device_id, []);
-        entityDeviceMap.get(entity.device_id)!.push(entity.entity_id);
-      }
-    }
 
     const roomEntities: RoomEntities = {
       lights: [], covers: [], covers_curtain: [], scenes: [], climate: [],
@@ -161,12 +136,12 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       const cameraCards: LovelaceCardConfig[] = [];
       for (const cameraId of roomEntities.cameras) {
         if (!hass.states[cameraId]) continue;
-        const camEntity = entityIdMap.get(cameraId);
+        const camEntity = Registry.getEntity(cameraId);
         const deviceId = camEntity?.device_id;
 
         let isReolink = false;
         if (deviceId) {
-          const device = deviceIdMap.get(deviceId);
+          const device = Registry.getDevice(deviceId);
           if (device) {
             const mfr = (device.manufacturer || '').toLowerCase();
             const model = (device.model || '').toLowerCase();
@@ -175,7 +150,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         }
 
         if (isReolink && deviceId) {
-          const devEntities = entityDeviceMap.get(deviceId) || [];
+          const devEntities = Registry.getEntityIdsForDevice(deviceId);
           const spotlight = devEntities.find(id => id.startsWith('light.') && hass.states[id] && !Registry.isEntityExcluded(id));
           const motion = devEntities.find(id => id.startsWith('binary_sensor.') && hass.states[id]?.attributes?.device_class === 'motion' && !Registry.isEntityExcluded(id));
           const siren = devEntities.find(id => id.startsWith('siren.') && hass.states[id] && !Registry.isEntityExcluded(id));
@@ -251,10 +226,13 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     // Room Pins
     const roomPinEntities: string[] = dashboardConfig.room_pin_entities || [];
     const pinsForArea = roomPinEntities.filter(entityId => {
-      const entity = entityIdMap.get(entityId);
+      const entity = Registry.getEntity(entityId);
       if (!entity) return false;
       if (entity.area_id === area.area_id) return true;
-      if (entity.device_id && areaDevices.has(entity.device_id)) return true;
+      if (entity.device_id) {
+        const device = Registry.getDevice(entity.device_id);
+        if (device?.area_id === area.area_id) return true;
+      }
       return false;
     });
 

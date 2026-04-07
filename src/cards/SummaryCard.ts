@@ -57,18 +57,14 @@ class Simon42SummaryCard extends HTMLElement {
     const oldHass = this._hass;
     this._hass = hass;
 
-    // Invalidate caches when entity registry changes
+    // Invalidate entity set cache only when registry changes (entities added/removed).
+    // State changes don't affect WHICH entities are relevant — only the count changes.
     if (!oldHass || oldHass.entities !== hass.entities) {
       this._relevantEntityIds = null;
       this._dummyEntity = null;
     }
 
-    // Rebuild relevant entity set when states object reference changes
-    if (!oldHass || oldHass.states !== hass.states) {
-      this._relevantEntityIds = null;
-    }
-
-    // Recalculate count
+    // Recalculate count (uses cached entity set, just recounts based on current states)
     const newCount = this._calculateCount();
 
     // Only render when count changed or first render
