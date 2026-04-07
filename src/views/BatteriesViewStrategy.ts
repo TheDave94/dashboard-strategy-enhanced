@@ -9,16 +9,24 @@ import { Registry } from '../Registry';
 class Simon42ViewBatteriesStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
     // Ensure Registry is initialized (idempotent — no-op if already done)
-    await Registry.initialize(hass, config.config || {});
+    Registry.initialize(hass, config.config || {});
 
-    // Use pre-filtered visible entity IDs from Registry (no hidden/disabled/excluded)
-    const sensorIds = Registry.getVisibleEntityIdsForDomain('sensor');
-    const binarySensorIds = Registry.getVisibleEntityIdsForDomain('binary_sensor');
+    // Use raw (unfiltered) domain maps — battery sensors are often entity_category
+    // "diagnostic" which getVisibleEntityIdsForDomain() would exclude.
+    // We still filter out no_dboard and config-hidden below.
+    const sensorIds = Registry.getEntityIdsForDomain('sensor');
+    const binarySensorIds = Registry.getEntityIdsForDomain('binary_sensor');
 
-    // Filter battery entities from pre-filtered sets
+    // Filter battery entities — exclude hidden/no_dboard but keep diagnostic
     const batteryEntities = [...sensorIds, ...binarySensorIds].filter(entityId => {
       const state = hass.states[entityId];
       if (!state) return false;
+
+      // Exclude hidden and no_dboard entities (but NOT diagnostic — batteries are often diagnostic)
+      if (Registry.isExcludedByLabel(entityId)) return false;
+      if (Registry.isHiddenByConfig(entityId)) return false;
+      const entry = Registry.getEntity(entityId);
+      if (entry?.hidden) return false;
 
       const isBattery = entityId.includes('battery') || state.attributes?.device_class === 'battery';
       if (!isBattery) return false;

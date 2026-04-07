@@ -2,33 +2,26 @@
 // Registry Entry Types for Home Assistant
 // ====================================================================
 // Typed representations of HA's entity, device, area, and floor registries.
-// Based on home-assistant/frontend source via mushroom-strategy reference.
+// Matches the shape of hass.entities, hass.devices, hass.areas, hass.floors.
 // ====================================================================
 
-// -- Entity Registry --------------------------------------------------
+// -- Entity Registry (from hass.entities) -----------------------------
 
 export type EntityCategory = 'config' | 'diagnostic';
 
 export interface EntityRegistryEntry {
-  id: string;
   entity_id: string;
-  unique_id: string;
   name?: string | null;
   icon?: string | null;
   device_id?: string | null;
   area_id?: string | null;
-  config_entry_id?: string | null;
   labels: string[];
   hidden?: boolean;
-  hidden_by?: 'user' | 'integration' | null;
-  disabled_by?: 'user' | 'device' | 'integration' | 'config_entry' | null;
   entity_category?: EntityCategory | null;
   platform?: string;
   has_entity_name?: boolean;
   display_precision?: number;
   translation_key?: string | null;
-  original_name?: string | null;
-  categories: Record<string, string>;
 }
 
 // -- Device Registry --------------------------------------------------

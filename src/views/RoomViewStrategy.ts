@@ -17,7 +17,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     const dashboardConfig = config.dashboardConfig || {};
 
     // Ensure Registry is initialized (idempotent — no-op if already done)
-    await Registry.initialize(hass, dashboardConfig);
+    Registry.initialize(hass, dashboardConfig);
     const groupsOptions: Record<string, any> = config.groups_options || {};
 
     const roomEntities: RoomEntities = {
@@ -31,7 +31,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     };
 
     // Main categorization loop — use pre-filtered visible entities from Registry
-    // (no hidden_by, disabled_by, no_dboard, config/diagnostic, config-hidden)
+    // (no hidden, no_dboard, config/diagnostic, config-hidden)
     const visibleEntities = Registry.getVisibleEntitiesForArea(area.area_id);
 
     for (const entity of visibleEntities) {

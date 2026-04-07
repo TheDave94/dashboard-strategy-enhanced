@@ -25,8 +25,8 @@ import { timeStart, timeEnd, debugLog } from './utils/debug';
  * fast lookups. Must be initialized once via Registry.initialize() before
  * any other access.
  *
- * Design mirrors Mushroom Strategy's Registry pattern: no instance creation,
- * all members are static, all maps are built once on initialize().
+ * Reads directly from hass.entities/devices/areas (synchronous, no WebSocket
+ * calls). All members are static, all maps are built once on initialize().
  */
 class Registry {
   // Prevent instantiation
@@ -37,15 +37,15 @@ class Registry {
   private static _hass: HomeAssistant;
   private static _config: Simon42StrategyConfig;
 
-  // === Fetched registry arrays (from WebSocket) ===
+  // === Registry arrays (from hass object) ===
 
-  /** Full entity registry entries fetched via callWS */
+  /** Entity registry entries from hass.entities */
   private static _fetchedEntities: EntityRegistryEntry[];
 
-  /** Full device registry entries fetched via callWS */
+  /** Device registry entries from hass.devices */
   private static _fetchedDevices: DeviceRegistryEntry[];
 
-  /** Full area registry entries fetched via callWS */
+  /** Area registry entries from hass.areas */
   private static _fetchedAreas: AreaRegistryEntry[];
 
   // === Pre-computed Maps for O(1) lookups ===
@@ -87,76 +87,37 @@ class Registry {
   /** Initialization flag */
   private static _initialized: boolean = false;
 
-  /** Deduplication promise for concurrent initialize() calls */
-  private static _initPromise: Promise<void> | null = null;
-
   // =====================================================================
   // Initialization
   // =====================================================================
 
   /**
-   * Initialize the registry from HA data and strategy config.
-   * Idempotent: skips if already initialized, deduplicates concurrent calls.
+   * Initialize the registry from hass object and strategy config.
+   * Synchronous — reads directly from hass.entities/devices/areas.
+   * Idempotent: skips if already initialized.
    */
-  static async initialize(hass: HomeAssistant, config: Simon42StrategyConfig): Promise<void> {
+  static initialize(hass: HomeAssistant, config: Simon42StrategyConfig): void {
     if (Registry._initialized) return;
-    if (Registry._initPromise) return Registry._initPromise;
 
-    Registry._initPromise = Registry._doInitialize(hass, config);
-    try {
-      await Registry._initPromise;
-    } finally {
-      Registry._initPromise = null;
-    }
-  }
-
-  private static async _doInitialize(hass: HomeAssistant, config: Simon42StrategyConfig): Promise<void> {
     timeStart('registry-init');
     Registry._hass = hass;
     Registry._config = config;
 
-    // Fetch full registries via WebSocket API (official HA approach)
-    timeStart('registry-fetch-ws');
-    await Registry._fetchRegistries();
-    timeEnd('registry-fetch-ws');
+    // Read registries from hass object (synchronous, no WebSocket)
+    Registry._fetchedEntities = Object.values(hass.entities);
+    Registry._fetchedDevices = Object.values(hass.devices);
+    Registry._fetchedAreas = Object.values(hass.areas);
 
     // Build exclusion sets FIRST (needed by entity maps for pre-filtering)
-    timeStart('registry-build-exclusions');
     Registry._buildExclusionSets();
-    timeEnd('registry-build-exclusions');
 
     // Build pre-computed Maps/Sets for O(1) lookups (raw + pre-filtered)
-    timeStart('registry-build-maps');
     Registry._buildDeviceMaps();
     Registry._buildEntityMaps();
-    timeEnd('registry-build-maps');
 
     Registry._initialized = true;
     debugLog(`Registry initialized: ${Registry._fetchedEntities.length} entities, ${Registry._fetchedDevices.length} devices, ${Registry._fetchedAreas.length} areas`);
     timeEnd('registry-init');
-  }
-
-  // =====================================================================
-  // WebSocket registry fetch (like Mushroom Strategy)
-  // =====================================================================
-
-  /**
-   * Fetch entity, device, and area registries from HA via WebSocket API.
-   * This is the official approach used by Mushroom Strategy and HA frontend.
-   */
-  private static async _fetchRegistries(): Promise<void> {
-    [Registry._fetchedEntities, Registry._fetchedDevices, Registry._fetchedAreas] =
-      await Promise.all([
-        Registry._hass.callWS<EntityRegistryEntry[]>({
-          type: 'config/entity_registry/list',
-        }),
-        Registry._hass.callWS<DeviceRegistryEntry[]>({
-          type: 'config/device_registry/list',
-        }),
-        Registry._hass.callWS<AreaRegistryEntry[]>({
-          type: 'config/area_registry/list',
-        }),
-      ]);
   }
 
   // =====================================================================
@@ -172,17 +133,15 @@ class Registry {
    * Combines all exclusion criteria into a single check:
    * - no_dboard label
    * - Config-hidden (areas_options)
-   * - hidden_by (user/integration)
-   * - disabled_by (user/integration)
+   * - hidden (by user/integration)
    * - entity_category config/diagnostic
    *
-   * Note: Does NOT check state attributes — only registry data.
+   * Note: disabled entities are already excluded from hass.entities.
    */
   private static _isEntityVisible(entity: EntityRegistryEntry): boolean {
     if (Registry._excludeSet.has(entity.entity_id)) return false;
     if (Registry._hiddenFromConfig.has(entity.entity_id)) return false;
-    if (entity.hidden_by) return false;
-    if (entity.disabled_by) return false;
+    if (entity.hidden) return false;
     if (entity.entity_category === 'config' || entity.entity_category === 'diagnostic')
       return false;
     return true;
@@ -386,7 +345,7 @@ class Registry {
 
   /**
    * Get visible entity IDs for a domain. O(1).
-   * Pre-filtered: no hidden_by, disabled_by, no_dboard, config/diagnostic, config-hidden.
+   * Pre-filtered: no hidden, no_dboard, config/diagnostic, config-hidden.
    */
   static getVisibleEntityIdsForDomain(domain: string): string[] {
     return Registry._visibleEntitiesByDomain.get(domain) || [];
@@ -394,7 +353,7 @@ class Registry {
 
   /**
    * Get visible entity registry entries for an area. O(1).
-   * Pre-filtered: no hidden_by, disabled_by, no_dboard, config/diagnostic, config-hidden.
+   * Pre-filtered: no hidden, no_dboard, config/diagnostic, config-hidden.
    */
   static getVisibleEntitiesForArea(areaId: string): EntityRegistryEntry[] {
     return Registry._visibleEntitiesByArea.get(areaId) || [];
@@ -421,7 +380,7 @@ class Registry {
   // Area / Floor accessors
   // =====================================================================
 
-  /** All area registry entries (from WebSocket fetch). */
+  /** All area registry entries (from hass.areas). */
   static get areas(): AreaRegistryEntry[] {
     return Registry._fetchedAreas || [];
   }
@@ -448,12 +407,12 @@ class Registry {
   /**
    * Full exclusion check combining all filtering criteria.
    *
-   * Matches the JS data-collectors pipeline:
    * 1. no_dboard label
    * 2. areas_options hidden
-   * 3. hidden_by (user/integration) from entity registry
-   * 4. disabled_by (user/integration) from entity registry
-   * 5. entity_category "config" or "diagnostic" from entity registry
+   * 3. hidden (by user/integration)
+   * 4. entity_category "config" or "diagnostic"
+   *
+   * Note: disabled entities are already excluded from hass.entities.
    */
   static isEntityExcluded(entityId: string): boolean {
     if (Registry._excludeSet.has(entityId)) return true;
@@ -462,8 +421,7 @@ class Registry {
     const entry = Registry._entityById.get(entityId);
     if (!entry) return false; // Entity not in registry — don't exclude
 
-    if (entry.hidden_by) return true;
-    if (entry.disabled_by) return true;
+    if (entry.hidden) return true;
     if (entry.entity_category === 'config' || entry.entity_category === 'diagnostic')
       return true;
 

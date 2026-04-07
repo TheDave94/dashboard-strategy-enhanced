@@ -75,8 +75,8 @@ class Simon42SummaryCard extends HTMLElement {
   }
 
   private _isEntityRelevant(id: string, _state: HassEntity): boolean {
-    // Single Registry call: no_dboard label + config hidden + hidden_by +
-    // disabled_by + entity_category (registry + state attribute fallback)
+    // Single Registry call: no_dboard label + config hidden + hidden +
+    // entity_category (registry + state attribute fallback)
     return !Registry.isEntityExcludedWithStateCategory(id);
   }
 
@@ -137,9 +137,10 @@ class Simon42SummaryCard extends HTMLElement {
       }
 
       case 'batteries': {
-        // Combine sensor + binary_sensor domains from Registry
-        const sensorIds = Registry.getVisibleEntityIdsForDomain('sensor');
-        const bsIds = Registry.getVisibleEntityIdsForDomain('binary_sensor');
+        // Use raw domain maps — battery sensors are often entity_category "diagnostic"
+        // which getVisibleEntityIdsForDomain() would exclude
+        const sensorIds = Registry.getEntityIdsForDomain('sensor');
+        const bsIds = Registry.getEntityIdsForDomain('binary_sensor');
         const allDomainIds = [...sensorIds, ...bsIds];
 
         const batteryEntities = allDomainIds.filter(id => {
@@ -148,9 +149,12 @@ class Simon42SummaryCard extends HTMLElement {
           const isBatterySensor =
             (id.includes('battery') || state.attributes?.device_class === 'battery');
           if (!isBatterySensor) return false;
-          if (!this._isEntityRelevant(id, state)) return false;
-          const registryEntry = hass.entities?.[id];
-          if (this._config.hide_mobile_app_batteries && registryEntry?.platform === 'mobile_app') return false;
+          // Exclude hidden/no_dboard but keep diagnostic (batteries are often diagnostic)
+          if (Registry.isExcludedByLabel(id)) return false;
+          if (Registry.isHiddenByConfig(id)) return false;
+          const entry = Registry.getEntity(id);
+          if (entry?.hidden) return false;
+          if (this._config.hide_mobile_app_batteries && entry?.platform === 'mobile_app') return false;
           return true;
         });
 

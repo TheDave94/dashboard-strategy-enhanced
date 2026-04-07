@@ -167,7 +167,7 @@ export function getVisibleAreasFromHass(
 
 /**
  * Checks whether an entity should be excluded from the dashboard based on
- * its registry flags: hidden, hidden_by, disabled_by, or entity_category.
+ * its registry flags: hidden, entity_category, labels, and config.
  *
  * Delegates to Registry.isEntityExcludedWithStateCategory() which covers
  * all exclusion criteria including state attribute fallback.

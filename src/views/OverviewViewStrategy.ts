@@ -25,7 +25,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     const dashboardConfig: Simon42StrategyConfig = config.dashboardConfig || {};
 
     // Initialize Registry (idempotent — skips if already done by another view)
-    await Registry.initialize(hass, dashboardConfig);
+    Registry.initialize(hass, dashboardConfig);
 
     // Visible areas (filtered + sorted by config)
     const visibleAreas = getVisibleAreas(Registry.areas, dashboardConfig.areas_display);

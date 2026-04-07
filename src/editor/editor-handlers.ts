@@ -513,10 +513,10 @@ export async function getAreaGroupedEntities(
     if (!belongsToArea) continue;
     if (excludeLabels.includes(entity.entity_id)) continue;
     if (!hass.states[entity.entity_id]) continue;
-    if (entity.hidden_by || entity.disabled_by) continue;
+    if (entity.hidden) continue;
 
     const entityRegistry = hass.entities?.[entity.entity_id];
-    if (entityRegistry && (entityRegistry.hidden_by || entityRegistry.disabled_by)) continue;
+    if (entityRegistry?.hidden) continue;
 
     const domain = entity.entity_id.split('.')[0];
     const state = hass.states[entity.entity_id];
