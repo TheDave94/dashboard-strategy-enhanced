@@ -9,7 +9,7 @@ const config: webpack.Configuration = {
   output: {
     clean: true,
     filename: 'simon42-dashboard-strategy.js',
-    chunkFilename: 'simon42-dashboard-strategy-[name].js',
+    chunkFilename: 'simon42-dashboard-strategy-[name].[contenthash:8].js',
     path: path.resolve(import.meta.dirname, 'dist'),
     // publicPath must match the HA resource URL path for async chunk loading
     publicPath: '/hacsfiles/simon42-dashboard-strategy/',
