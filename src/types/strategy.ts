@@ -33,6 +33,7 @@ export interface Simon42StrategyConfig {
   room_pin_entities?: string[];
 
   // Area management
+  use_default_area_sort?: boolean; // default: false
   areas_display?: AreasDisplay;
   areas_options?: Record<string, AreaOptions>;
 

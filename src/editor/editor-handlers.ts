@@ -147,6 +147,18 @@ export function attachShowLocksInRoomsCheckboxListener(
   }
 }
 
+export function attachUseDefaultAreaSortCheckboxListener(
+  element: HTMLElement,
+  callback: (checked: boolean) => void
+): void {
+  const checkbox = element.querySelector('#use-default-area-sort') as HTMLInputElement | null;
+  if (checkbox) {
+    checkbox.addEventListener('change', (e: Event) => {
+      callback((e.target as HTMLInputElement).checked);
+    });
+  }
+}
+
 // -- Area Management --------------------------------------------------
 
 export function attachAreaCheckboxListeners(

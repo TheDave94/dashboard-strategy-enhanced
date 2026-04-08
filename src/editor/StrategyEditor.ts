@@ -19,6 +19,7 @@ import {
   attachBatterySummaryCheckboxListener,
   attachHideMobileAppBatteriesCheckboxListener,
   attachShowLocksInRoomsCheckboxListener,
+  attachUseDefaultAreaSortCheckboxListener,
   attachAreaCheckboxListeners,
   attachDragAndDropListeners,
   attachExpandButtonListeners,
@@ -144,6 +145,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const showBatterySummary = this._config.show_battery_summary !== false;
     const hideMobileAppBatteries = this._config.hide_mobile_app_batteries === true;
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
+    const useDefaultAreaSort = this._config.use_default_area_sort === true;
     const customViews = this._config.custom_views || [];
     const summariesColumns = this._config.summaries_columns || 2;
     const alarmEntity = this._config.alarm_entity || '';
@@ -198,6 +200,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         showBatterySummary,
         hideMobileAppBatteries,
         showLocksInRooms,
+        useDefaultAreaSort,
         customViews,
       })}
     `;
@@ -216,6 +219,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachBatterySummaryCheckboxListener(this, (val: boolean) => this._showBatterySummaryChanged(val));
     attachHideMobileAppBatteriesCheckboxListener(this, (hide: boolean) => this._hideMobileAppBatteriesChanged(hide));
     attachShowLocksInRoomsCheckboxListener(this, (show: boolean) => this._showLocksInRoomsChanged(show));
+    attachUseDefaultAreaSortCheckboxListener(this, (val: boolean) => this._useDefaultAreaSortChanged(val));
     this._attachCustomViewsListeners();
     this._attachSummariesColumnsListener();
     this._attachAlarmEntityListener();
@@ -951,6 +955,22 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
 
     if (show === false) {
       delete newConfig.show_locks_in_rooms;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _useDefaultAreaSortChanged(useDefault: boolean): void {
+    if (!this._config || !this._hass) return;
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      use_default_area_sort: useDefault,
+    };
+
+    if (useDefault === false) {
+      delete newConfig.use_default_area_sort;
     }
 
     this._config = newConfig;

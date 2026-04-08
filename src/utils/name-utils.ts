@@ -120,12 +120,22 @@ export function stripCoverType(entityId: string, hass: HomeAssistant): string {
  * Filters areas based on display configuration (hidden list) and sorts them
  * by the configured order or alphabetically as fallback.
  */
-export function getVisibleAreas(areas: AreaRegistryEntry[], displayConfig?: AreasDisplay): AreaRegistryEntry[] {
+export function getVisibleAreas(
+  areas: AreaRegistryEntry[],
+  displayConfig?: AreasDisplay,
+  useDefaultSort?: boolean
+): AreaRegistryEntry[] {
   const hiddenAreas = displayConfig?.hidden ?? [];
-  const orderConfig = displayConfig?.order ?? [];
 
   // Filter out hidden areas
-  let visibleAreas = areas.filter((area) => !hiddenAreas.includes(area.area_id));
+  const visibleAreas = areas.filter((area) => !hiddenAreas.includes(area.area_id));
+
+  // If useDefaultSort is true, use HA's native area order (as-is from registry)
+  if (useDefaultSort) {
+    return visibleAreas;
+  }
+
+  const orderConfig = displayConfig?.order ?? [];
 
   // Sort by configured order, then alphabetically for unordered
   if (orderConfig.length > 0) {
@@ -150,8 +160,12 @@ export function getVisibleAreas(areas: AreaRegistryEntry[], displayConfig?: Area
  * instead of Registry.areas (requires WebSocket init).
  * Used by the dashboard entry point to avoid blocking on Registry.
  */
-export function getVisibleAreasFromHass(hass: HomeAssistant, displayConfig?: AreasDisplay): AreaRegistryEntry[] {
-  return getVisibleAreas(Object.values(hass.areas), displayConfig);
+export function getVisibleAreasFromHass(
+  hass: HomeAssistant,
+  displayConfig?: AreasDisplay,
+  useDefaultSort?: boolean
+): AreaRegistryEntry[] {
+  return getVisibleAreas(Object.values(hass.areas), displayConfig, useDefaultSort);
 }
 
 /**

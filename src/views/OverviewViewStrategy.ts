@@ -28,7 +28,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     Registry.initialize(hass, dashboardConfig);
 
     // Visible areas (filtered + sorted by config)
-    const visibleAreas = getVisibleAreas(Registry.areas, dashboardConfig.areas_display);
+    const visibleAreas = getVisibleAreas(Registry.areas, dashboardConfig.areas_display, dashboardConfig.use_default_area_sort);
 
     // Collect data for overview
     const persons = collectPersons(hass, dashboardConfig);

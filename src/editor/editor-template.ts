@@ -46,6 +46,7 @@ export interface EditorHTMLParams {
   showBatterySummary: boolean;
   hideMobileAppBatteries: boolean;
   showLocksInRooms: boolean;
+  useDefaultAreaSort: boolean;
   customViews: CustomView[];
 }
 
@@ -83,6 +84,7 @@ export function renderEditorHTML({
   showBatterySummary,
   hideMobileAppBatteries,
   showLocksInRooms,
+  useDefaultAreaSort,
   customViews,
 }: EditorHTMLParams): string {
   return `
@@ -354,6 +356,17 @@ export function renderEditorHTML({
         </div>
         <div class="description">
           Gruppiert die Bereiche in der Übersicht nach Etagen. Wenn aktiviert, wird für jede Etage eine separate Section erstellt.
+        </div>
+        <div class="form-row">
+          <input
+            type="checkbox"
+            id="use-default-area-sort"
+            ${useDefaultAreaSort ? 'checked' : ''}
+          />
+          <label for="use-default-area-sort">Home Assistant Sortierung verwenden</label>
+        </div>
+        <div class="description">
+          Verwendet die Sortierung der Bereiche aus Home Assistant statt der im Dashboard konfigurierten Reihenfolge. Nützlich wenn die Bereiche bereits in HA sortiert sind.
         </div>
       </div>
 

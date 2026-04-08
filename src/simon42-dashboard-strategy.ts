@@ -51,7 +51,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     Registry.initialize(hass, config);
     t('registry initialized');
 
-    const visibleAreas = getVisibleAreasFromHass(hass, config.areas_display);
+    const visibleAreas = getVisibleAreasFromHass(hass, config.areas_display, config.use_default_area_sort);
 
     const showSummaryViews = config.show_summary_views === true;
     const showRoomViews = config.show_room_views === true;
