@@ -20,7 +20,7 @@ export function createWeatherEnergySection(
   weatherEntity: string | null,
   showWeather: boolean,
   showEnergy: boolean,
-  groupByFloors: boolean = false,
+  groupByFloors: boolean = false
 ): LovelaceSectionConfig | LovelaceSectionConfig[] | null {
   // Floor grouping active: return separate sections
   if (groupByFloors) {

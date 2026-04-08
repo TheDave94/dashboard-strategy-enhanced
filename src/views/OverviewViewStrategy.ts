@@ -47,15 +47,20 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     // Build sections
     const areasSections = createAreasSection(visibleAreas, groupByFloors, hass);
     const weatherEnergySection = createWeatherEnergySection(
-      weatherEntity ?? null, showWeather, showEnergy, groupByFloors
+      weatherEntity ?? null,
+      showWeather,
+      showEnergy,
+      groupByFloors
     );
 
     const overviewSections: LovelaceSectionConfig[] = [
       createOverviewSection({ someSensorId, showSearchCard, config: dashboardConfig, hass }),
       ...(Array.isArray(areasSections) ? areasSections : [areasSections]),
       ...(weatherEnergySection
-        ? (Array.isArray(weatherEnergySection) ? weatherEnergySection : [weatherEnergySection])
-        : [])
+        ? Array.isArray(weatherEnergySection)
+          ? weatherEnergySection
+          : [weatherEnergySection]
+        : []),
     ];
 
     const totalCards = overviewSections.reduce((sum, s) => sum + (s.cards?.length || 0), 0);

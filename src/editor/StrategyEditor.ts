@@ -112,9 +112,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
 
         return {
           entity_id: entityId,
-          name:
-            state.attributes?.friendly_name ||
-            entityId.split('.')[1].replace(/_/g, ' '),
+          name: state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' '),
           area_id: areaId,
           device_area_id: areaId, // backward compat
         };
@@ -136,8 +134,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const showRoomViews = this._config.show_room_views === true;
     const groupByFloors = this._config.group_by_floors === true;
     const showCoversSummary = this._config.show_covers_summary !== false;
-    const hideMobileAppBatteries =
-      this._config.hide_mobile_app_batteries === true;
+    const hideMobileAppBatteries = this._config.hide_mobile_app_batteries === true;
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const customViews = this._config.custom_views || [];
     const summariesColumns = this._config.summaries_columns || 2;
@@ -153,9 +150,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         const state = this._hass!.states[entityId];
         return {
           entity_id: entityId,
-          name:
-            state.attributes?.friendly_name ||
-            entityId.split('.')[1].replace(/_/g, ' '),
+          name: state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' '),
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -164,9 +159,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const allEntities = this._getAllEntitiesForSelect();
 
     // Areas
-    const allAreas = Object.values(this._hass.areas).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    const allAreas = Object.values(this._hass.areas).sort((a, b) => a.name.localeCompare(b.name));
     const hiddenAreas = this._config.areas_display?.hidden || [];
     const areaOrder = this._config.areas_display?.order || [];
 
@@ -198,42 +191,22 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     `;
 
     // Bind event listeners
-    attachWeatherCheckboxListener(this, (val: boolean) =>
-      this._showWeatherChanged(val),
-    );
-    attachEnergyCheckboxListener(this, (val: boolean) =>
-      this._showEnergyChanged(val),
-    );
-    attachSearchCardCheckboxListener(this, (val: boolean) =>
-      this._showSearchCardChanged(val),
-    );
-    attachSummaryViewsCheckboxListener(this, (val: boolean) =>
-      this._showSummaryViewsChanged(val),
-    );
-    attachRoomViewsCheckboxListener(this, (val: boolean) =>
-      this._showRoomViewsChanged(val),
-    );
-    attachGroupByFloorsCheckboxListener(this, (val: boolean) =>
-      this._groupByFloorsChanged(val),
-    );
-    attachCoversSummaryCheckboxListener(this, (val: boolean) =>
-      this._showCoversSummaryChanged(val),
-    );
-    attachHideMobileAppBatteriesCheckboxListener(this, (hide: boolean) =>
-      this._hideMobileAppBatteriesChanged(hide),
-    );
-    attachShowLocksInRoomsCheckboxListener(this, (show: boolean) =>
-      this._showLocksInRoomsChanged(show),
-    );
+    attachWeatherCheckboxListener(this, (val: boolean) => this._showWeatherChanged(val));
+    attachEnergyCheckboxListener(this, (val: boolean) => this._showEnergyChanged(val));
+    attachSearchCardCheckboxListener(this, (val: boolean) => this._showSearchCardChanged(val));
+    attachSummaryViewsCheckboxListener(this, (val: boolean) => this._showSummaryViewsChanged(val));
+    attachRoomViewsCheckboxListener(this, (val: boolean) => this._showRoomViewsChanged(val));
+    attachGroupByFloorsCheckboxListener(this, (val: boolean) => this._groupByFloorsChanged(val));
+    attachCoversSummaryCheckboxListener(this, (val: boolean) => this._showCoversSummaryChanged(val));
+    attachHideMobileAppBatteriesCheckboxListener(this, (hide: boolean) => this._hideMobileAppBatteriesChanged(hide));
+    attachShowLocksInRoomsCheckboxListener(this, (show: boolean) => this._showLocksInRoomsChanged(show));
     this._attachCustomViewsListeners();
     this._attachSummariesColumnsListener();
     this._attachAlarmEntityListener();
     this._attachFavoritesListeners();
     this._attachRoomPinsListeners();
-    attachAreaCheckboxListeners(
-      this,
-      (areaId: string, isVisible: boolean) =>
-        this._areaVisibilityChanged(areaId, isVisible),
+    attachAreaCheckboxListeners(this, (areaId: string, isVisible: boolean) =>
+      this._areaVisibilityChanged(areaId, isVisible)
     );
 
     // Sort area items by displayOrder
@@ -247,12 +220,8 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
       this,
       this._hass,
       this._config,
-      (
-        areaId: string,
-        group: string,
-        entityId: string | null,
-        isVisible: boolean,
-      ) => this._entityVisibilityChanged(areaId, group, entityId, isVisible),
+      (areaId: string, group: string, entityId: string | null, isVisible: boolean) =>
+        this._entityVisibilityChanged(areaId, group, entityId, isVisible)
     );
 
     // Restore expanded state
@@ -262,12 +231,8 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   // -- Summaries columns ------------------------------------------------
 
   _attachSummariesColumnsListener(): void {
-    const radio2 = this.querySelector(
-      '#summaries-2-columns',
-    ) as HTMLInputElement | null;
-    const radio4 = this.querySelector(
-      '#summaries-4-columns',
-    ) as HTMLInputElement | null;
+    const radio2 = this.querySelector('#summaries-2-columns') as HTMLInputElement | null;
+    const radio4 = this.querySelector('#summaries-4-columns') as HTMLInputElement | null;
 
     if (radio2) {
       radio2.addEventListener('change', (e: Event) => {
@@ -308,9 +273,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   // -- Alarm entity -----------------------------------------------------
 
   _attachAlarmEntityListener(): void {
-    const alarmSelect = this.querySelector(
-      '#alarm-entity',
-    ) as HTMLSelectElement | null;
+    const alarmSelect = this.querySelector('#alarm-entity') as HTMLSelectElement | null;
     if (alarmSelect) {
       alarmSelect.addEventListener('change', (e: Event) => {
         this._alarmEntityChanged((e.target as HTMLSelectElement).value);
@@ -342,9 +305,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   _attachFavoritesListeners(): void {
     // Add button
     const addBtn = this.querySelector('#add-favorite-btn');
-    const select = this.querySelector(
-      '#favorite-entity-select',
-    ) as HTMLSelectElement | null;
+    const select = this.querySelector('#favorite-entity-select') as HTMLSelectElement | null;
 
     if (addBtn && select) {
       addBtn.addEventListener('click', () => {
@@ -430,10 +391,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     import('./editor-template')
       .then((module) => {
         container.innerHTML =
-          (module as any).renderFavoritesList?.(
-            favoriteEntities,
-            allEntities,
-          ) ||
+          (module as any).renderFavoritesList?.(favoriteEntities, allEntities) ||
           this._renderFavoritesListFallback(favoriteEntities, allEntities);
 
         // Reattach listeners
@@ -441,25 +399,17 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
       })
       .catch(() => {
         // Fallback if import fails
-        container.innerHTML = this._renderFavoritesListFallback(
-          favoriteEntities,
-          allEntities,
-        );
+        container.innerHTML = this._renderFavoritesListFallback(favoriteEntities, allEntities);
         this._attachFavoritesListeners();
       });
   }
 
-  private _renderFavoritesListFallback(
-    favoriteEntities: string[],
-    allEntities: EntitySelectOption[],
-  ): string {
+  private _renderFavoritesListFallback(favoriteEntities: string[], allEntities: EntitySelectOption[]): string {
     if (!favoriteEntities || favoriteEntities.length === 0) {
       return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Favoriten hinzugefügt</div>';
     }
 
-    const entityMap = new Map(
-      allEntities.map((e) => [e.entity_id, e.name]),
-    );
+    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
 
     return `
       <div style="border: 1px solid var(--divider-color); border-radius: 4px; overflow: hidden;">
@@ -489,9 +439,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   _attachRoomPinsListeners(): void {
     // Add button
     const addBtn = this.querySelector('#add-room-pin-btn');
-    const select = this.querySelector(
-      '#room-pin-entity-select',
-    ) as HTMLSelectElement | null;
+    const select = this.querySelector('#room-pin-entity-select') as HTMLSelectElement | null;
 
     if (addBtn && select) {
       addBtn.addEventListener('click', () => {
@@ -572,35 +520,21 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
 
     const roomPinEntities = this._config.room_pin_entities || [];
     const allEntities = this._getAllEntitiesForSelect();
-    const allAreas = Object.values(this._hass!.areas).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    const allAreas = Object.values(this._hass!.areas).sort((a, b) => a.name.localeCompare(b.name));
 
     // Dynamic import of the render function
     import('./editor-template')
       .then((module) => {
         container.innerHTML =
-          (module as any).renderRoomPinsList?.(
-            roomPinEntities,
-            allEntities,
-            allAreas,
-          ) ||
-          this._renderRoomPinsListFallback(
-            roomPinEntities,
-            allEntities,
-            allAreas,
-          );
+          (module as any).renderRoomPinsList?.(roomPinEntities, allEntities, allAreas) ||
+          this._renderRoomPinsListFallback(roomPinEntities, allEntities, allAreas);
 
         // Reattach listeners
         this._attachRoomPinsListeners();
       })
       .catch(() => {
         // Fallback if import fails
-        container.innerHTML = this._renderRoomPinsListFallback(
-          roomPinEntities,
-          allEntities,
-          allAreas,
-        );
+        container.innerHTML = this._renderRoomPinsListFallback(roomPinEntities, allEntities, allAreas);
         this._attachRoomPinsListeners();
       });
   }
@@ -608,15 +542,13 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   private _renderRoomPinsListFallback(
     roomPinEntities: string[],
     allEntities: EntitySelectOption[],
-    allAreas: Array<{ area_id: string; name: string }>,
+    allAreas: Array<{ area_id: string; name: string }>
   ): string {
     if (!roomPinEntities || roomPinEntities.length === 0) {
       return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Raum-Pins hinzugefügt</div>';
     }
 
-    const entityMap = new Map(
-      allEntities.map((e) => [e.entity_id, e]),
-    );
+    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e]));
     const areaMap = new Map(allAreas.map((a) => [a.area_id, a.name]));
 
     return `
@@ -626,9 +558,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
             const entity = entityMap.get(entityId);
             const name = entity?.name || entityId;
             const areaId = entity?.area_id || entity?.device_area_id;
-            const areaName = areaId
-              ? areaMap.get(areaId) || areaId
-              : 'Kein Raum';
+            const areaName = areaId ? areaMap.get(areaId) || areaId : 'Kein Raum';
 
             return `
             <div class="room-pin-item" data-entity-id="${entityId}" style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--divider-color); background: var(--card-background-color);">
@@ -662,18 +592,13 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     // Remove buttons
     this.querySelectorAll('.remove-custom-view-btn').forEach((btn) => {
       btn.addEventListener('click', (e: Event) => {
-        const index = parseInt(
-          (e.target as HTMLElement).dataset.index || '0',
-          10,
-        );
+        const index = parseInt((e.target as HTMLElement).dataset.index || '0', 10);
         this._removeCustomView(index);
       });
     });
 
     // Title / Path / Icon inputs
-    this.querySelectorAll(
-      '.custom-view-title, .custom-view-path, .custom-view-icon',
-    ).forEach((input) => {
+    this.querySelectorAll('.custom-view-title, .custom-view-path, .custom-view-icon').forEach((input) => {
       input.addEventListener('change', (e: Event) => {
         const target = e.target as HTMLInputElement;
         const index = parseInt(target.dataset.index || '0', 10);
@@ -697,9 +622,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   }
 
   _addCustomView(): void {
-    const customViews: CustomView[] = [
-      ...(this._config.custom_views || []),
-    ];
+    const customViews: CustomView[] = [...(this._config.custom_views || [])];
     customViews.push({
       title: 'Neue View',
       path: `custom-view-${customViews.length + 1}`,
@@ -718,9 +641,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   }
 
   _removeCustomView(index: number): void {
-    const customViews: CustomView[] = [
-      ...(this._config.custom_views || []),
-    ];
+    const customViews: CustomView[] = [...(this._config.custom_views || [])];
     customViews.splice(index, 1);
 
     const newConfig: Simon42StrategyConfig = { ...this._config };
@@ -735,14 +656,8 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     this._updateCustomViewsList();
   }
 
-  _updateCustomViewField(
-    index: number,
-    field: string,
-    value: string,
-  ): void {
-    const customViews: CustomView[] = [
-      ...(this._config.custom_views || []),
-    ];
+  _updateCustomViewField(index: number, field: string, value: string): void {
+    const customViews: CustomView[] = [...(this._config.custom_views || [])];
     if (!customViews[index]) return;
 
     customViews[index] = { ...customViews[index], [field]: value };
@@ -756,9 +671,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   }
 
   _updateCustomViewYaml(index: number, yamlString: string): void {
-    const customViews: CustomView[] = [
-      ...(this._config.custom_views || []),
-    ];
+    const customViews: CustomView[] = [...(this._config.custom_views || [])];
     if (!customViews[index]) return;
 
     const updated: CustomView = {
@@ -777,10 +690,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
           updated.parsed_config = undefined;
         }
       } catch (e: unknown) {
-        const message =
-          e instanceof Error
-            ? e.message?.split('\n')[0]
-            : 'Ungültiges YAML';
+        const message = e instanceof Error ? e.message?.split('\n')[0] : 'Ungültiges YAML';
         updated._yaml_error = message || 'Ungültiges YAML';
         updated.parsed_config = undefined;
       }
@@ -798,15 +708,12 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     this._fireConfigChanged(newConfig);
 
     // Update only the validation display (not the whole list — avoids cursor loss)
-    const validationEl = this.querySelector(
-      `.custom-view-validation[data-index="${index}"]`,
-    );
+    const validationEl = this.querySelector(`.custom-view-validation[data-index="${index}"]`);
     if (validationEl) {
       if (updated._yaml_error) {
         validationEl.innerHTML = `<span style="color: var(--error-color, red);">❌ ${updated._yaml_error}</span>`;
       } else if (yamlString.trim()) {
-        validationEl.innerHTML =
-          '<span style="color: var(--success-color, green);">✅ YAML gültig</span>';
+        validationEl.innerHTML = '<span style="color: var(--success-color, green);">✅ YAML gültig</span>';
       } else {
         validationEl.innerHTML = '';
       }
@@ -816,9 +723,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   _updateCustomViewsList(): void {
     const container = this.querySelector('#custom-views-list');
     if (container) {
-      container.innerHTML = renderCustomViewsList(
-        this._config.custom_views || [],
-      );
+      container.innerHTML = renderCustomViewsList(this._config.custom_views || []);
       this._attachCustomViewsListeners();
     }
   }
@@ -1016,9 +921,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     if (!areaList) return;
 
     const items = Array.from(areaList.querySelectorAll('.area-item'));
-    const newOrder = items.map(
-      (item) => (item as HTMLElement).dataset.areaId!,
-    );
+    const newOrder = items.map((item) => (item as HTMLElement).dataset.areaId!);
 
     const newConfig: Simon42StrategyConfig = {
       ...this._config,
@@ -1032,12 +935,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     this._fireConfigChanged(newConfig);
   }
 
-  _entityVisibilityChanged(
-    areaId: string,
-    group: string,
-    entityId: string | null,
-    isVisible: boolean,
-  ): void {
+  _entityVisibilityChanged(areaId: string, group: string, entityId: string | null, isVisible: boolean): void {
     if (!this._config || !this._hass) return;
 
     // Get current groups_options for this area
@@ -1051,33 +949,19 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
       // All entities in the group
       if (!isVisible) {
         // Add all entities in this group to hidden
-        const entityList = this.querySelector(
-          `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`,
-        );
+        const entityList = this.querySelector(`.entity-list[data-area-id="${areaId}"][data-group="${group}"]`);
         if (entityList) {
-          const entityCheckboxes =
-            entityList.querySelectorAll('.entity-checkbox');
-          const allEntities = Array.from(entityCheckboxes).map(
-            (cb) => (cb as HTMLElement).dataset.entityId!,
-          );
-          hiddenEntities = [
-            ...new Set([...hiddenEntities, ...allEntities]),
-          ];
+          const entityCheckboxes = entityList.querySelectorAll('.entity-checkbox');
+          const allEntities = Array.from(entityCheckboxes).map((cb) => (cb as HTMLElement).dataset.entityId!);
+          hiddenEntities = [...new Set([...hiddenEntities, ...allEntities])];
         }
       } else {
         // Remove all entities of this group from hidden
-        const entityList = this.querySelector(
-          `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`,
-        );
+        const entityList = this.querySelector(`.entity-list[data-area-id="${areaId}"][data-group="${group}"]`);
         if (entityList) {
-          const entityCheckboxes =
-            entityList.querySelectorAll('.entity-checkbox');
-          const allEntities = Array.from(entityCheckboxes).map(
-            (cb) => (cb as HTMLElement).dataset.entityId!,
-          );
-          hiddenEntities = hiddenEntities.filter(
-            (e) => !allEntities.includes(e),
-          );
+          const entityCheckboxes = entityList.querySelectorAll('.entity-checkbox');
+          const allEntities = Array.from(entityCheckboxes).map((cb) => (cb as HTMLElement).dataset.entityId!);
+          hiddenEntities = hiddenEntities.filter((e) => !allEntities.includes(e));
         }
       }
     } else {
@@ -1138,10 +1022,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     };
 
     // Remove areas_options when empty
-    if (
-      newConfig.areas_options &&
-      Object.keys(newConfig.areas_options).length === 0
-    ) {
+    if (newConfig.areas_options && Object.keys(newConfig.areas_options).length === 0) {
       delete newConfig.areas_options;
     }
 
@@ -1154,12 +1035,8 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   _restoreExpandedState(): void {
     // Restore expanded areas
     this._expandedAreas.forEach((areaId) => {
-      const button = this.querySelector(
-        `.expand-button[data-area-id="${areaId}"]`,
-      );
-      const content = this.querySelector(
-        `.area-content[data-area-id="${areaId}"]`,
-      ) as HTMLElement | null;
+      const button = this.querySelector(`.expand-button[data-area-id="${areaId}"]`);
+      const content = this.querySelector(`.area-content[data-area-id="${areaId}"]`) as HTMLElement | null;
 
       if (button && content) {
         content.style.display = 'block';
@@ -1170,10 +1047,10 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         if (expandedGroups) {
           expandedGroups.forEach((groupKey) => {
             const groupButton = content.querySelector(
-              `.expand-button-small[data-area-id="${areaId}"][data-group="${groupKey}"]`,
+              `.expand-button-small[data-area-id="${areaId}"][data-group="${groupKey}"]`
             );
             const entityList = content.querySelector(
-              `.entity-list[data-area-id="${areaId}"][data-group="${groupKey}"]`,
+              `.entity-list[data-area-id="${areaId}"][data-group="${groupKey}"]`
             ) as HTMLElement | null;
 
             if (groupButton && entityList) {
@@ -1218,7 +1095,4 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
 }
 
 // Register custom element
-customElements.define(
-  'simon42-dashboard-strategy-editor',
-  Simon42DashboardStrategyEditor,
-);
+customElements.define('simon42-dashboard-strategy-editor', Simon42DashboardStrategyEditor);

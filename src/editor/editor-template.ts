@@ -111,11 +111,15 @@ export function renderEditorHTML({
           <label for="alarm-entity" style="margin-right: 8px; min-width: 120px;">Alarm-Entität:</label>
           <select id="alarm-entity" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
             <option value="">Keine (Uhr in voller Breite)</option>
-            ${alarmEntities.map(entity => `
+            ${alarmEntities
+              .map(
+                (entity) => `
               <option value="${entity.entity_id}" ${entity.entity_id === alarmEntity ? 'selected' : ''}>
                 ${entity.name}
               </option>
-            `).join('')}
+            `
+              )
+              .join('')}
           </select>
         </div>
         <div class="description">
@@ -131,9 +135,13 @@ export function renderEditorHTML({
         <div style="display: flex; gap: 8px; align-items: flex-start;">
           <select id="favorite-entity-select" style="flex: 1; min-width: 0; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
             <option value="">Entität auswählen...</option>
-            ${allEntities.map(entity => `
+            ${allEntities
+              .map(
+                (entity) => `
               <option value="${entity.entity_id}">${entity.name}</option>
-            `).join('')}
+            `
+              )
+              .join('')}
           </select>
           <button id="add-favorite-btn" style="flex-shrink: 0; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer; white-space: nowrap;">
             + Hinzufügen
@@ -153,10 +161,13 @@ export function renderEditorHTML({
           <select id="room-pin-entity-select" style="flex: 1; min-width: 0; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
             <option value="">Entität auswählen...</option>
             ${allEntities
-              .filter(entity => entity.area_id || entity.device_area_id)
-              .map(entity => `
+              .filter((entity) => entity.area_id || entity.device_area_id)
+              .map(
+                (entity) => `
                 <option value="${entity.entity_id}">${entity.name}</option>
-              `).join('')}
+              `
+              )
+              .join('')}
           </select>
           <button id="add-room-pin-btn" style="flex-shrink: 0; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer; white-space: nowrap;">
             + Hinzufügen
@@ -181,9 +192,11 @@ export function renderEditorHTML({
           </label>
         </div>
         <div class="description">
-          ${hasSearchCardDeps
-            ? 'Zeigt die custom:search-card direkt unter der Uhr in der Übersicht an.'
-            : '⚠️ Benötigt <strong>custom:search-card</strong> und <strong>card-tools</strong>. Bitte installieren Sie beide Komponenten, um diese Funktion zu nutzen.'}
+          ${
+            hasSearchCardDeps
+              ? 'Zeigt die custom:search-card direkt unter der Uhr in der Übersicht an.'
+              : '⚠️ Benötigt <strong>custom:search-card</strong> und <strong>card-tools</strong>. Bitte installieren Sie beide Komponenten, um diese Funktion zu nutzen.'
+          }
         </div>
       </div>
 
@@ -328,13 +341,14 @@ function renderFavoritesList(favoriteEntities: string[], allEntities: EditorEnti
   }
 
   // Erstelle Map für schnellen Zugriff auf Entity-Namen
-  const entityMap = new Map<string, string>(allEntities.map(e => [e.entity_id, e.name]));
+  const entityMap = new Map<string, string>(allEntities.map((e) => [e.entity_id, e.name]));
 
   return `
     <div style="border: 1px solid var(--divider-color); border-radius: 4px; overflow: hidden;">
-      ${favoriteEntities.map((entityId: string, index: number) => {
-        const name = entityMap.get(entityId) || entityId;
-        return `
+      ${favoriteEntities
+        .map((entityId: string, index: number) => {
+          const name = entityMap.get(entityId) || entityId;
+          return `
           <div class="favorite-item" data-entity-id="${entityId}" style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--divider-color); background: var(--card-background-color);">
             <span class="drag-handle" style="margin-right: 12px; cursor: grab; color: var(--secondary-text-color);">☰</span>
             <span style="flex: 1; font-size: 14px;">
@@ -346,7 +360,8 @@ function renderFavoritesList(favoriteEntities: string[], allEntities: EditorEnti
             </button>
           </div>
         `;
-      }).join('')}
+        })
+        .join('')}
     </div>
   `;
 }
@@ -354,25 +369,26 @@ function renderFavoritesList(favoriteEntities: string[], allEntities: EditorEnti
 export function renderRoomPinsList(
   roomPinEntities: string[],
   allEntities: EditorEntity[],
-  allAreas: AreaRegistryEntry[],
+  allAreas: AreaRegistryEntry[]
 ): string {
   if (!roomPinEntities || roomPinEntities.length === 0) {
     return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Raum-Pins hinzugefügt</div>';
   }
 
   // Erstelle Maps für schnellen Zugriff
-  const entityMap = new Map<string, EditorEntity>(allEntities.map(e => [e.entity_id, e]));
-  const areaMap = new Map<string, string>(allAreas.map(a => [a.area_id, a.name]));
+  const entityMap = new Map<string, EditorEntity>(allEntities.map((e) => [e.entity_id, e]));
+  const areaMap = new Map<string, string>(allAreas.map((a) => [a.area_id, a.name]));
 
   return `
     <div style="border: 1px solid var(--divider-color); border-radius: 4px; overflow: hidden;">
-      ${roomPinEntities.map((entityId: string, index: number) => {
-        const entity = entityMap.get(entityId);
-        const name = entity?.name || entityId;
-        const areaId = entity?.area_id || entity?.device_area_id;
-        const areaName = areaId ? areaMap.get(areaId) || areaId : 'Kein Raum';
+      ${roomPinEntities
+        .map((entityId: string, index: number) => {
+          const entity = entityMap.get(entityId);
+          const name = entity?.name || entityId;
+          const areaId = entity?.area_id || entity?.device_area_id;
+          const areaName = areaId ? areaMap.get(areaId) || areaId : 'Kein Raum';
 
-        return `
+          return `
           <div class="room-pin-item" data-entity-id="${entityId}" style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--divider-color); background: var(--card-background-color);">
             <span class="drag-handle" style="margin-right: 12px; cursor: grab; color: var(--secondary-text-color);">☰</span>
             <span style="flex: 1; font-size: 14px;">
@@ -386,7 +402,8 @@ export function renderRoomPinsList(
             </button>
           </div>
         `;
-      }).join('')}
+        })
+        .join('')}
     </div>
   `;
 }
@@ -396,13 +413,16 @@ export function renderCustomViewsList(customViews: CustomView[]): string {
     return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Custom Views erstellt</div>';
   }
 
-  return customViews.map((view: CustomView, index: number) => {
-    const yamlValid = view.parsed_config ? true : false;
-    const validationMsg = view._yaml_error
-      ? `<span style="color: var(--error-color);">❌ ${view._yaml_error}</span>`
-      : (view.yaml ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>' : '');
+  return customViews
+    .map((view: CustomView, index: number) => {
+      const yamlValid = view.parsed_config ? true : false;
+      const validationMsg = view._yaml_error
+        ? `<span style="color: var(--error-color);">❌ ${view._yaml_error}</span>`
+        : view.yaml
+          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          : '';
 
-    return `
+      return `
       <div class="custom-view-item" data-index="${index}" style="border: 1px solid var(--divider-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--card-background-color);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <strong style="font-size: 14px;">${view.title || 'Neue View'}</strong>
@@ -421,24 +441,22 @@ export function renderCustomViewsList(customViews: CustomView[]): string {
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 }
 
-function renderAreaItems(
-  allAreas: AreaRegistryEntry[],
-  hiddenAreas: string[],
-  areaOrder: string[],
-): string {
+function renderAreaItems(allAreas: AreaRegistryEntry[], hiddenAreas: string[], areaOrder: string[]): string {
   if (allAreas.length === 0) {
     return '<div class="empty-state">Keine Bereiche verfügbar</div>';
   }
 
-  return allAreas.map((area: AreaRegistryEntry, index: number) => {
-    const isHidden = hiddenAreas.includes(area.area_id);
-    const orderIndex = areaOrder.indexOf(area.area_id);
-    const displayOrder = orderIndex !== -1 ? orderIndex : 9999 + index;
+  return allAreas
+    .map((area: AreaRegistryEntry, index: number) => {
+      const isHidden = hiddenAreas.includes(area.area_id);
+      const orderIndex = areaOrder.indexOf(area.area_id);
+      const displayOrder = orderIndex !== -1 ? orderIndex : 9999 + index;
 
-    return `
+      return `
       <div class="area-item"
            data-area-id="${area.area_id}"
            data-order="${displayOrder}">
@@ -461,7 +479,8 @@ function renderAreaItems(
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 }
 
 // -- Domain group definition for entity rendering ---------------------
@@ -477,7 +496,7 @@ export function renderAreaEntitiesHTML(
   groupedEntities: Record<string, string[]>,
   hiddenEntities: Record<string, string[]>,
   entityOrders: Record<string, string[]>,
-  hass: HassStatesSubset,
+  hass: HassStatesSubset
 ): string {
   const domainGroups: DomainGroup[] = [
     { key: 'lights', label: 'Beleuchtung', icon: 'mdi:lightbulb' },
@@ -499,8 +518,8 @@ export function renderAreaEntitiesHTML(
     if (entities.length === 0) return;
 
     const hiddenInGroup = hiddenEntities[group.key] || [];
-    const allHidden = entities.every(e => hiddenInGroup.includes(e));
-    const someHidden = entities.some(e => hiddenInGroup.includes(e)) && !allHidden;
+    const allHidden = entities.every((e) => hiddenInGroup.includes(e));
+    const someHidden = entities.some((e) => hiddenInGroup.includes(e)) && !allHidden;
 
     html += `
       <div class="entity-group" data-group="${group.key}">
@@ -521,12 +540,13 @@ export function renderAreaEntitiesHTML(
           </button>
         </div>
         <div class="entity-list" data-area-id="${areaId}" data-group="${group.key}" style="display: none;">
-          ${entities.map((entityId: string) => {
-            const state = hass.states[entityId];
-            const name = state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
-            const isHidden = hiddenInGroup.includes(entityId);
+          ${entities
+            .map((entityId: string) => {
+              const state = hass.states[entityId];
+              const name = state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+              const isHidden = hiddenInGroup.includes(entityId);
 
-            return `
+              return `
               <div class="entity-item">
                 <input
                   type="checkbox"
@@ -540,7 +560,8 @@ export function renderAreaEntitiesHTML(
                 <span class="entity-id">${entityId}</span>
               </div>
             `;
-          }).join('')}
+            })
+            .join('')}
         </div>
       </div>
     `;

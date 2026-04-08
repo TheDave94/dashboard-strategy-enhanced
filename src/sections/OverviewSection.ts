@@ -110,7 +110,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       summary_type: 'batteries',
       areas_options: config.areas_options || {},
       hide_mobile_app_batteries: config.hide_mobile_app_batteries,
-    },
+    }
   );
 
   // Layout logic: adapt to number of cards
@@ -132,9 +132,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   }
 
   // Favorites section
-  const favoriteEntities = (config.favorite_entities || []).filter(
-    (entityId) => hass.states[entityId] !== undefined,
-  );
+  const favoriteEntities = (config.favorite_entities || []).filter((entityId) => hass.states[entityId] !== undefined);
 
   if (favoriteEntities.length > 0) {
     cards.push({

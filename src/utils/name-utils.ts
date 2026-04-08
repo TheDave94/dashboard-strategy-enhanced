@@ -21,9 +21,18 @@ interface AreaRegExps {
 const _areaRegExpCache = new Map<string, AreaRegExps>();
 
 const _coverTypeRegExps: RegExp[] = [
-  'Rollo', 'Rollos', 'Rolladen', 'Rolläden',
-  'Vorhang', 'Vorhänge', 'Jalousie', 'Jalousien',
-  'Shutter', 'Shutters', 'Blind', 'Blinds',
+  'Rollo',
+  'Rollos',
+  'Rolladen',
+  'Rolläden',
+  'Vorhang',
+  'Vorhänge',
+  'Jalousie',
+  'Jalousien',
+  'Shutter',
+  'Shutters',
+  'Blind',
+  'Blinds',
 ].map((type) => new RegExp(`\\b${type}\\b`, 'gi'));
 
 // -- Helper: escape special regex characters --------------------------
@@ -37,10 +46,7 @@ function escapeRegExp(str: string): string {
 function getFriendlyName(entityId: string, hass: HomeAssistant): string | null {
   const state = hass.states[entityId];
   if (!state) return null;
-  return (
-    (state.attributes?.friendly_name as string | undefined) ??
-    entityId.split('.')[1].replace(/_/g, ' ')
-  );
+  return (state.attributes?.friendly_name as string | undefined) ?? entityId.split('.')[1].replace(/_/g, ' ');
 }
 
 // -- Exported functions -----------------------------------------------
@@ -50,11 +56,7 @@ function getFriendlyName(entityId: string, hass: HomeAssistant): string | null {
  * Uses cached, regex-escaped patterns per area name to avoid recompilation
  * and prevent bugs with special characters in area names.
  */
-export function stripAreaName(
-  entityId: string,
-  area: AreaRegistryEntry,
-  hass: HomeAssistant,
-): string {
+export function stripAreaName(entityId: string, area: AreaRegistryEntry, hass: HomeAssistant): string {
   const state = hass.states[entityId];
   if (!state) return entityId;
 
@@ -75,11 +77,7 @@ export function stripAreaName(
   }
 
   const re = _areaRegExpCache.get(areaName)!;
-  const cleanName = name
-    .replace(re.start, '')
-    .replace(re.end, '')
-    .replace(re.middle, ' ')
-    .trim();
+  const cleanName = name.replace(re.start, '').replace(re.end, '').replace(re.middle, ' ').trim();
 
   // Only use cleaned name if something meaningful remains
   if (cleanName.length > 0 && cleanName.toLowerCase() !== areaName.toLowerCase()) {
@@ -115,20 +113,14 @@ export function stripCoverType(entityId: string, hass: HomeAssistant): string {
   }
 
   // Fallback to original friendly name
-  return (
-    (state.attributes?.friendly_name as string | undefined) ??
-    entityId.split('.')[1].replace(/_/g, ' ')
-  );
+  return (state.attributes?.friendly_name as string | undefined) ?? entityId.split('.')[1].replace(/_/g, ' ');
 }
 
 /**
  * Filters areas based on display configuration (hidden list) and sorts them
  * by the configured order or alphabetically as fallback.
  */
-export function getVisibleAreas(
-  areas: AreaRegistryEntry[],
-  displayConfig?: AreasDisplay,
-): AreaRegistryEntry[] {
+export function getVisibleAreas(areas: AreaRegistryEntry[], displayConfig?: AreasDisplay): AreaRegistryEntry[] {
   const hiddenAreas = displayConfig?.hidden ?? [];
   const orderConfig = displayConfig?.order ?? [];
 
@@ -158,10 +150,7 @@ export function getVisibleAreas(
  * instead of Registry.areas (requires WebSocket init).
  * Used by the dashboard entry point to avoid blocking on Registry.
  */
-export function getVisibleAreasFromHass(
-  hass: HomeAssistant,
-  displayConfig?: AreasDisplay,
-): AreaRegistryEntry[] {
+export function getVisibleAreasFromHass(hass: HomeAssistant, displayConfig?: AreasDisplay): AreaRegistryEntry[] {
   return getVisibleAreas(Object.values(hass.areas), displayConfig);
 }
 
@@ -172,10 +161,7 @@ export function getVisibleAreasFromHass(
  * Delegates to Registry.isEntityExcludedWithStateCategory() which covers
  * all exclusion criteria including state attribute fallback.
  */
-export function isEntityHiddenOrDisabled(
-  entity: EntityRegistryEntry,
-  hass: HomeAssistant,
-): boolean {
+export function isEntityHiddenOrDisabled(entity: EntityRegistryEntry, hass: HomeAssistant): boolean {
   return Registry.isEntityExcludedWithStateCategory(entity.entity_id);
 }
 
@@ -183,11 +169,7 @@ export function isEntityHiddenOrDisabled(
  * Comparator that sorts entity IDs by last_changed timestamp,
  * most recently changed first.
  */
-export function sortByLastChanged(
-  a: string,
-  b: string,
-  hass: HomeAssistant,
-): number {
+export function sortByLastChanged(a: string, b: string, hass: HomeAssistant): number {
   const stateA = hass.states[a];
   const stateB = hass.states[b];
   if (!stateA || !stateB) return 0;

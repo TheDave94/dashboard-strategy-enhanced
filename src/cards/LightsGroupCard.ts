@@ -86,8 +86,7 @@ class Simon42LightsGroupCard extends LitElement {
   }
 
   private _getFilteredLightEntities(hass: HomeAssistant): string[] {
-    return Registry.getVisibleEntityIdsForDomain('light')
-      .filter(id => hass.states[id] !== undefined);
+    return Registry.getVisibleEntityIdsForDomain('light').filter((id) => hass.states[id] !== undefined);
   }
 
   private _getRelevantLights(): string[] {
@@ -116,16 +115,18 @@ class Simon42LightsGroupCard extends LitElement {
       type: 'heading',
       heading: `${isOn ? 'Eingeschaltete Lichter' : 'Ausgeschaltete Lichter'} (${lights.length})`,
       icon: isOn ? 'mdi:lightbulb-group' : 'mdi:lightbulb-group-off',
-      badges: [{
-        type: 'button',
-        icon: isOn ? 'mdi:lightbulb-off' : 'mdi:lightbulb-on',
-        text: isOn ? 'Alle aus' : 'Alle ein',
-        tap_action: {
-          action: 'perform-action',
-          perform_action: isOn ? 'light.turn_off' : 'light.turn_on',
-          target: { entity_id: lights },
+      badges: [
+        {
+          type: 'button',
+          icon: isOn ? 'mdi:lightbulb-off' : 'mdi:lightbulb-on',
+          text: isOn ? 'Alle aus' : 'Alle ein',
+          tap_action: {
+            action: 'perform-action',
+            perform_action: isOn ? 'light.turn_off' : 'light.turn_on',
+            target: { entity_id: lights },
+          },
         },
-      }],
+      ],
     };
   }
 

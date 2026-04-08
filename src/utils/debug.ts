@@ -69,8 +69,9 @@ export function trackHassUpdate(componentName: string): void {
 
 /** Dump all s42 performance measures to console as sorted table */
 function dumpAllMeasures(): void {
-  const entries = performance.getEntriesByType('measure')
-    .filter(e => e.name.startsWith('s42-'))
+  const entries = performance
+    .getEntriesByType('measure')
+    .filter((e) => e.name.startsWith('s42-'))
     .sort((a, b) => a.startTime - b.startTime);
 
   if (entries.length === 0) {
@@ -78,11 +79,13 @@ function dumpAllMeasures(): void {
     return;
   }
 
-  console.table(entries.map(e => ({
-    name: e.name.replace('s42-', ''),
-    start: `${e.startTime.toFixed(1)}ms`,
-    duration: `${e.duration.toFixed(2)}ms`,
-  })));
+  console.table(
+    entries.map((e) => ({
+      name: e.name.replace('s42-', ''),
+      start: `${e.startTime.toFixed(1)}ms`,
+      duration: `${e.duration.toFixed(2)}ms`,
+    }))
+  );
 
   const total = entries.reduce((sum, e) => sum + e.duration, 0);
   console.log(`[s42-perf] Total measured: ${total.toFixed(2)}ms across ${entries.length} measures`);

@@ -18,10 +18,7 @@ interface EditorElement extends HTMLElement {
 
 // -- Checkbox Listener Functions --------------------------------------
 
-export function attachWeatherCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachWeatherCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const weatherCheckbox = element.querySelector('#show-weather') as HTMLInputElement | null;
   if (weatherCheckbox) {
     weatherCheckbox.addEventListener('change', (e: Event) => {
@@ -30,10 +27,7 @@ export function attachWeatherCheckboxListener(
   }
 }
 
-export function attachEnergyCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachEnergyCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const energyCheckbox = element.querySelector('#show-energy') as HTMLInputElement | null;
   if (energyCheckbox) {
     energyCheckbox.addEventListener('change', (e: Event) => {
@@ -42,10 +36,7 @@ export function attachEnergyCheckboxListener(
   }
 }
 
-export function attachSearchCardCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachSearchCardCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const searchCardCheckbox = element.querySelector('#show-search-card') as HTMLInputElement | null;
   if (searchCardCheckbox) {
     searchCardCheckbox.addEventListener('change', (e: Event) => {
@@ -54,10 +45,7 @@ export function attachSearchCardCheckboxListener(
   }
 }
 
-export function attachSummaryViewsCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachSummaryViewsCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const summaryViewsCheckbox = element.querySelector('#show-summary-views') as HTMLInputElement | null;
   if (summaryViewsCheckbox) {
     summaryViewsCheckbox.addEventListener('change', (e: Event) => {
@@ -66,10 +54,7 @@ export function attachSummaryViewsCheckboxListener(
   }
 }
 
-export function attachRoomViewsCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachRoomViewsCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const roomViewsCheckbox = element.querySelector('#show-room-views') as HTMLInputElement | null;
   if (roomViewsCheckbox) {
     roomViewsCheckbox.addEventListener('change', (e: Event) => {
@@ -78,10 +63,7 @@ export function attachRoomViewsCheckboxListener(
   }
 }
 
-export function attachGroupByFloorsCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachGroupByFloorsCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const groupByFloorsCheckbox = element.querySelector('#group-by-floors') as HTMLInputElement | null;
   if (groupByFloorsCheckbox) {
     groupByFloorsCheckbox.addEventListener('change', (e: Event) => {
@@ -90,10 +72,7 @@ export function attachGroupByFloorsCheckboxListener(
   }
 }
 
-export function attachCoversSummaryCheckboxListener(
-  element: HTMLElement,
-  callback: (checked: boolean) => void,
-): void {
+export function attachCoversSummaryCheckboxListener(element: HTMLElement, callback: (checked: boolean) => void): void {
   const coversSummaryCheckbox = element.querySelector('#show-covers-summary') as HTMLInputElement | null;
   if (coversSummaryCheckbox) {
     coversSummaryCheckbox.addEventListener('change', (e: Event) => {
@@ -104,7 +83,7 @@ export function attachCoversSummaryCheckboxListener(
 
 export function attachHideMobileAppBatteriesCheckboxListener(
   element: HTMLElement,
-  callback: (checked: boolean) => void,
+  callback: (checked: boolean) => void
 ): void {
   const checkbox = element.querySelector('#hide-mobile-app-batteries') as HTMLInputElement | null;
   if (checkbox) {
@@ -116,7 +95,7 @@ export function attachHideMobileAppBatteriesCheckboxListener(
 
 export function attachShowLocksInRoomsCheckboxListener(
   element: HTMLElement,
-  callback: (checked: boolean) => void,
+  callback: (checked: boolean) => void
 ): void {
   const checkbox = element.querySelector('#show-locks-in-rooms') as HTMLInputElement | null;
   if (checkbox) {
@@ -130,7 +109,7 @@ export function attachShowLocksInRoomsCheckboxListener(
 
 export function attachAreaCheckboxListeners(
   element: HTMLElement,
-  callback: (areaId: string, isVisible: boolean) => void,
+  callback: (areaId: string, isVisible: boolean) => void
 ): void {
   const areaCheckboxes = element.querySelectorAll('.area-checkbox') as NodeListOf<HTMLInputElement>;
   areaCheckboxes.forEach((checkbox) => {
@@ -154,7 +133,7 @@ export function attachExpandButtonListeners(
   element: EditorElement,
   hass: HomeAssistant,
   config: Simon42StrategyConfig,
-  onEntitiesLoad: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void,
+  onEntitiesLoad: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void
 ): void {
   const expandButtons = element.querySelectorAll('.expand-button') as NodeListOf<HTMLButtonElement>;
 
@@ -163,9 +142,7 @@ export function attachExpandButtonListeners(
       e.stopPropagation();
       const areaId = button.dataset.areaId!;
       const areaItem = button.closest('.area-item') as HTMLElement;
-      const content = areaItem.querySelector(
-        `.area-content[data-area-id="${areaId}"]`,
-      ) as HTMLElement;
+      const content = areaItem.querySelector(`.area-content[data-area-id="${areaId}"]`) as HTMLElement;
 
       if (content.style.display === 'none') {
         // Expand
@@ -183,13 +160,7 @@ export function attachExpandButtonListeners(
           const hiddenEntities = getHiddenEntitiesForArea(areaId, config);
           const entityOrders = getEntityOrdersForArea(areaId, config);
 
-          const entitiesHTML = renderAreaEntitiesHTML(
-            areaId,
-            groupedEntities,
-            hiddenEntities,
-            entityOrders,
-            hass,
-          );
+          const entitiesHTML = renderAreaEntitiesHTML(areaId, groupedEntities, hiddenEntities, entityOrders, hass);
           content.innerHTML = entitiesHTML;
 
           // Attach listeners for new entity checkboxes
@@ -216,7 +187,7 @@ export function attachExpandButtonListeners(
 
 export function attachGroupCheckboxListeners(
   element: HTMLElement,
-  callback: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void,
+  callback: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void
 ): void {
   const groupCheckboxes = element.querySelectorAll('.group-checkbox') as NodeListOf<HTMLInputElement>;
 
@@ -235,9 +206,7 @@ export function attachGroupCheckboxListeners(
       callback(areaId, group, null, isVisible); // null = all entities in group
 
       // Update all entity checkboxes in this group
-      const entityList = element.querySelector(
-        `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`,
-      );
+      const entityList = element.querySelector(`.entity-list[data-area-id="${areaId}"][data-group="${group}"]`);
       if (entityList) {
         const entityCheckboxes = entityList.querySelectorAll('.entity-checkbox') as NodeListOf<HTMLInputElement>;
         entityCheckboxes.forEach((cb) => {
@@ -256,7 +225,7 @@ export function attachGroupCheckboxListeners(
 
 export function attachEntityCheckboxListeners(
   element: HTMLElement,
-  callback: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void,
+  callback: (areaId: string, group: string, entityId: string | null, isVisible: boolean) => void
 ): void {
   const entityCheckboxes = element.querySelectorAll('.entity-checkbox') as NodeListOf<HTMLInputElement>;
 
@@ -271,17 +240,13 @@ export function attachEntityCheckboxListeners(
       callback(areaId, group, entityId, isVisible);
 
       // Update Group-Checkbox state (all/some/none checked)
-      const entityList = element.querySelector(
-        `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`,
-      );
+      const entityList = element.querySelector(`.entity-list[data-area-id="${areaId}"][data-group="${group}"]`);
       const groupCheckbox = element.querySelector(
-        `.group-checkbox[data-area-id="${areaId}"][data-group="${group}"]`,
+        `.group-checkbox[data-area-id="${areaId}"][data-group="${group}"]`
       ) as HTMLInputElement | null;
 
       if (entityList && groupCheckbox) {
-        const allCheckboxes = Array.from(
-          entityList.querySelectorAll('.entity-checkbox'),
-        ) as HTMLInputElement[];
+        const allCheckboxes = Array.from(entityList.querySelectorAll('.entity-checkbox')) as HTMLInputElement[];
         const checkedCount = allCheckboxes.filter((cb) => cb.checked).length;
 
         if (checkedCount === 0) {
@@ -304,10 +269,7 @@ export function attachEntityCheckboxListeners(
 
 // -- Entity Group Expand/Collapse -------------------------------------
 
-export function attachEntityExpandButtonListeners(
-  element: HTMLElement,
-  editorElement: EditorElement,
-): void {
+export function attachEntityExpandButtonListeners(element: HTMLElement, editorElement: EditorElement): void {
   const expandButtons = element.querySelectorAll('.expand-button-small') as NodeListOf<HTMLButtonElement>;
 
   expandButtons.forEach((button) => {
@@ -316,7 +278,7 @@ export function attachEntityExpandButtonListeners(
       const areaId = button.dataset.areaId!;
       const group = button.dataset.group!;
       const entityList = element.querySelector(
-        `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`,
+        `.entity-list[data-area-id="${areaId}"][data-group="${group}"]`
       ) as HTMLElement | null;
 
       if (entityList) {
@@ -366,10 +328,7 @@ export function sortAreaItems(element: HTMLElement): void {
 
 // -- Drag-and-Drop Area Reordering ------------------------------------
 
-export function attachDragAndDropListeners(
-  element: HTMLElement,
-  onOrderChange: () => void,
-): void {
+export function attachDragAndDropListeners(element: HTMLElement, onOrderChange: () => void): void {
   const areaList = element.querySelector('#area-list') as HTMLElement | null;
   if (!areaList) return;
 
@@ -461,10 +420,7 @@ export function attachDragAndDropListeners(
 
 // -- Helper Functions -------------------------------------------------
 
-export async function getAreaGroupedEntities(
-  areaId: string,
-  hass: HomeAssistant,
-): Promise<RoomEntities> {
+export async function getAreaGroupedEntities(areaId: string, hass: HomeAssistant): Promise<RoomEntities> {
   // Use hass.devices and hass.entities (standard Home Assistant objects)
   // No WebSocket calls needed!
 
@@ -551,10 +507,7 @@ export async function getAreaGroupedEntities(
   return roomEntities;
 }
 
-export function getHiddenEntitiesForArea(
-  areaId: string,
-  config: Simon42StrategyConfig,
-): Record<string, string[]> {
+export function getHiddenEntitiesForArea(areaId: string, config: Simon42StrategyConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};
@@ -570,10 +523,7 @@ export function getHiddenEntitiesForArea(
   return hidden;
 }
 
-export function getEntityOrdersForArea(
-  areaId: string,
-  config: Simon42StrategyConfig,
-): Record<string, string[]> {
+export function getEntityOrdersForArea(areaId: string, config: Simon42StrategyConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};

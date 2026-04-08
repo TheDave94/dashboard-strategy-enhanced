@@ -2,11 +2,7 @@
 // View Builder - Creates View Definitions
 // ====================================================================
 
-import type {
-  LovelaceViewConfig,
-  LovelaceBadgeConfig,
-  LovelaceSectionConfig,
-} from '../types/lovelace';
+import type { LovelaceViewConfig, LovelaceBadgeConfig, LovelaceSectionConfig } from '../types/lovelace';
 
 /**
  * Creates the main overview view.
@@ -16,7 +12,7 @@ import type {
  */
 export function createOverviewView(
   sections: LovelaceSectionConfig[],
-  personBadges: LovelaceBadgeConfig[],
+  personBadges: LovelaceBadgeConfig[]
 ): LovelaceViewConfig {
   return {
     title: 'Übersicht',
@@ -36,4 +32,3 @@ export function createOverviewView(
     sections,
   };
 }
-

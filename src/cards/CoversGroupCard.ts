@@ -21,13 +21,23 @@ interface CoversGroupConfig {
 
 // Pre-compiled RegExps for cover type name stripping
 const COVER_TERMS = [
-  'Rollo', 'Rollladen', 'Jalousie', 'Vorhang', 'Gardine',
-  'Rolladen', 'Beschattung', 'Raffstore', 'Fenster',
-  'Cover', 'Blind', 'Curtain', 'Shade', 'Shutter', 'Window',
+  'Rollo',
+  'Rollladen',
+  'Jalousie',
+  'Vorhang',
+  'Gardine',
+  'Rolladen',
+  'Beschattung',
+  'Raffstore',
+  'Fenster',
+  'Cover',
+  'Blind',
+  'Curtain',
+  'Shade',
+  'Shutter',
+  'Window',
 ];
-const COVER_TERM_REGEXPS = COVER_TERMS.map(
-  term => new RegExp(`^${term}\\s+|\\s+${term}$`, 'gi'),
-);
+const COVER_TERM_REGEXPS = COVER_TERMS.map((term) => new RegExp(`^${term}\\s+|\\s+${term}$`, 'gi'));
 
 const DEFAULT_DEVICE_CLASSES = ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'];
 
@@ -100,13 +110,12 @@ class Simon42CoversGroupCard extends LitElement {
   }
 
   private _getFilteredCoverEntities(hass: HomeAssistant): string[] {
-    return Registry.getVisibleEntityIdsForDomain('cover')
-      .filter(id => {
-        const state = hass.states[id];
-        if (!state) return false;
-        const deviceClass = (state.attributes as any)?.device_class as string | undefined;
-        return this._deviceClasses.includes(deviceClass!) || !deviceClass;
-      });
+    return Registry.getVisibleEntityIdsForDomain('cover').filter((id) => {
+      const state = hass.states[id];
+      if (!state) return false;
+      const deviceClass = (state.attributes as any)?.device_class as string | undefined;
+      return this._deviceClasses.includes(deviceClass!) || !deviceClass;
+    });
   }
 
   private _getRelevantCovers(): string[] {
@@ -154,16 +163,18 @@ class Simon42CoversGroupCard extends LitElement {
       type: 'heading',
       heading: `${isOpen ? 'Offene Rollos & Vorhänge' : 'Geschlossene Rollos & Vorhänge'} (${covers.length})`,
       icon: isOpen ? 'mdi:blinds-horizontal' : 'mdi:blinds',
-      badges: [{
-        type: 'button',
-        icon: isOpen ? 'mdi:arrow-down' : 'mdi:arrow-up',
-        text: isOpen ? 'Alle schließen' : 'Alle öffnen',
-        tap_action: {
-          action: 'perform-action',
-          perform_action: isOpen ? 'cover.close_cover' : 'cover.open_cover',
-          target: { entity_id: covers },
+      badges: [
+        {
+          type: 'button',
+          icon: isOpen ? 'mdi:arrow-down' : 'mdi:arrow-up',
+          text: isOpen ? 'Alle schließen' : 'Alle öffnen',
+          tap_action: {
+            action: 'perform-action',
+            perform_action: isOpen ? 'cover.close_cover' : 'cover.open_cover',
+            target: { entity_id: covers },
+          },
         },
-      }],
+      ],
     };
   }
 
@@ -187,15 +198,17 @@ class Simon42CoversGroupCard extends LitElement {
   }
 
   private _calculateRenderKey(covers: string[]): string {
-    return covers.map(id => {
-      const state = this.hass!.states[id];
-      if (!state) return id;
-      if (state.state === 'opening' || state.state === 'closing') {
-        const position = (state.attributes as any).current_position || 0;
-        return `${id}:${state.state}:${position}`;
-      }
-      return `${id}:${state.state}`;
-    }).join(',');
+    return covers
+      .map((id) => {
+        const state = this.hass!.states[id];
+        if (!state) return id;
+        if (state.state === 'opening' || state.state === 'closing') {
+          const position = (state.attributes as any).current_position || 0;
+          return `${id}:${state.state}:${position}`;
+        }
+        return `${id}:${state.state}`;
+      })
+      .join(',');
   }
 
   protected render() {

@@ -123,7 +123,9 @@ class Registry {
     timeEnd('registry-buildEntityMaps');
 
     Registry._initialized = true;
-    debugLog(`Registry initialized: ${Registry._fetchedEntities.length} entities, ${Registry._fetchedDevices.length} devices, ${Registry._fetchedAreas.length} areas`);
+    debugLog(
+      `Registry initialized: ${Registry._fetchedEntities.length} entities, ${Registry._fetchedDevices.length} devices, ${Registry._fetchedAreas.length} areas`
+    );
     timeEnd('registry-init');
   }
 
@@ -149,8 +151,7 @@ class Registry {
     if (Registry._excludeSet.has(entity.entity_id)) return false;
     if (Registry._hiddenFromConfig.has(entity.entity_id)) return false;
     if (entity.hidden) return false;
-    if (entity.entity_category === 'config' || entity.entity_category === 'diagnostic')
-      return false;
+    if (entity.entity_category === 'config' || entity.entity_category === 'diagnostic') return false;
     return true;
   }
 
@@ -229,8 +230,7 @@ class Registry {
     Registry._configDiagEntitiesByArea = new Map();
 
     for (const e of entities) {
-      const areaId =
-        e.area_id || (e.device_id ? Registry._deviceById.get(e.device_id)?.area_id : undefined);
+      const areaId = e.area_id || (e.device_id ? Registry._deviceById.get(e.device_id)?.area_id : undefined);
       if (!areaId) continue;
 
       // Raw map (all entities in area)
@@ -429,8 +429,7 @@ class Registry {
     if (!entry) return false; // Entity not in registry — don't exclude
 
     if (entry.hidden) return true;
-    if (entry.entity_category === 'config' || entry.entity_category === 'diagnostic')
-      return true;
+    if (entry.entity_category === 'config' || entry.entity_category === 'diagnostic') return true;
 
     return false;
   }
@@ -448,10 +447,7 @@ class Registry {
 
     // Fallback: check entity_category from state attributes
     const state = Registry._hass.states[entityId];
-    if (
-      state?.attributes?.entity_category === 'config' ||
-      state?.attributes?.entity_category === 'diagnostic'
-    ) {
+    if (state?.attributes?.entity_category === 'config' || state?.attributes?.entity_category === 'diagnostic') {
       return true;
     }
 

@@ -2,10 +2,13 @@
   "name": "simon42-dashboard-strategy",
   "version": "1.2.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "webpack",
     "build-dev": "webpack --config webpack.dev.config.ts",
-    "watch": "webpack --config webpack.dev.config.ts --watch"
+    "watch": "webpack --config webpack.dev.config.ts --watch",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
@@ -15,6 +18,7 @@
     "@types/js-yaml": "^4.0.9",
     "compression-webpack-plugin": "^12.0.0",
     "home-assistant-js-websocket": "^9.6.0",
+    "prettier": "^3.8.1",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
