@@ -1,0 +1,25 @@
+name: Close stale issues
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 35
+          days-before-close: 7
+          stale-issue-label: stale
+          stale-issue-message: >
+            Dieses Issue hatte 35 Tage lang keine Aktivität und wird in 7 Tagen
+            automatisch geschlossen. Falls es noch relevant ist, bitte kurz
+            kommentieren — dann bleibt es offen.
+          close-issue-message: >
+            Automatisch geschlossen nach 42 Tagen ohne Aktivität.
+            Falls das Problem weiterhin besteht, gerne ein neues Issue öffnen.
+          exempt-issue-labels: pinned,enhancement
