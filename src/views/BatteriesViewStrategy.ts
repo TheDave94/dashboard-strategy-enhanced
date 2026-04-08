@@ -68,6 +68,12 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
         continue;
       }
       const value = parseFloat(state.state);
+      const unit = state.attributes?.unit_of_measurement;
+      // Only apply percentage thresholds to %-based sensors.
+      // Voltage sensors (V, mV) have device-specific ranges and cannot be
+      // meaningfully compared against percentage thresholds (e.g. 3V would
+      // be "critical" at < 20 which is wrong). Skip them entirely.
+      if (unit && unit !== '%') continue;
       if (value < 20) critical.push(entityId);
       else if (value <= 50) low.push(entityId);
       else good.push(entityId);

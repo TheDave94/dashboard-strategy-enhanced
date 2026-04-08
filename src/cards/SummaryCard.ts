@@ -261,6 +261,8 @@ class Simon42SummaryCard extends LitElement {
           if (id.startsWith('binary_sensor.')) {
             if (state.state === 'on') count++;
           } else {
+            const unit = state.attributes?.unit_of_measurement;
+            if (unit && unit !== '%') continue;
             const value = parseFloat(state.state);
             if (!isNaN(value) && value < 20) count++;
           }
