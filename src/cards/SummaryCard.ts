@@ -126,20 +126,20 @@ class Simon42SummaryCard extends LitElement {
 
     switch (this._config.summary_type) {
       case 'lights':
-        result = Registry.getVisibleEntityIdsForDomain('light')
-          .filter(id => hass.states[id] && this._isEntityRelevant(id, hass.states[id]));
+        result = Registry.getVisibleEntityIdsForDomain('light').filter(
+          (id) => hass.states[id] && this._isEntityRelevant(id, hass.states[id])
+        );
         break;
 
       case 'covers':
-        result = Registry.getVisibleEntityIdsForDomain('cover')
-          .filter(id => {
-            const state = hass.states[id];
-            if (!state) return false;
-            if (!this._isEntityRelevant(id, state)) return false;
-            const coverDeviceClass = state.attributes?.device_class;
-            if (coverDeviceClass && !COVER_DEVICE_CLASSES.has(coverDeviceClass)) return false;
-            return true;
-          });
+        result = Registry.getVisibleEntityIdsForDomain('cover').filter((id) => {
+          const state = hass.states[id];
+          if (!state) return false;
+          if (!this._isEntityRelevant(id, state)) return false;
+          const coverDeviceClass = state.attributes?.device_class;
+          if (coverDeviceClass && !COVER_DEVICE_CLASSES.has(coverDeviceClass)) return false;
+          return true;
+        });
         break;
 
       case 'security': {
@@ -177,11 +177,10 @@ class Simon42SummaryCard extends LitElement {
         const bsIds = Registry.getEntityIdsForDomain('binary_sensor');
         const allDomainIds = [...sensorIds, ...bsIds];
 
-        const batteryEntities = allDomainIds.filter(id => {
+        const batteryEntities = allDomainIds.filter((id) => {
           const state = hass.states[id];
           if (!state) return false;
-          const isBatterySensor =
-            (id.includes('battery') || state.attributes?.device_class === 'battery');
+          const isBatterySensor = id.includes('battery') || state.attributes?.device_class === 'battery';
           if (!isBatterySensor) return false;
           if (Registry.isExcludedByLabel(id)) return false;
           if (Registry.isHiddenByConfig(id)) return false;
@@ -199,7 +198,7 @@ class Simon42SummaryCard extends LitElement {
           }
         }
 
-        result = batteryEntities.filter(id => {
+        result = batteryEntities.filter((id) => {
           if (!id.startsWith('binary_sensor.')) return true;
           const deviceId = hass.entities?.[id]?.device_id;
           return !deviceId || !sensorDeviceIds.has(deviceId);
@@ -304,19 +303,21 @@ class Simon42SummaryCard extends LitElement {
   private _handleClick(): void {
     if (!this.hass || !this._config) return;
     const displayConfig = this._getDisplayConfig();
-    this.dispatchEvent(new CustomEvent('hass-action', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        config: {
-          tap_action: {
-            action: 'navigate',
-            navigation_path: displayConfig.path,
+    this.dispatchEvent(
+      new CustomEvent('hass-action', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          config: {
+            tap_action: {
+              action: 'navigate',
+              navigation_path: displayConfig.path,
+            },
           },
+          action: 'tap',
         },
-        action: 'tap',
-      },
-    }));
+      })
+    );
   }
 
   protected render() {

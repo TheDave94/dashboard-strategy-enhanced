@@ -17,8 +17,8 @@ export function collectPersons(hass: HomeAssistant, config: Simon42StrategyConfi
   const personIds = Registry.getVisibleEntityIdsForDomain('person');
 
   return personIds
-    .filter(id => !!hass.states[id])
-    .map(id => {
+    .filter((id) => !!hass.states[id])
+    .map((id) => {
       const state = hass.states[id];
       return {
         entity_id: id,
@@ -35,7 +35,7 @@ export function collectPersons(hass: HomeAssistant, config: Simon42StrategyConfi
  */
 export function findWeatherEntity(hass: HomeAssistant): string | undefined {
   const weatherIds = Registry.getVisibleEntityIdsForDomain('weather');
-  return weatherIds.find(id => !!hass.states[id]);
+  return weatherIds.find((id) => !!hass.states[id]);
 }
 
 /**

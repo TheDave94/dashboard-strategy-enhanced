@@ -17,10 +17,7 @@ import type { PersonData } from '../types/strategy';
  * - Hidden entities (registry hidden === true) are excluded
  * - Name is trimmed to first name only
  */
-export function createPersonBadges(
-  persons: PersonData[],
-  hass: HomeAssistant,
-): LovelaceBadgeConfig[] {
+export function createPersonBadges(persons: PersonData[], hass: HomeAssistant): LovelaceBadgeConfig[] {
   const badges: LovelaceBadgeConfig[] = [];
 
   for (const person of persons) {

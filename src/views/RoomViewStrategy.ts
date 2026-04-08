@@ -3,7 +3,12 @@
 // ====================================================================
 
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
-import type { LovelaceViewConfig, LovelaceCardConfig, LovelaceSectionConfig, LovelaceBadgeConfig } from '../types/lovelace';
+import type {
+  LovelaceViewConfig,
+  LovelaceCardConfig,
+  LovelaceSectionConfig,
+  LovelaceBadgeConfig,
+} from '../types/lovelace';
 import type { AreaRegistryEntry } from '../types/registries';
 import type { RoomEntities, SensorEntities } from '../types/strategy';
 import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
@@ -20,7 +25,7 @@ const MEDIA_STOP = 4096;
 /** Check if a light supports brightness (based on supported_color_modes) */
 function lightSupportsBrightness(state: HassEntity): boolean {
   const modes = state.attributes?.supported_color_modes as string[] | undefined;
-  return modes?.some(m => LIGHT_BRIGHTNESS_MODES.includes(m)) || false;
+  return modes?.some((m) => LIGHT_BRIGHTNESS_MODES.includes(m)) || false;
 }
 
 /** Check if a fan supports speed control */
@@ -46,13 +51,30 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     const groupsOptions: Record<string, any> = config.groups_options || {};
 
     const roomEntities: RoomEntities = {
-      lights: [], covers: [], covers_curtain: [], scenes: [], climate: [],
-      media_player: [], vacuum: [], fan: [], switches: [], locks: [], cameras: [],
+      lights: [],
+      covers: [],
+      covers_curtain: [],
+      scenes: [],
+      climate: [],
+      media_player: [],
+      vacuum: [],
+      fan: [],
+      switches: [],
+      locks: [],
+      cameras: [],
     };
 
     const sensorEntities: SensorEntities = {
-      temperature: [], humidity: [], pm25: [], pm10: [], co2: [], voc: [],
-      motion: [], occupancy: [], illuminance: [], battery: [],
+      temperature: [],
+      humidity: [],
+      pm25: [],
+      pm10: [],
+      co2: [],
+      voc: [],
+      motion: [],
+      occupancy: [],
+      illuminance: [],
+      battery: [],
     };
 
     // Main categorization loop — use pre-filtered visible entities from Registry
@@ -71,20 +93,47 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       const deviceClass = state.attributes?.device_class as string | undefined;
       const unit = state.attributes?.unit_of_measurement as string | undefined;
 
-      if (domain === 'light') { roomEntities.lights.push(entityId); continue; }
+      if (domain === 'light') {
+        roomEntities.lights.push(entityId);
+        continue;
+      }
       if (domain === 'cover') {
         if (deviceClass === 'curtain' || deviceClass === 'blind') roomEntities.covers_curtain.push(entityId);
         else roomEntities.covers.push(entityId);
         continue;
       }
-      if (domain === 'scene') { roomEntities.scenes.push(entityId); continue; }
-      if (domain === 'climate') { roomEntities.climate.push(entityId); continue; }
-      if (domain === 'media_player') { roomEntities.media_player.push(entityId); continue; }
-      if (domain === 'vacuum') { roomEntities.vacuum.push(entityId); continue; }
-      if (domain === 'fan') { roomEntities.fan.push(entityId); continue; }
-      if (domain === 'switch') { roomEntities.switches.push(entityId); continue; }
-      if (domain === 'lock' && dashboardConfig.show_locks_in_rooms) { roomEntities.locks.push(entityId); continue; }
-      if (domain === 'camera') { roomEntities.cameras.push(entityId); continue; }
+      if (domain === 'scene') {
+        roomEntities.scenes.push(entityId);
+        continue;
+      }
+      if (domain === 'climate') {
+        roomEntities.climate.push(entityId);
+        continue;
+      }
+      if (domain === 'media_player') {
+        roomEntities.media_player.push(entityId);
+        continue;
+      }
+      if (domain === 'vacuum') {
+        roomEntities.vacuum.push(entityId);
+        continue;
+      }
+      if (domain === 'fan') {
+        roomEntities.fan.push(entityId);
+        continue;
+      }
+      if (domain === 'switch') {
+        roomEntities.switches.push(entityId);
+        continue;
+      }
+      if (domain === 'lock' && dashboardConfig.show_locks_in_rooms) {
+        roomEntities.locks.push(entityId);
+        continue;
+      }
+      if (domain === 'camera') {
+        roomEntities.cameras.push(entityId);
+        continue;
+      }
 
       // Sensors for badges
       if (domain === 'sensor') {
@@ -93,17 +142,44 @@ class Simon42ViewRoomStrategy extends HTMLElement {
           if (!isNaN(val) && val < 20) sensorEntities.battery.push(entityId);
           continue;
         }
-        if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') { sensorEntities.temperature.push(entityId); continue; }
-        if (deviceClass === 'humidity' || unit === '%') { sensorEntities.humidity.push(entityId); continue; }
-        if (deviceClass === 'pm25' || entityId.includes('pm_2_5') || entityId.includes('pm25')) { sensorEntities.pm25.push(entityId); continue; }
-        if (deviceClass === 'pm10' || entityId.includes('pm_10') || entityId.includes('pm10')) { sensorEntities.pm10.push(entityId); continue; }
-        if (deviceClass === 'carbon_dioxide' || entityId.includes('co2')) { sensorEntities.co2.push(entityId); continue; }
-        if (deviceClass === 'volatile_organic_compounds' || entityId.includes('voc')) { sensorEntities.voc.push(entityId); continue; }
-        if (deviceClass === 'illuminance' || unit === 'lx') { sensorEntities.illuminance.push(entityId); continue; }
+        if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') {
+          sensorEntities.temperature.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'humidity' || unit === '%') {
+          sensorEntities.humidity.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'pm25' || entityId.includes('pm_2_5') || entityId.includes('pm25')) {
+          sensorEntities.pm25.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'pm10' || entityId.includes('pm_10') || entityId.includes('pm10')) {
+          sensorEntities.pm10.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'carbon_dioxide' || entityId.includes('co2')) {
+          sensorEntities.co2.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'volatile_organic_compounds' || entityId.includes('voc')) {
+          sensorEntities.voc.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'illuminance' || unit === 'lx') {
+          sensorEntities.illuminance.push(entityId);
+          continue;
+        }
       }
       if (domain === 'binary_sensor') {
-        if (deviceClass === 'motion') { sensorEntities.motion.push(entityId); continue; }
-        if (deviceClass === 'occupancy' || deviceClass === 'presence') { sensorEntities.occupancy.push(entityId); continue; }
+        if (deviceClass === 'motion') {
+          sensorEntities.motion.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'occupancy' || deviceClass === 'presence') {
+          sensorEntities.occupancy.push(entityId);
+          continue;
+        }
       }
     }
 
@@ -134,15 +210,26 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     let primaryTemp: string | null = null;
     let primaryHumidity: string | null = null;
 
-    if (area.temperature_entity_id && hass.states[area.temperature_entity_id] && !Registry.isEntityExcluded(area.temperature_entity_id)) {
+    if (
+      area.temperature_entity_id &&
+      hass.states[area.temperature_entity_id] &&
+      !Registry.isEntityExcluded(area.temperature_entity_id)
+    ) {
       primaryTemp = area.temperature_entity_id;
     }
-    if (area.humidity_entity_id && hass.states[area.humidity_entity_id] && !Registry.isEntityExcluded(area.humidity_entity_id)) {
+    if (
+      area.humidity_entity_id &&
+      hass.states[area.humidity_entity_id] &&
+      !Registry.isEntityExcluded(area.humidity_entity_id)
+    ) {
       primaryHumidity = area.humidity_entity_id;
     }
 
     const badgeConfig = (entity: string, color: string): LovelaceBadgeConfig => ({
-      type: 'entity', entity, color, tap_action: { action: 'more-info' },
+      type: 'entity',
+      entity,
+      color,
+      tap_action: { action: 'more-info' },
     });
 
     const temp = primaryTemp || sensorEntities.temperature[0];
@@ -181,20 +268,47 @@ class Simon42ViewRoomStrategy extends HTMLElement {
 
         if (isReolink && deviceId) {
           const devEntities = Registry.getEntityIdsForDevice(deviceId);
-          const spotlight = devEntities.find(id => id.startsWith('light.') && hass.states[id] && !Registry.isEntityExcluded(id));
-          const motion = devEntities.find(id => id.startsWith('binary_sensor.') && hass.states[id]?.attributes?.device_class === 'motion' && !Registry.isEntityExcluded(id));
-          const siren = devEntities.find(id => id.startsWith('siren.') && hass.states[id] && !Registry.isEntityExcluded(id));
+          const spotlight = devEntities.find(
+            (id) => id.startsWith('light.') && hass.states[id] && !Registry.isEntityExcluded(id)
+          );
+          const motion = devEntities.find(
+            (id) =>
+              id.startsWith('binary_sensor.') &&
+              hass.states[id]?.attributes?.device_class === 'motion' &&
+              !Registry.isEntityExcluded(id)
+          );
+          const siren = devEntities.find(
+            (id) => id.startsWith('siren.') && hass.states[id] && !Registry.isEntityExcluded(id)
+          );
           const glanceEntities: any[] = [];
           if (spotlight) glanceEntities.push({ entity: spotlight });
           if (motion) glanceEntities.push({ entity: motion });
           if (siren) glanceEntities.push({ entity: siren });
-          cameraCards.push({ type: 'picture-glance', camera_image: cameraId, camera_view: 'auto', fit_mode: 'cover', title: stripAreaName(cameraId, area, hass), entities: glanceEntities });
+          cameraCards.push({
+            type: 'picture-glance',
+            camera_image: cameraId,
+            camera_view: 'auto',
+            fit_mode: 'cover',
+            title: stripAreaName(cameraId, area, hass),
+            entities: glanceEntities,
+          });
         } else {
-          cameraCards.push({ type: 'picture-entity', entity: cameraId, camera_image: cameraId, camera_view: 'auto', name: stripAreaName(cameraId, area, hass), show_name: true, show_state: false });
+          cameraCards.push({
+            type: 'picture-entity',
+            entity: cameraId,
+            camera_image: cameraId,
+            camera_view: 'auto',
+            name: stripAreaName(cameraId, area, hass),
+            show_name: true,
+            show_state: false,
+          });
         }
       }
       if (cameraCards.length > 0) {
-        sections.push({ type: 'grid', cards: [{ type: 'heading', heading: 'Kameras', heading_style: 'title', icon: 'mdi:cctv' }, ...cameraCards] });
+        sections.push({
+          type: 'grid',
+          cards: [{ type: 'heading', heading: 'Kameras', heading_style: 'title', icon: 'mdi:cctv' }, ...cameraCards],
+        });
       }
     }
 
@@ -204,74 +318,146 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     }
 
     // Helper: create a domain section
-    const domainSection = (entities: string[], heading: string, icon: string, tileConfig: (e: string) => LovelaceCardConfig): void => {
+    const domainSection = (
+      entities: string[],
+      heading: string,
+      icon: string,
+      tileConfig: (e: string) => LovelaceCardConfig
+    ): void => {
       if (entities.length === 0) return;
-      sections.push({ type: 'grid', cards: [{ type: 'heading', heading, heading_style: 'title', icon }, ...entities.map(tileConfig)] });
+      sections.push({
+        type: 'grid',
+        cards: [{ type: 'heading', heading, heading_style: 'title', icon }, ...entities.map(tileConfig)],
+      });
     };
 
-    domainSection(roomEntities.lights, 'Beleuchtung', 'mdi:lightbulb', e => {
+    domainSection(roomEntities.lights, 'Beleuchtung', 'mdi:lightbulb', (e) => {
       const state = hass.states[e];
       const hasBrightness = state && lightSupportsBrightness(state);
       return {
-        type: 'tile', entity: e, name: stripAreaName(e, area, hass),
+        type: 'tile',
+        entity: e,
+        name: stripAreaName(e, area, hass),
         ...(hasBrightness ? { features: [{ type: 'light-brightness' }], features_position: 'inline' } : {}),
-        vertical: false, state_content: 'last_changed',
+        vertical: false,
+        state_content: 'last_changed',
       };
     });
 
-    domainSection(roomEntities.locks, 'Schlösser', 'mdi:lock', e => ({
-      type: 'tile', entity: e, name: stripAreaName(e, area, hass), features: [{ type: 'lock-commands' }], features_position: 'inline', vertical: false, state_content: 'last_changed',
+    domainSection(roomEntities.locks, 'Schlösser', 'mdi:lock', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      features: [{ type: 'lock-commands' }],
+      features_position: 'inline',
+      vertical: false,
+      state_content: 'last_changed',
     }));
 
-    domainSection(roomEntities.climate, 'Klima', 'mdi:thermostat', e => ({
-      type: 'tile', entity: e, name: stripAreaName(e, area, hass), features: [{ type: 'climate-hvac-modes' }], features_position: 'inline', vertical: false, state_content: ['hvac_action', 'current_temperature'],
+    domainSection(roomEntities.climate, 'Klima', 'mdi:thermostat', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      features: [{ type: 'climate-hvac-modes' }],
+      features_position: 'inline',
+      vertical: false,
+      state_content: ['hvac_action', 'current_temperature'],
     }));
 
-    domainSection(roomEntities.covers, 'Rollos & Jalousien', 'mdi:window-shutter', e => ({
-      type: 'tile', entity: e, name: stripAreaName(e, area, hass), features: [{ type: 'cover-open-close' }], vertical: false, features_position: 'inline', state_content: ['current_position', 'last_changed'],
+    domainSection(roomEntities.covers, 'Rollos & Jalousien', 'mdi:window-shutter', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      features: [{ type: 'cover-open-close' }],
+      vertical: false,
+      features_position: 'inline',
+      state_content: ['current_position', 'last_changed'],
     }));
 
-    domainSection(roomEntities.covers_curtain, 'Vorhänge', 'mdi:curtains', e => ({
-      type: 'tile', entity: e, name: stripAreaName(e, area, hass), features: [{ type: 'cover-open-close' }], vertical: false, features_position: 'inline', state_content: ['current_position', 'last_changed'],
+    domainSection(roomEntities.covers_curtain, 'Vorhänge', 'mdi:curtains', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      features: [{ type: 'cover-open-close' }],
+      vertical: false,
+      features_position: 'inline',
+      state_content: ['current_position', 'last_changed'],
     }));
 
-    domainSection(roomEntities.media_player, 'Medien', 'mdi:speaker', e => {
+    domainSection(roomEntities.media_player, 'Medien', 'mdi:speaker', (e) => {
       const state = hass.states[e];
       const hasPlayback = state && mediaPlayerSupportsPlayback(state);
       return {
-        type: 'tile', entity: e, name: stripAreaName(e, area, hass), vertical: false,
+        type: 'tile',
+        entity: e,
+        name: stripAreaName(e, area, hass),
+        vertical: false,
         ...(hasPlayback ? { features: [{ type: 'media-player-playback' }], features_position: 'inline' } : {}),
         state_content: ['media_title', 'media_artist'],
       };
     });
 
-    domainSection(roomEntities.scenes, 'Szenen', 'mdi:palette', e => ({
-      type: 'tile', entity: e, name: stripAreaName(e, area, hass), vertical: false, state_content: 'last_changed',
+    domainSection(roomEntities.scenes, 'Szenen', 'mdi:palette', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      vertical: false,
+      state_content: 'last_changed',
     }));
 
     // Misc (vacuum, fan, switches)
     const miscCards: LovelaceCardConfig[] = [];
-    for (const e of roomEntities.vacuum) miscCards.push({ type: 'tile', entity: e, name: stripAreaName(e, area, hass), features: [{ type: 'vacuum-commands' }], features_position: 'inline', vertical: false, state_content: 'last_changed' });
+    for (const e of roomEntities.vacuum)
+      miscCards.push({
+        type: 'tile',
+        entity: e,
+        name: stripAreaName(e, area, hass),
+        features: [{ type: 'vacuum-commands' }],
+        features_position: 'inline',
+        vertical: false,
+        state_content: 'last_changed',
+      });
     for (const e of roomEntities.fan) {
       const state = hass.states[e];
       const hasSpeed = state && fanSupportsSpeed(state);
-      miscCards.push({ type: 'tile', entity: e, name: stripAreaName(e, area, hass), ...(hasSpeed ? { features: [{ type: 'fan-speed' }], features_position: 'inline' } : {}), vertical: false, state_content: 'last_changed' });
+      miscCards.push({
+        type: 'tile',
+        entity: e,
+        name: stripAreaName(e, area, hass),
+        ...(hasSpeed ? { features: [{ type: 'fan-speed' }], features_position: 'inline' } : {}),
+        vertical: false,
+        state_content: 'last_changed',
+      });
     }
-    for (const e of roomEntities.switches) miscCards.push({ type: 'tile', entity: e, name: stripAreaName(e, area, hass), vertical: false, state_content: 'last_changed' });
+    for (const e of roomEntities.switches)
+      miscCards.push({
+        type: 'tile',
+        entity: e,
+        name: stripAreaName(e, area, hass),
+        vertical: false,
+        state_content: 'last_changed',
+      });
 
     miscCards.sort((a, b) => {
-      const sA = hass.states[a.entity]; const sB = hass.states[b.entity];
+      const sA = hass.states[a.entity];
+      const sB = hass.states[b.entity];
       if (!sA || !sB) return 0;
       return new Date(sB.last_changed).getTime() - new Date(sA.last_changed).getTime();
     });
 
     if (miscCards.length > 0) {
-      sections.push({ type: 'grid', cards: [{ type: 'heading', heading: 'Sonstiges', heading_style: 'title', icon: 'mdi:dots-horizontal' }, ...miscCards] });
+      sections.push({
+        type: 'grid',
+        cards: [
+          { type: 'heading', heading: 'Sonstiges', heading_style: 'title', icon: 'mdi:dots-horizontal' },
+          ...miscCards,
+        ],
+      });
     }
 
     // Room Pins
     const roomPinEntities: string[] = dashboardConfig.room_pin_entities || [];
-    const pinsForArea = roomPinEntities.filter(entityId => {
+    const pinsForArea = roomPinEntities.filter((entityId) => {
       const entity = Registry.getEntity(entityId);
       if (!entity) return false;
       if (entity.area_id === area.area_id) return true;
@@ -283,10 +469,24 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     });
 
     if (pinsForArea.length > 0) {
-      sections.push({ type: 'grid', cards: [{ type: 'heading', heading: 'Raum-Pins', heading_style: 'title', icon: 'mdi:pin' }, ...pinsForArea.map(e => ({ type: 'tile', entity: e, name: stripAreaName(e, area, hass), vertical: false, state_content: 'last_changed' }))] });
+      sections.push({
+        type: 'grid',
+        cards: [
+          { type: 'heading', heading: 'Raum-Pins', heading_style: 'title', icon: 'mdi:pin' },
+          ...pinsForArea.map((e) => ({
+            type: 'tile',
+            entity: e,
+            name: stripAreaName(e, area, hass),
+            vertical: false,
+            state_content: 'last_changed',
+          })),
+        ],
+      });
     }
 
-    debugLog(`Room ${area.area_id}: ${visibleEntities.length} visible entities, ${sections.length} sections, ${badges.length} badges`);
+    debugLog(
+      `Room ${area.area_id}: ${visibleEntities.length} visible entities, ${sections.length} sections, ${badges.length} badges`
+    );
     timeEnd(`room-generate-${area.area_id}`);
     return { type: 'sections', header: { badges_position: 'bottom' }, sections, badges };
   }

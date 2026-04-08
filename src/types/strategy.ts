@@ -10,18 +10,18 @@
 
 export interface Simon42StrategyConfig {
   // Global toggles
-  show_weather?: boolean;              // default: true
-  show_energy?: boolean;               // default: true
-  show_search_card?: boolean;          // default: false
-  show_summary_views?: boolean;        // default: false
-  show_room_views?: boolean;           // default: false
-  group_by_floors?: boolean;           // default: false
-  show_covers_summary?: boolean;       // default: true
+  show_weather?: boolean; // default: true
+  show_energy?: boolean; // default: true
+  show_search_card?: boolean; // default: false
+  show_summary_views?: boolean; // default: false
+  show_room_views?: boolean; // default: false
+  group_by_floors?: boolean; // default: false
+  show_covers_summary?: boolean; // default: true
   hide_mobile_app_batteries?: boolean; // default: false
-  show_locks_in_rooms?: boolean;       // default: false
+  show_locks_in_rooms?: boolean; // default: false
 
   // Layout
-  summaries_columns?: 2 | 4;          // default: 2
+  summaries_columns?: 2 | 4; // default: 2
 
   // Special entities
   alarm_entity?: string;

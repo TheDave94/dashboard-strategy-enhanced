@@ -14,7 +14,9 @@ const STRATEGY_VERSION = '1.2.0-beta.3';
 
 const DEBUG = new URLSearchParams(window.location.search).has('s42_debug');
 const T0 = performance.now();
-const t = (label: string) => { if (DEBUG) console.log(`[s42-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`); };
+const t = (label: string) => {
+  if (DEBUG) console.log(`[s42-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`);
+};
 let generateCallCount = 0;
 
 // Start loading all chunks IMMEDIATELY
@@ -33,10 +35,7 @@ const modulesPromise = Promise.all([
 modulesPromise.then(() => t('all chunks loaded'));
 
 class Simon42DashboardStrategy extends HTMLElement {
-  static async generate(
-    config: Simon42StrategyConfig,
-    hass: HomeAssistant
-  ): Promise<LovelaceConfig> {
+  static async generate(config: Simon42StrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
     generateCallCount++;
     t(`generate() called (#${generateCallCount})`);
 
@@ -59,16 +58,20 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
     const overviewConfig = await getStrategy('ll-strategy-simon42-view-overview').generate(
-      { dashboardConfig: config }, hass
+      { dashboardConfig: config },
+      hass
     );
     t('overview resolved');
 
     const utilityConfigs = await Promise.all([
       getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass),
-      getStrategy('ll-strategy-simon42-view-covers').generate({
-        device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
-        config,
-      }, hass),
+      getStrategy('ll-strategy-simon42-view-covers').generate(
+        {
+          device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
+          config,
+        },
+        hass
+      ),
       getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass),
       getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass),
     ]);
@@ -76,13 +79,16 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     const roomStrategy = getStrategy('ll-strategy-simon42-view-room');
     const roomConfigs = await Promise.all(
-      visibleAreas.map(area => {
+      visibleAreas.map((area) => {
         const areaOptions = (config.areas_options || {})[area.area_id] || {};
-        return roomStrategy.generate({
-          area,
-          groups_options: areaOptions.groups_options || {},
-          dashboardConfig: config,
-        }, hass);
+        return roomStrategy.generate(
+          {
+            area,
+            groups_options: areaOptions.groups_options || {},
+            dashboardConfig: config,
+          },
+          hass
+        );
       })
     );
     t(`${visibleAreas.length} room views resolved`);
@@ -95,20 +101,32 @@ class Simon42DashboardStrategy extends HTMLElement {
         ...overviewConfig,
       },
       {
-        title: 'Lichter', path: 'lights', icon: 'mdi:lamps',
-        subview: !showSummaryViews, ...utilityConfigs[0],
+        title: 'Lichter',
+        path: 'lights',
+        icon: 'mdi:lamps',
+        subview: !showSummaryViews,
+        ...utilityConfigs[0],
       },
       {
-        title: 'Rollos & Vorhänge', path: 'covers', icon: 'mdi:blinds-horizontal',
-        subview: !showSummaryViews, ...utilityConfigs[1],
+        title: 'Rollos & Vorhänge',
+        path: 'covers',
+        icon: 'mdi:blinds-horizontal',
+        subview: !showSummaryViews,
+        ...utilityConfigs[1],
       },
       {
-        title: 'Sicherheit', path: 'security', icon: 'mdi:security',
-        subview: !showSummaryViews, ...utilityConfigs[2],
+        title: 'Sicherheit',
+        path: 'security',
+        icon: 'mdi:security',
+        subview: !showSummaryViews,
+        ...utilityConfigs[2],
       },
       {
-        title: 'Batterien', path: 'batteries', icon: 'mdi:battery-alert',
-        subview: !showSummaryViews, ...utilityConfigs[3],
+        title: 'Batterien',
+        path: 'batteries',
+        icon: 'mdi:battery-alert',
+        subview: !showSummaryViews,
+        ...utilityConfigs[3],
       },
       ...visibleAreas.map((area, i) => ({
         title: area.name,

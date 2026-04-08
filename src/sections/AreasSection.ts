@@ -13,13 +13,21 @@ import { Registry } from '../Registry';
 
 // Area control domains to check (same as HA, excluding 'switch')
 const CONTROL_DOMAINS = [
-  'light', 'fan',
-  'cover-shutter', 'cover-blind', 'cover-curtain', 'cover-shade',
-  'cover-awning', 'cover-garage', 'cover-gate', 'cover-door',
-  'cover-window', 'cover-damper',
+  'light',
+  'fan',
+  'cover-shutter',
+  'cover-blind',
+  'cover-curtain',
+  'cover-shade',
+  'cover-awning',
+  'cover-garage',
+  'cover-gate',
+  'cover-door',
+  'cover-window',
+  'cover-damper',
 ] as const;
 
-type ControlDomain = typeof CONTROL_DOMAINS[number];
+type ControlDomain = (typeof CONTROL_DOMAINS)[number];
 
 /**
  * Pre-computes which area-controls actually have entities in this area.
@@ -72,9 +80,7 @@ function buildAreaCard(area: AreaRegistryEntry, hass: HomeAssistant): LovelaceCa
     area: area.area_id,
     display_type: 'compact',
     sensor_classes: sensorClasses.length > 0 ? sensorClasses : undefined,
-    features: controls.length > 0
-      ? [{ type: 'area-controls', controls }]
-      : [],
+    features: controls.length > 0 ? [{ type: 'area-controls', controls }] : [],
     features_position: 'inline',
     navigation_path: area.area_id,
     vertical: false,
@@ -91,7 +97,7 @@ function buildAreaCard(area: AreaRegistryEntry, hass: HomeAssistant): LovelaceCa
 export function createAreasSection(
   visibleAreas: AreaRegistryEntry[],
   groupByFloors: boolean = false,
-  hass: HomeAssistant | null = null,
+  hass: HomeAssistant | null = null
 ): LovelaceSectionConfig | LovelaceSectionConfig[] {
   // No floor grouping: flat list
   if (!groupByFloors || !hass) {
@@ -103,7 +109,7 @@ export function createAreasSection(
           heading_style: 'title',
           heading: 'Bereiche',
         },
-        ...visibleAreas.map(area => buildAreaCard(area, hass!)),
+        ...visibleAreas.map((area) => buildAreaCard(area, hass!)),
       ],
     };
   }
@@ -150,7 +156,7 @@ export function createAreasSection(
           heading: floorName,
           icon: floorIcon,
         },
-        ...areas.map(area => buildAreaCard(area, hass!)),
+        ...areas.map((area) => buildAreaCard(area, hass!)),
       ],
     });
   }
@@ -166,7 +172,7 @@ export function createAreasSection(
           heading: 'Weitere Bereiche',
           icon: 'mdi:home-outline',
         },
-        ...areasWithoutFloor.map(area => buildAreaCard(area, hass!)),
+        ...areasWithoutFloor.map((area) => buildAreaCard(area, hass!)),
       ],
     });
   }

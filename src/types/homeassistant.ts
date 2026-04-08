@@ -16,12 +16,7 @@ import {
   HassServiceTarget,
 } from 'home-assistant-js-websocket';
 
-import {
-  EntityRegistryEntry,
-  DeviceRegistryEntry,
-  AreaRegistryEntry,
-  FloorRegistryEntry,
-} from './registries';
+import { EntityRegistryEntry, DeviceRegistryEntry, AreaRegistryEntry, FloorRegistryEntry } from './registries';
 
 // -- Supporting Types -------------------------------------------------
 
@@ -84,7 +79,7 @@ export interface HomeAssistant {
     serviceData?: Record<string, any>,
     target?: HassServiceTarget,
     notifyOnError?: boolean,
-    returnResponse?: boolean,
+    returnResponse?: boolean
   ): Promise<ServiceCallResponse>;
 
   callWS<T>(msg: MessageBase): Promise<T>;

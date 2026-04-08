@@ -18,7 +18,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
     const binarySensorIds = Registry.getEntityIdsForDomain('binary_sensor');
 
     // Filter battery entities — exclude hidden/no_dboard but keep diagnostic
-    const batteryEntities = [...sensorIds, ...binarySensorIds].filter(entityId => {
+    const batteryEntities = [...sensorIds, ...binarySensorIds].filter((entityId) => {
       const state = hass.states[entityId];
       if (!state) return false;
 
@@ -50,7 +50,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
         if (deviceId) sensorDeviceIds.add(deviceId);
       }
     }
-    const dedupedEntities = batteryEntities.filter(id => {
+    const dedupedEntities = batteryEntities.filter((id) => {
       if (!id.startsWith('binary_sensor.')) return true;
       const deviceId = Registry.getEntity(id)?.device_id;
       return !deviceId || !sensorDeviceIds.has(deviceId);
@@ -79,8 +79,18 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: `🔴 Kritisch (< 20%) - ${critical.length} ${critical.length === 1 ? 'Batterie' : 'Batterien'}`, heading_style: 'title' },
-          ...critical.map(e => ({ type: 'tile', entity: e, vertical: false, state_content: ['state', 'last_changed'], color: 'red' })),
+          {
+            type: 'heading',
+            heading: `🔴 Kritisch (< 20%) - ${critical.length} ${critical.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading_style: 'title',
+          },
+          ...critical.map((e) => ({
+            type: 'tile',
+            entity: e,
+            vertical: false,
+            state_content: ['state', 'last_changed'],
+            color: 'red',
+          })),
         ],
       });
     }
@@ -89,8 +99,18 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: `🟡 Niedrig (20-50%) - ${low.length} ${low.length === 1 ? 'Batterie' : 'Batterien'}`, heading_style: 'title' },
-          ...low.map(e => ({ type: 'tile', entity: e, vertical: false, state_content: ['state', 'last_changed'], color: 'yellow' })),
+          {
+            type: 'heading',
+            heading: `🟡 Niedrig (20-50%) - ${low.length} ${low.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading_style: 'title',
+          },
+          ...low.map((e) => ({
+            type: 'tile',
+            entity: e,
+            vertical: false,
+            state_content: ['state', 'last_changed'],
+            color: 'yellow',
+          })),
         ],
       });
     }
@@ -99,8 +119,18 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: `🟢 Gut (> 50%) - ${good.length} ${good.length === 1 ? 'Batterie' : 'Batterien'}`, heading_style: 'title' },
-          ...good.map(e => ({ type: 'tile', entity: e, vertical: false, state_content: ['state', 'last_changed'], color: 'green' })),
+          {
+            type: 'heading',
+            heading: `🟢 Gut (> 50%) - ${good.length} ${good.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading_style: 'title',
+          },
+          ...good.map((e) => ({
+            type: 'tile',
+            entity: e,
+            vertical: false,
+            state_content: ['state', 'last_changed'],
+            color: 'green',
+          })),
         ],
       });
     }
