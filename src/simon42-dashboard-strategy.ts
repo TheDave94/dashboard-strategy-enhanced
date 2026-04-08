@@ -29,6 +29,7 @@ const modulesPromise = Promise.all([
   import('./views/CoversViewStrategy'),
   import('./views/SecurityViewStrategy'),
   import('./views/BatteriesViewStrategy'),
+  import('./views/ClimateViewStrategy'),
   import('./views/RoomViewStrategy'),
 ]);
 
@@ -74,6 +75,7 @@ class Simon42DashboardStrategy extends HTMLElement {
       ),
       getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass),
       getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass),
+      getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass),
     ]);
     t('utility views resolved');
 
@@ -127,6 +129,13 @@ class Simon42DashboardStrategy extends HTMLElement {
         icon: 'mdi:battery-alert',
         subview: !showSummaryViews,
         ...utilityConfigs[3],
+      },
+      {
+        title: 'Klima',
+        path: 'climate',
+        icon: 'mdi:thermostat',
+        subview: !showSummaryViews,
+        ...utilityConfigs[4],
       },
       ...visibleAreas.map((area, i) => ({
         title: area.name,

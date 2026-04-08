@@ -18,6 +18,7 @@ import {
   attachCoversSummaryCheckboxListener,
   attachSecuritySummaryCheckboxListener,
   attachBatterySummaryCheckboxListener,
+  attachClimateSummaryCheckboxListener,
   attachHideMobileAppBatteriesCheckboxListener,
   attachShowLocksInRoomsCheckboxListener,
   attachUseDefaultAreaSortCheckboxListener,
@@ -145,6 +146,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const showCoversSummary = this._config.show_covers_summary !== false;
     const showSecuritySummary = this._config.show_security_summary !== false;
     const showBatterySummary = this._config.show_battery_summary !== false;
+    const showClimateSummary = this._config.show_climate_summary === true;
     const hideMobileAppBatteries = this._config.hide_mobile_app_batteries === true;
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const useDefaultAreaSort = this._config.use_default_area_sort === true;
@@ -201,6 +203,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         showCoversSummary,
         showSecuritySummary,
         showBatterySummary,
+        showClimateSummary,
         hideMobileAppBatteries,
         showLocksInRooms,
         useDefaultAreaSort,
@@ -221,6 +224,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachCoversSummaryCheckboxListener(this, (val: boolean) => this._showCoversSummaryChanged(val));
     attachSecuritySummaryCheckboxListener(this, (val: boolean) => this._showSecuritySummaryChanged(val));
     attachBatterySummaryCheckboxListener(this, (val: boolean) => this._showBatterySummaryChanged(val));
+    attachClimateSummaryCheckboxListener(this, (val: boolean) => this._showClimateSummaryChanged(val));
     attachHideMobileAppBatteriesCheckboxListener(this, (hide: boolean) => this._hideMobileAppBatteriesChanged(hide));
     attachShowLocksInRoomsCheckboxListener(this, (show: boolean) => this._showLocksInRoomsChanged(show));
     attachUseDefaultAreaSortCheckboxListener(this, (val: boolean) => this._useDefaultAreaSortChanged(val));
@@ -943,6 +947,22 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
 
     if (show === true) {
       delete newConfig.show_battery_summary;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _showClimateSummaryChanged(show: boolean): void {
+    if (!this._config || !this._hass) return;
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      show_climate_summary: show,
+    };
+
+    if (show === false) {
+      delete newConfig.show_climate_summary;
     }
 
     this._config = newConfig;

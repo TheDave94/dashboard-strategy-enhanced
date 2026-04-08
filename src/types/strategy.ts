@@ -22,6 +22,7 @@ export interface Simon42StrategyConfig {
   group_lights_by_floors?: boolean; // default: false
   show_security_summary?: boolean; // default: true
   show_battery_summary?: boolean; // default: true
+  show_climate_summary?: boolean; // default: false
   hide_mobile_app_batteries?: boolean; // default: false
   show_locks_in_rooms?: boolean; // default: false
 
@@ -119,7 +120,7 @@ export interface PersonData {
 
 // -- Summary Types (used by summary cards) ----------------------------
 
-export type SummaryType = 'lights' | 'covers' | 'security' | 'batteries';
+export type SummaryType = 'lights' | 'covers' | 'security' | 'batteries' | 'climate';
 
 // -- Resolved Area (internal, enriched area for rendering) ------------
 

@@ -135,6 +135,18 @@ export function attachBatterySummaryCheckboxListener(
   }
 }
 
+export function attachClimateSummaryCheckboxListener(
+  element: HTMLElement,
+  callback: (checked: boolean) => void
+): void {
+  const checkbox = element.querySelector('#show-climate-summary') as HTMLInputElement | null;
+  if (checkbox) {
+    checkbox.addEventListener('change', (e: Event) => {
+      callback((e.target as HTMLInputElement).checked);
+    });
+  }
+}
+
 export function attachHideMobileAppBatteriesCheckboxListener(
   element: HTMLElement,
   callback: (checked: boolean) => void

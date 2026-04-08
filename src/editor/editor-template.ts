@@ -45,6 +45,7 @@ export interface EditorHTMLParams {
   showCoversSummary: boolean;
   showSecuritySummary: boolean;
   showBatterySummary: boolean;
+  showClimateSummary: boolean;
   hideMobileAppBatteries: boolean;
   showLocksInRooms: boolean;
   useDefaultAreaSort: boolean;
@@ -84,6 +85,7 @@ export function renderEditorHTML({
   showCoversSummary,
   showSecuritySummary,
   showBatterySummary,
+  showClimateSummary,
   hideMobileAppBatteries,
   showLocksInRooms,
   useDefaultAreaSort,
@@ -210,6 +212,17 @@ export function renderEditorHTML({
             ${showBatterySummary !== false ? 'checked' : ''}
           />
           <label for="show-battery-summary">Batterie-Zusammenfassung anzeigen</label>
+        </div>
+        <div class="form-row">
+          <input
+            type="checkbox"
+            id="show-climate-summary"
+            ${showClimateSummary ? 'checked' : ''}
+          />
+          <label for="show-climate-summary">Klima-Zusammenfassung anzeigen</label>
+        </div>
+        <div class="description">
+          Zeigt die Klima-Zusammenfassungskarte in der Übersicht an. Zählt aktive Thermostate und Klimageräte.
         </div>
         <div class="form-row">
           <input

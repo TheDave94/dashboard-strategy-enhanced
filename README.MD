@@ -1,5 +1,11 @@
 # simon42 Dashboard Strategy
 
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub Release](https://img.shields.io/github/v/release/TheRealSimon42/simon42-dashboard-strategy?style=for-the-badge&color=green)](https://github.com/TheRealSimon42/simon42-dashboard-strategy/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/TheRealSimon42/simon42-dashboard-strategy?style=for-the-badge&color=yellow)](https://github.com/TheRealSimon42/simon42-dashboard-strategy/stargazers)
+![AI-Assisted](https://img.shields.io/badge/AI--Assisted-blue?style=for-the-badge)
+[![License](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey?style=for-the-badge)](LICENSE)
+
 Eine modulare und hochkonfigurierbare Dashboard-Strategy fuer Home Assistant, die automatisch Views basierend auf Bereichen, Entitaeten und deren Zustaenden generiert.
 
 <p align="center">

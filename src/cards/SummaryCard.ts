@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-type SummaryType = 'lights' | 'covers' | 'security' | 'batteries';
+type SummaryType = 'lights' | 'covers' | 'security' | 'batteries' | 'climate';
 
 interface SummaryCardConfig {
   summary_type: SummaryType;
@@ -206,6 +206,12 @@ class Simon42SummaryCard extends LitElement {
         break;
       }
 
+      case 'climate':
+        result = Registry.getVisibleEntityIdsForDomain('climate').filter(
+          (id) => hass.states[id] && this._isEntityRelevant(id, hass.states[id])
+        );
+        break;
+
       default:
         result = [];
     }
@@ -261,6 +267,13 @@ class Simon42SummaryCard extends LitElement {
         }
         return count;
 
+      case 'climate':
+        for (const id of this._relevantEntityIds) {
+          const s = hass.states[id]?.state;
+          if (s && s !== 'off' && s !== 'unavailable' && s !== 'unknown') count++;
+        }
+        return count;
+
       default:
         return 0;
     }
@@ -294,6 +307,12 @@ class Simon42SummaryCard extends LitElement {
         name: hasItems ? `${count} ${count === 1 ? 'Batterie' : 'Batterien'} kritisch` : 'Alle Batterien OK',
         color: hasItems ? 'red' : 'grey',
         path: 'batteries',
+      },
+      climate: {
+        icon: 'mdi:thermostat',
+        name: hasItems ? `${count} ${count === 1 ? 'Thermostat' : 'Thermostate'} aktiv` : 'Alle Thermostate aus',
+        color: hasItems ? 'orange' : 'grey',
+        path: 'climate',
       },
     };
 
