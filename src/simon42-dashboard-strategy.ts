@@ -56,6 +56,11 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     const showSummaryViews = config.show_summary_views === true;
     const showRoomViews = config.show_room_views === true;
+    const showLights = config.show_light_summary !== false;
+    const showCovers = config.show_covers_summary !== false;
+    const showSecurity = config.show_security_summary !== false;
+    const showBatteries = config.show_battery_summary !== false;
+    const showClimate = config.show_climate_summary === true;
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
     const overviewConfig = await getStrategy('ll-strategy-simon42-view-overview').generate(
@@ -64,19 +69,23 @@ class Simon42DashboardStrategy extends HTMLElement {
     );
     t('overview resolved');
 
-    const utilityConfigs = await Promise.all([
-      getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass),
-      getStrategy('ll-strategy-simon42-view-covers').generate(
-        {
-          device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
-          config,
-        },
-        hass
-      ),
-      getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass),
-      getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass),
-      getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass),
-    ]);
+    // Only resolve utility views for enabled summaries
+    const utilityViewDefs = [
+      { enabled: showLights, title: 'Lichter', path: 'lights', icon: 'mdi:lamps',
+        resolve: () => getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass) },
+      { enabled: showCovers, title: 'Rollos & Vorhänge', path: 'covers', icon: 'mdi:blinds-horizontal',
+        resolve: () => getStrategy('ll-strategy-simon42-view-covers').generate(
+          { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
+      { enabled: showSecurity, title: 'Sicherheit', path: 'security', icon: 'mdi:security',
+        resolve: () => getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass) },
+      { enabled: showBatteries, title: 'Batterien', path: 'batteries', icon: 'mdi:battery-alert',
+        resolve: () => getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass) },
+      { enabled: showClimate, title: 'Klima', path: 'climate', icon: 'mdi:thermostat',
+        resolve: () => getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass) },
+    ];
+
+    const enabledDefs = utilityViewDefs.filter((d) => d.enabled);
+    const utilityConfigs = await Promise.all(enabledDefs.map((d) => d.resolve()));
     t('utility views resolved');
 
     const roomStrategy = getStrategy('ll-strategy-simon42-view-room');
@@ -102,41 +111,13 @@ class Simon42DashboardStrategy extends HTMLElement {
         icon: 'mdi:home',
         ...overviewConfig,
       },
-      {
-        title: 'Lichter',
-        path: 'lights',
-        icon: 'mdi:lamps',
+      ...enabledDefs.map((def, i) => ({
+        title: def.title,
+        path: def.path,
+        icon: def.icon,
         subview: !showSummaryViews,
-        ...utilityConfigs[0],
-      },
-      {
-        title: 'Rollos & Vorhänge',
-        path: 'covers',
-        icon: 'mdi:blinds-horizontal',
-        subview: !showSummaryViews,
-        ...utilityConfigs[1],
-      },
-      {
-        title: 'Sicherheit',
-        path: 'security',
-        icon: 'mdi:security',
-        subview: !showSummaryViews,
-        ...utilityConfigs[2],
-      },
-      {
-        title: 'Batterien',
-        path: 'batteries',
-        icon: 'mdi:battery-alert',
-        subview: !showSummaryViews,
-        ...utilityConfigs[3],
-      },
-      {
-        title: 'Klima',
-        path: 'climate',
-        icon: 'mdi:thermostat',
-        subview: !showSummaryViews,
-        ...utilityConfigs[4],
-      },
+        ...utilityConfigs[i],
+      })),
       ...visibleAreas.map((area, i) => ({
         title: area.name,
         path: area.area_id,
