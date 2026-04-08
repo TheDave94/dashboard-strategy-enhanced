@@ -26,17 +26,20 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   const { showSearchCard, config, hass } = data;
   const showClockCard = config.show_clock_card !== false;
 
-  const cards: LovelaceCardConfig[] = [
-    {
+  // Check if alarm entity is configured
+  const alarmEntity = config.alarm_entity;
+
+  const cards: LovelaceCardConfig[] = [];
+
+  // Only show "Übersicht" heading if clock or alarm is visible
+  if (showClockCard || alarmEntity) {
+    cards.push({
       type: 'heading',
       heading: 'Übersicht',
       heading_style: 'title',
       icon: 'mdi:overscan',
-    },
-  ];
-
-  // Check if alarm entity is configured
-  const alarmEntity = config.alarm_entity;
+    });
+  }
 
   if (showClockCard) {
     if (alarmEntity) {
@@ -63,7 +66,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       });
     }
   } else if (alarmEntity) {
-    // No clock, but alarm panel
+    // No clock, but alarm panel full width
     cards.push({
       type: 'tile',
       entity: alarmEntity,

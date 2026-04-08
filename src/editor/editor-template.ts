@@ -144,7 +144,7 @@ export function renderEditorHTML({
           </select>
         </div>
         <div class="description">
-          Wähle eine Alarm-Control-Panel-Entität aus, um sie neben der Uhr anzuzeigen. "Keine" auswählen, um nur die Uhr in voller Breite anzuzeigen.
+          Wähle eine Alarm-Control-Panel-Entität aus. Wenn die Uhrzeit-Karte aktiv ist, wird das Alarm-Panel daneben angezeigt. Ohne Uhrzeit-Karte erscheint das Alarm-Panel in voller Breite.
         </div>
       </div>
 
