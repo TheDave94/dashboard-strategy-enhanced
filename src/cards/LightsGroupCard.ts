@@ -161,18 +161,15 @@ class Simon42LightsGroupCard extends LitElement {
       floorMap.get(floorId)!.push(id);
     }
 
-    // Sort floors by level, then name
+    // Use HA's floor order from the registry. The hass.floors object preserves
+    // the user-defined order from HA's "Reorder areas and floors" dialog via
+    // Object.keys() insertion order — no separate sort_order field needed.
     const floors = this.hass.floors ?? {};
-    const sortedKeys = Array.from(floorMap.keys()).sort((a, b) => {
-      if (a === null) return 1;
-      if (b === null) return -1;
-      const floorA = floors[a];
-      const floorB = floors[b];
-      const levelA = floorA?.level ?? 0;
-      const levelB = floorB?.level ?? 0;
-      if (levelA !== levelB) return levelA - levelB;
-      return (floorA?.name || a).localeCompare(floorB?.name || b);
-    });
+    const floorOrder = Object.keys(floors);
+    const sortedKeys = [
+      ...floorOrder.filter((id) => floorMap.has(id)),
+      ...(floorMap.has(null) ? [null] : []),
+    ];
 
     return sortedKeys.map((floorId) => {
       const floor = floorId ? floors[floorId] : null;

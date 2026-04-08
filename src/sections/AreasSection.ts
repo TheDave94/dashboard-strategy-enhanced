@@ -133,14 +133,11 @@ export function createAreasSection(
   // Build sections per floor
   const sections: LovelaceSectionConfig[] = [];
 
-  // Sort floors alphabetically by name
-  const sortedFloors = Array.from(areasByFloor.keys()).sort((a, b) => {
-    const floorA = hass.floors?.[a];
-    const floorB = hass.floors?.[b];
-    const nameA = floorA?.name || a;
-    const nameB = floorB?.name || b;
-    return nameA.localeCompare(nameB);
-  });
+  // Use HA's floor order from the registry. The hass.floors object preserves
+  // the user-defined order from HA's "Reorder areas and floors" dialog via
+  // Object.keys() insertion order — no separate sort_order field needed.
+  const floorOrder = Object.keys(hass.floors || {});
+  const sortedFloors = floorOrder.filter((id) => areasByFloor.has(id));
 
   for (const floorId of sortedFloors) {
     const areas = areasByFloor.get(floorId)!;
