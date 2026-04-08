@@ -78,21 +78,9 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
   // -- Dependency check -------------------------------------------------
 
   _checkSearchCardDependencies(): boolean {
-    // Check whether custom:search-card and card-tools are available
     const hasSearchCard = customElements.get('search-card') !== undefined;
-    const hasCardTools =
-      window.customCards &&
-      window.customCards.some((card) => card.type === 'custom:search-card');
-
-    // Alternative check: try to detect if components are loaded
-    const searchCardExists =
-      hasSearchCard || document.querySelector('search-card') !== null;
-    const cardToolsExists =
-      typeof window.customCards !== 'undefined' ||
-      typeof window.cardTools !== 'undefined';
-
-    // Both must be available
-    return searchCardExists && cardToolsExists;
+    const hasCardTools = customElements.get('card-tools') !== undefined;
+    return hasSearchCard && hasCardTools;
   }
 
   // -- Entity helpers ---------------------------------------------------
