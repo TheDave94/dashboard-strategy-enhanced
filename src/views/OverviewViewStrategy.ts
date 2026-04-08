@@ -53,8 +53,9 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       groupByFloors
     );
 
+    const overviewSection = createOverviewSection({ someSensorId, showSearchCard, config: dashboardConfig, hass });
     const overviewSections: LovelaceSectionConfig[] = [
-      createOverviewSection({ someSensorId, showSearchCard, config: dashboardConfig, hass }),
+      ...(overviewSection ? [overviewSection] : []),
       ...(Array.isArray(areasSections) ? areasSections : [areasSections]),
       ...(weatherEnergySection
         ? Array.isArray(weatherEnergySection)

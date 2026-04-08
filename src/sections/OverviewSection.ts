@@ -22,7 +22,7 @@ export interface OverviewSectionParams {
  * Creates the overview section with summaries, clock, optional alarm,
  * optional search card, and favorites.
  */
-export function createOverviewSection(data: OverviewSectionParams): LovelaceSectionConfig {
+export function createOverviewSection(data: OverviewSectionParams): LovelaceSectionConfig | null {
   const { showSearchCard, config, hass } = data;
   const showClockCard = config.show_clock_card !== false;
 
@@ -174,6 +174,11 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
         state_content: 'last_changed',
       });
     }
+  }
+
+  // If nothing is visible, skip the entire section
+  if (cards.length === 0) {
+    return null;
   }
 
   return {
