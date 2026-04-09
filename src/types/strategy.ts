@@ -17,6 +17,7 @@ export interface Simon42StrategyConfig {
   show_room_views?: boolean; // default: false
   group_by_floors?: boolean; // default: false
   show_covers_summary?: boolean; // default: true
+  show_partially_open_covers?: boolean; // default: false
   show_clock_card?: boolean; // default: true
   show_light_summary?: boolean; // default: true
   group_lights_by_floors?: boolean; // default: false

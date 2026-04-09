@@ -43,6 +43,7 @@ export interface EditorHTMLParams {
   showLightSummary: boolean;
   groupLightsByFloors: boolean;
   showCoversSummary: boolean;
+  showPartiallyOpenCovers: boolean;
   showSecuritySummary: boolean;
   showBatterySummary: boolean;
   showClimateSummary: boolean;
@@ -90,6 +91,7 @@ export function renderEditorHTML({
   showLightSummary,
   groupLightsByFloors,
   showCoversSummary,
+  showPartiallyOpenCovers,
   showSecuritySummary,
   showBatterySummary,
   showClimateSummary,
@@ -210,6 +212,19 @@ export function renderEditorHTML({
             ${showCoversSummary !== false ? 'checked' : ''}
           />
           <label for="show-covers-summary">Rollo-Zusammenfassung anzeigen</label>
+        </div>
+        <div style="margin-left: 26px; margin-bottom: 8px;">
+          <div class="form-row">
+            <input
+              type="checkbox"
+              id="show-partially-open-covers"
+              ${showPartiallyOpenCovers ? 'checked' : ''}
+            />
+            <label for="show-partially-open-covers">Teiloffene Rollos separat anzeigen</label>
+          </div>
+          <div class="description">
+            Zeigt teiloffene Rollos (weder ganz offen noch geschlossen) in einer eigenen Gruppe an.
+          </div>
         </div>
         <div class="form-row">
           <input

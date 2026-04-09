@@ -6,29 +6,44 @@ import type { LovelaceViewConfig } from '../types/lovelace';
 
 class Simon42ViewCoversStrategy extends HTMLElement {
   static async generate(config: any, _hass: any): Promise<LovelaceViewConfig> {
+    const strategyConfig = config.config || {};
+    const showPartiallyOpen = strategyConfig.show_partially_open_covers === true;
+    const deviceClasses = config.device_classes || ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'];
+
+    const cards: any[] = [
+      {
+        type: 'custom:simon42-covers-group-card',
+        entities: config.entities,
+        config: config.config,
+        device_classes: deviceClasses,
+        group_type: 'open',
+        show_partially_open: showPartiallyOpen,
+      },
+    ];
+
+    if (showPartiallyOpen) {
+      cards.push({
+        type: 'custom:simon42-covers-group-card',
+        entities: config.entities,
+        config: config.config,
+        device_classes: deviceClasses,
+        group_type: 'partially_open',
+        show_partially_open: true,
+      });
+    }
+
+    cards.push({
+      type: 'custom:simon42-covers-group-card',
+      entities: config.entities,
+      config: config.config,
+      device_classes: deviceClasses,
+      group_type: 'closed',
+      show_partially_open: showPartiallyOpen,
+    });
+
     return {
       type: 'sections',
-      sections: [
-        {
-          type: 'grid',
-          cards: [
-            {
-              type: 'custom:simon42-covers-group-card',
-              entities: config.entities,
-              config: config.config,
-              device_classes: config.device_classes || ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
-              group_type: 'open',
-            },
-            {
-              type: 'custom:simon42-covers-group-card',
-              entities: config.entities,
-              config: config.config,
-              device_classes: config.device_classes || ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'],
-              group_type: 'closed',
-            },
-          ],
-        },
-      ],
+      sections: [{ type: 'grid', cards }],
     };
   }
 }

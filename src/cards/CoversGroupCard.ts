@@ -15,7 +15,8 @@ declare global {
 
 interface CoversGroupConfig {
   config?: any;
-  group_type: 'open' | 'closed';
+  group_type: 'open' | 'closed' | 'partially_open';
+  show_partially_open?: boolean;
   device_classes?: string[];
 }
 
@@ -120,16 +121,44 @@ class Simon42CoversGroupCard extends LitElement {
 
   private _getRelevantCovers(): string[] {
     if (!this.hass || !this._cachedFilteredIds) return [];
-    const isOpen = this._config.group_type === 'open';
+    const groupType = this._config.group_type;
+    const showPartiallyOpen = this._config.show_partially_open === true;
 
     const relevant: string[] = [];
     for (const id of this._cachedFilteredIds) {
       const state = this.hass.states[id];
       if (!state) continue;
-      if (isOpen) {
-        if (state.state === 'open' || state.state === 'opening') relevant.push(id);
+
+      const position = (state.attributes as any)?.current_position;
+      const hasPosition = typeof position === 'number';
+      const isMoving = state.state === 'opening' || state.state === 'closing';
+
+      if (groupType === 'partially_open') {
+        // Partially open: position between 0 and 100 (open or currently moving)
+        if (state.state === 'open' || isMoving) {
+          if (hasPosition && position > 0 && position < 100) {
+            relevant.push(id);
+          }
+        }
+      } else if (groupType === 'open') {
+        if (state.state === 'open' || state.state === 'opening') {
+          if (showPartiallyOpen) {
+            // Only fully open (100%) or covers without position attribute
+            if (!hasPosition || position >= 100) {
+              relevant.push(id);
+            }
+          } else {
+            relevant.push(id);
+          }
+        }
       } else {
-        if (state.state === 'closed' || state.state === 'closing') relevant.push(id);
+        if (state.state === 'closed') {
+          relevant.push(id);
+        } else if (state.state === 'closing') {
+          // When partially_open is active, closing covers with position > 0 belong to partially_open
+          if (showPartiallyOpen && hasPosition && position > 0) continue;
+          relevant.push(id);
+        }
       }
     }
 
@@ -158,7 +187,39 @@ class Simon42CoversGroupCard extends LitElement {
   }
 
   private _buildHeadingConfig(covers: string[]): any {
-    const isOpen = this._config.group_type === 'open';
+    const groupType = this._config.group_type;
+
+    if (groupType === 'partially_open') {
+      return {
+        type: 'heading',
+        heading: `Teiloffene Rollos & Vorhänge (${covers.length})`,
+        icon: 'mdi:blinds-horizontal',
+        badges: [
+          {
+            type: 'button',
+            icon: 'mdi:arrow-up',
+            text: 'Alle öffnen',
+            tap_action: {
+              action: 'perform-action',
+              perform_action: 'cover.open_cover',
+              target: { entity_id: covers },
+            },
+          },
+          {
+            type: 'button',
+            icon: 'mdi:arrow-down',
+            text: 'Alle schließen',
+            tap_action: {
+              action: 'perform-action',
+              perform_action: 'cover.close_cover',
+              target: { entity_id: covers },
+            },
+          },
+        ],
+      };
+    }
+
+    const isOpen = groupType === 'open';
     return {
       type: 'heading',
       heading: `${isOpen ? 'Offene Rollos & Vorhänge' : 'Geschlossene Rollos & Vorhänge'} (${covers.length})`,
@@ -202,8 +263,8 @@ class Simon42CoversGroupCard extends LitElement {
       .map((id) => {
         const state = this.hass!.states[id];
         if (!state) return id;
-        if (state.state === 'opening' || state.state === 'closing') {
-          const position = (state.attributes as any).current_position || 0;
+        const position = (state.attributes as any)?.current_position;
+        if (typeof position === 'number') {
           return `${id}:${state.state}:${position}`;
         }
         return `${id}:${state.state}`;
@@ -215,11 +276,7 @@ class Simon42CoversGroupCard extends LitElement {
     if (!this.hass || !this._cachedFilteredIds) return nothing;
 
     const covers = this._getRelevantCovers();
-    if (covers.length === 0) {
-      this.hidden = true;
-      return nothing;
-    }
-    this.hidden = false;
+    this.hidden = covers.length === 0;
 
     return html`
       <div class="covers-section">
@@ -238,7 +295,16 @@ class Simon42CoversGroupCard extends LitElement {
     if (this._lastCoversList === coversKey) return;
     this._lastCoversList = coversKey;
 
-    if (covers.length === 0) return;
+    if (covers.length === 0) {
+      const headingSlot = this.shadowRoot!.getElementById('heading');
+      if (headingSlot) headingSlot.innerHTML = '';
+      const grid = this.shadowRoot!.getElementById('grid');
+      if (grid) grid.innerHTML = '';
+      this._headingCard = null;
+      this._tileCards.clear();
+      this._lastCoversList = '';
+      return;
+    }
 
     // Reconcile heading card
     const headingSlot = this.shadowRoot!.getElementById('heading');

@@ -111,6 +111,18 @@ export function attachCoversSummaryCheckboxListener(element: HTMLElement, callba
   }
 }
 
+export function attachPartiallyOpenCoversCheckboxListener(
+  element: HTMLElement,
+  callback: (checked: boolean) => void
+): void {
+  const checkbox = element.querySelector('#show-partially-open-covers') as HTMLInputElement | null;
+  if (checkbox) {
+    checkbox.addEventListener('change', (e: Event) => {
+      callback((e.target as HTMLInputElement).checked);
+    });
+  }
+}
+
 export function attachSecuritySummaryCheckboxListener(
   element: HTMLElement,
   callback: (checked: boolean) => void

@@ -16,6 +16,7 @@ import {
   attachLightSummaryCheckboxListener,
   attachGroupLightsByFloorsCheckboxListener,
   attachCoversSummaryCheckboxListener,
+  attachPartiallyOpenCoversCheckboxListener,
   attachSecuritySummaryCheckboxListener,
   attachBatterySummaryCheckboxListener,
   attachClimateSummaryCheckboxListener,
@@ -146,6 +147,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const showLightSummary = this._config.show_light_summary !== false;
     const groupLightsByFloors = this._config.group_lights_by_floors === true;
     const showCoversSummary = this._config.show_covers_summary !== false;
+    const showPartiallyOpenCovers = this._config.show_partially_open_covers === true;
     const showSecuritySummary = this._config.show_security_summary !== false;
     const showBatterySummary = this._config.show_battery_summary !== false;
     const showClimateSummary = this._config.show_climate_summary === true;
@@ -210,6 +212,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         showLightSummary,
         groupLightsByFloors,
         showCoversSummary,
+        showPartiallyOpenCovers,
         showSecuritySummary,
         showBatterySummary,
         showClimateSummary,
@@ -238,6 +241,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachLightSummaryCheckboxListener(this, (val: boolean) => this._showLightSummaryChanged(val));
     attachGroupLightsByFloorsCheckboxListener(this, (val: boolean) => this._groupLightsByFloorsChanged(val));
     attachCoversSummaryCheckboxListener(this, (val: boolean) => this._showCoversSummaryChanged(val));
+    attachPartiallyOpenCoversCheckboxListener(this, (val: boolean) => this._showPartiallyOpenCoversChanged(val));
     attachSecuritySummaryCheckboxListener(this, (val: boolean) => this._showSecuritySummaryChanged(val));
     attachBatterySummaryCheckboxListener(this, (val: boolean) => this._showBatterySummaryChanged(val));
     attachClimateSummaryCheckboxListener(this, (val: boolean) => this._showClimateSummaryChanged(val));
@@ -1101,6 +1105,14 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
       delete newConfig.show_covers_summary;
     }
 
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _showPartiallyOpenCoversChanged(show: boolean): void {
+    if (!this._config || !this._hass) return;
+    const newConfig: Simon42StrategyConfig = { ...this._config, show_partially_open_covers: show };
+    if (show === false) delete newConfig.show_partially_open_covers;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
