@@ -14,6 +14,7 @@ import type { RoomEntities, SensorEntities } from '../types/strategy';
 import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
+import { localize } from '../utils/localize';
 
 // HA supported_features bitmask values
 const LIGHT_BRIGHTNESS_MODES = ['brightness', 'color_temp', 'hs', 'xy', 'rgb', 'rgbw', 'rgbww', 'white'];
@@ -356,7 +357,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       if (cameraCards.length > 0) {
         sections.push({
           type: 'grid',
-          cards: [{ type: 'heading', heading: 'Kameras', heading_style: 'title', icon: 'mdi:cctv' }, ...cameraCards],
+          cards: [{ type: 'heading', heading: localize('room.cameras'), heading_style: 'title', icon: 'mdi:cctv' }, ...cameraCards],
         });
       }
     }
@@ -392,7 +393,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         {
           type: 'button',
           icon: 'mdi:lightbulb-on',
-          text: 'Alle ein',
+          text: localize('room.all_on'),
           tap_action: {
             action: 'perform-action',
             perform_action: 'light.turn_on',
@@ -403,7 +404,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         {
           type: 'button',
           icon: 'mdi:lightbulb-off',
-          text: 'Alle aus',
+          text: localize('room.all_off'),
           tap_action: {
             action: 'perform-action',
             perform_action: 'light.turn_off',
@@ -415,7 +416,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: 'Beleuchtung', heading_style: 'title', icon: 'mdi:lightbulb', badges },
+          { type: 'heading', heading: localize('room.lighting'), heading_style: 'title', icon: 'mdi:lightbulb', badges },
           ...roomEntities.lights.map((e) => {
             const state = hass.states[e];
             const hasBrightness = state && lightSupportsBrightness(state);
@@ -432,7 +433,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       });
     }
 
-    domainSection(roomEntities.locks, 'Schlösser', 'mdi:lock', (e) => ({
+    domainSection(roomEntities.locks, localize('room.locks'), 'mdi:lock', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -442,7 +443,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       state_content: 'last_changed',
     }));
 
-    domainSection(roomEntities.climate, 'Klima', 'mdi:thermostat', (e) => ({
+    domainSection(roomEntities.climate, localize('room.climate'), 'mdi:thermostat', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -452,7 +453,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       state_content: ['hvac_action', 'current_temperature'],
     }));
 
-    domainSection(roomEntities.covers, 'Rollos & Jalousien', 'mdi:window-shutter', (e) => ({
+    domainSection(roomEntities.covers, localize('room.covers'), 'mdi:window-shutter', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -462,7 +463,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       state_content: ['current_position', 'last_changed'],
     }));
 
-    domainSection(roomEntities.covers_curtain, 'Vorhänge', 'mdi:curtains', (e) => ({
+    domainSection(roomEntities.covers_curtain, localize('room.curtains'), 'mdi:curtains', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -472,7 +473,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       state_content: ['current_position', 'last_changed'],
     }));
 
-    domainSection(roomEntities.media_player, 'Medien', 'mdi:speaker', (e) => {
+    domainSection(roomEntities.media_player, localize('room.media'), 'mdi:speaker', (e) => {
       const state = hass.states[e];
       const hasPlayback = state && mediaPlayerSupportsPlayback(state);
       return {
@@ -485,7 +486,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       };
     });
 
-    domainSection(roomEntities.scenes, 'Szenen', 'mdi:palette', (e) => ({
+    domainSection(roomEntities.scenes, localize('room.scenes'), 'mdi:palette', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -537,13 +538,13 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: 'Sonstiges', heading_style: 'title', icon: 'mdi:dots-horizontal' },
+          { type: 'heading', heading: localize('room.misc'), heading_style: 'title', icon: 'mdi:dots-horizontal' },
           ...miscCards,
         ],
       });
     }
 
-    domainSection(roomEntities.automations, 'Automationen', 'mdi:robot', (e) => ({
+    domainSection(roomEntities.automations, localize('room.automations'), 'mdi:robot', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -551,7 +552,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       state_content: 'last_changed',
     }));
 
-    domainSection(roomEntities.scripts, 'Skripte', 'mdi:script-text', (e) => ({
+    domainSection(roomEntities.scripts, localize('room.scripts'), 'mdi:script-text', (e) => ({
       type: 'tile',
       entity: e,
       name: stripAreaName(e, area, hass),
@@ -575,7 +576,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       sections.push({
         type: 'grid',
         cards: [
-          { type: 'heading', heading: 'Raum-Pins', heading_style: 'title', icon: 'mdi:pin' },
+          { type: 'heading', heading: localize('room.room_pins'), heading_style: 'title', icon: 'mdi:pin' },
           ...pinsForArea.map((e) => {
             const pinStateContent: string[] = [];
             if (dashboardConfig.room_pins_show_state === true) pinStateContent.push('state');

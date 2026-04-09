@@ -3,6 +3,7 @@
 // ====================================================================
 
 import type { LovelaceViewConfig } from '../types/lovelace';
+import { localize } from '../utils/localize';
 
 class Simon42ViewCoversStrategy extends HTMLElement {
   static async generate(config: any, _hass: any): Promise<LovelaceViewConfig> {
@@ -50,11 +51,11 @@ class Simon42ViewCoversStrategy extends HTMLElement {
       const awningConfig = {
         ...baseConfig,
         device_classes: ['awning'],
-        heading_open: 'Ausgefahrene Markisen',
-        heading_closed: 'Eingefahrene Markisen',
-        heading_partial: 'Teilweise ausgefahrene Markisen',
-        batch_open_text: 'Alle ausfahren',
-        batch_close_text: 'Alle einfahren',
+        heading_open: localize('covers.awnings_open'),
+        heading_closed: localize('covers.awnings_closed'),
+        heading_partial: localize('covers.awnings_partial'),
+        batch_open_text: localize('covers.awnings_open_all'),
+        batch_close_text: localize('covers.awnings_close_all'),
       };
 
       cards.push({

@@ -5,6 +5,7 @@
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
+import { localize } from '../utils/localize';
 
 class Simon42ViewBatteriesStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
@@ -93,7 +94,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
         cards: [
           {
             type: 'heading',
-            heading: `🔴 Kritisch (< ${criticalThreshold}%) - ${critical.length} ${critical.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading: `🔴 ${localize('batteries.critical')} (< ${criticalThreshold}%) - ${critical.length} ${critical.length === 1 ? localize('batteries.battery_one') : localize('batteries.battery_many')}`,
             heading_style: 'title',
           },
           ...critical.map((e) => ({
@@ -113,7 +114,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
         cards: [
           {
             type: 'heading',
-            heading: `🟡 Niedrig (${criticalThreshold}-${lowThreshold}%) - ${low.length} ${low.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading: `🟡 ${localize('batteries.low')} (${criticalThreshold}-${lowThreshold}%) - ${low.length} ${low.length === 1 ? localize('batteries.battery_one') : localize('batteries.battery_many')}`,
             heading_style: 'title',
           },
           ...low.map((e) => ({
@@ -133,7 +134,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
         cards: [
           {
             type: 'heading',
-            heading: `🟢 Gut (> ${lowThreshold}%) - ${good.length} ${good.length === 1 ? 'Batterie' : 'Batterien'}`,
+            heading: `🟢 ${localize('batteries.good')} (> ${lowThreshold}%) - ${good.length} ${good.length === 1 ? localize('batteries.battery_one') : localize('batteries.battery_many')}`,
             heading_style: 'title',
           },
           ...good.map((e) => ({

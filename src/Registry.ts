@@ -19,6 +19,7 @@ import type {
 } from './types/registries';
 import type { Simon42StrategyConfig } from './types/strategy';
 import { timeStart, timeEnd, debugLog } from './utils/debug';
+import { setupLocalize } from './utils/localize';
 
 /**
  * Static singleton registry that holds all HA registry data and provides
@@ -102,6 +103,9 @@ class Registry {
     timeStart('registry-init');
     Registry._hass = hass;
     Registry._config = config;
+
+    // Initialize localization from hass language settings
+    setupLocalize(hass);
 
     // Read registries from hass object (synchronous, no WebSocket)
     Registry._fetchedEntities = Object.values(hass.entities);

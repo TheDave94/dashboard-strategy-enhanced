@@ -7,6 +7,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
 import { trackHassUpdate } from '../utils/debug';
+import { localize } from '../utils/localize';
 
 declare global {
   interface Window {
@@ -175,7 +176,7 @@ class Simon42LightsGroupCard extends LitElement {
       const floor = floorId ? floors[floorId] : null;
       return {
         floorId,
-        floorName: floor?.name || 'Weitere',
+        floorName: floor?.name || localize('lights.floor_other'),
         floorIcon: floor?.icon || 'mdi:home-outline',
         lights: floorMap.get(floorId)!,
       };
@@ -186,7 +187,7 @@ class Simon42LightsGroupCard extends LitElement {
     const isOn = this._config.group_type === 'on';
     const heading = label
       ? `${label} (${lights.length})`
-      : `${isOn ? 'Eingeschaltete Lichter' : 'Ausgeschaltete Lichter'} (${lights.length})`;
+      : `${isOn ? localize('lights.on') : localize('lights.off')} (${lights.length})`;
     return {
       type: 'heading',
       heading,
@@ -195,7 +196,7 @@ class Simon42LightsGroupCard extends LitElement {
         {
           type: 'button',
           icon: isOn ? 'mdi:lightbulb-off' : 'mdi:lightbulb-on',
-          text: isOn ? 'Alle aus' : 'Alle ein',
+          text: isOn ? localize('lights.all_off') : localize('lights.all_on'),
           tap_action: {
             action: 'perform-action',
             perform_action: isOn ? 'light.turn_off' : 'light.turn_on',

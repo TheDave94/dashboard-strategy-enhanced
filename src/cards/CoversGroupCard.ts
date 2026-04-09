@@ -6,6 +6,7 @@ import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
 import type { HomeAssistant } from '../types/homeassistant';
 import { Registry } from '../Registry';
 import { trackHassUpdate } from '../utils/debug';
+import { localize } from '../utils/localize';
 
 declare global {
   interface Window {
@@ -195,11 +196,11 @@ class Simon42CoversGroupCard extends LitElement {
 
   private _buildHeadingConfig(covers: string[]): any {
     const groupType = this._config.group_type;
-    const openText = this._config.batch_open_text || 'Alle öffnen';
-    const closeText = this._config.batch_close_text || 'Alle schließen';
+    const openText = this._config.batch_open_text || localize('covers.open_all');
+    const closeText = this._config.batch_close_text || localize('covers.close_all');
 
     if (groupType === 'partially_open') {
-      const headingLabel = this._config.heading_partial || 'Teiloffene Rollos & Vorhänge';
+      const headingLabel = this._config.heading_partial || localize('covers.partially_open');
       return {
         type: 'heading',
         heading: `${headingLabel} (${covers.length})`,
@@ -231,8 +232,8 @@ class Simon42CoversGroupCard extends LitElement {
 
     const isOpen = groupType === 'open';
     const headingLabel = isOpen
-      ? (this._config.heading_open || 'Offene Rollos & Vorhänge')
-      : (this._config.heading_closed || 'Geschlossene Rollos & Vorhänge');
+      ? (this._config.heading_open || localize('covers.open'))
+      : (this._config.heading_closed || localize('covers.closed'));
     return {
       type: 'heading',
       heading: `${headingLabel} (${covers.length})`,

@@ -45,6 +45,7 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     const { Registry } = await import('./Registry');
     const { getVisibleAreasFromHass } = await import('./utils/name-utils');
+    const { localize } = await import('./utils/localize');
     t('imports done');
 
     const getStrategy = (tag: string): any => customElements.get(tag);
@@ -71,16 +72,16 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     // Only resolve utility views for enabled summaries
     const utilityViewDefs = [
-      { enabled: showLights, title: 'Lichter', path: 'lights', icon: 'mdi:lamps',
+      { enabled: showLights, title: localize('views.lights'), path: 'lights', icon: 'mdi:lamps',
         resolve: () => getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass) },
-      { enabled: showCovers, title: 'Rollos & Vorhänge', path: 'covers', icon: 'mdi:blinds-horizontal',
+      { enabled: showCovers, title: localize('views.covers'), path: 'covers', icon: 'mdi:blinds-horizontal',
         resolve: () => getStrategy('ll-strategy-simon42-view-covers').generate(
           { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
-      { enabled: showSecurity, title: 'Sicherheit', path: 'security', icon: 'mdi:security',
+      { enabled: showSecurity, title: localize('views.security'), path: 'security', icon: 'mdi:security',
         resolve: () => getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass) },
-      { enabled: showBatteries, title: 'Batterien', path: 'batteries', icon: 'mdi:battery-alert',
+      { enabled: showBatteries, title: localize('views.batteries'), path: 'batteries', icon: 'mdi:battery-alert',
         resolve: () => getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass) },
-      { enabled: showClimate, title: 'Klima', path: 'climate', icon: 'mdi:thermostat',
+      { enabled: showClimate, title: localize('views.climate'), path: 'climate', icon: 'mdi:thermostat',
         resolve: () => getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass) },
     ];
 
@@ -106,7 +107,7 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     const views: LovelaceViewConfig[] = [
       {
-        title: 'Übersicht',
+        title: localize('views.overview'),
         path: 'home',
         icon: 'mdi:home',
         ...overviewConfig,
@@ -142,7 +143,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     t(`generate() done — ${views.length} views`);
 
     return {
-      title: 'Dynamisches Dashboard',
+      title: localize('dashboard.title'),
       views,
     };
   }

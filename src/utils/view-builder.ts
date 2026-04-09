@@ -3,6 +3,7 @@
 // ====================================================================
 
 import type { LovelaceViewConfig, LovelaceBadgeConfig, LovelaceSectionConfig } from '../types/lovelace';
+import { localize } from './localize';
 
 /**
  * Creates the main overview view.
@@ -15,7 +16,7 @@ export function createOverviewView(
   personBadges: LovelaceBadgeConfig[]
 ): LovelaceViewConfig {
   return {
-    title: 'Übersicht',
+    title: localize('views.overview'),
     path: 'home',
     icon: 'mdi:home',
     type: 'sections',

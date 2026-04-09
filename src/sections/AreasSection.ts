@@ -10,6 +10,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
+import { localize } from '../utils/localize';
 
 // Area control domains to check (same as HA, excluding 'switch')
 const CONTROL_DOMAINS = [
@@ -108,7 +109,7 @@ export function createAreasSection(
         {
           type: 'heading',
           heading_style: 'title',
-          heading: 'Bereiche',
+          heading: localize('sections.areas'),
         },
         ...visibleAreas.map((area) => buildAreaCard(area, hass!)),
       ],
@@ -167,7 +168,7 @@ export function createAreasSection(
         {
           type: 'heading',
           heading_style: 'title',
-          heading: 'Weitere Bereiche',
+          heading: localize('sections.areas_other'),
           icon: 'mdi:home-outline',
         },
         ...areasWithoutFloor.map((area) => buildAreaCard(area, hass!)),

@@ -277,12 +277,10 @@ Gradual alignment with the official HA Home Strategy. Reference: `../references/
 - [x] LightsGroupCard: optional floor grouping with per-floor batch actions (`group_lights_by_floors`)
 - [x] ClimateViewStrategy: new climate view (heating/cooling/idle/off) + climate SummaryCard
 - [x] Content-hash chunk filenames for cache busting after HACS updates
+- [x] i18n: localize utility + DE/EN translations, auto-detect from hass.locale.language (#56)
 
 ### Open: Evaluate
 - SummaryCard entity caching removal (HA's home-summary doesn't cache — stateless per render = more correct behavior for dynamic entity changes)
-
-### Open: Bugs
-- Cover filter (#20): entities without `device_class` are included by default (fallback `!deviceClass` in CoversGroupCard._getFilteredCoverEntities). Smart desks (LoctekMotion) etc. show up as covers. Fix: remove fallback or introduce blacklist.
 
 ### Phase 2: Align Further Views
 - CoversViewStrategy, SecurityViewStrategy, BatteriesViewStrategy — optimize analogous to LightsView

@@ -10,6 +10,7 @@
 import type { HomeAssistant } from '../types/homeassistant';
 import type { Simon42StrategyConfig, CustomCard } from '../types/strategy';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
+import { localize } from '../utils/localize';
 
 export interface OverviewSectionParams {
   someSensorId: string | null;
@@ -35,7 +36,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   if (showClockCard || alarmEntity) {
     cards.push({
       type: 'heading',
-      heading: 'Übersicht',
+      heading: localize('sections.overview'),
       heading_style: 'title',
       icon: 'mdi:overscan',
     });
@@ -144,7 +145,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   if (summaryCards.length > 0) {
     cards.push({
       type: 'heading',
-      heading: 'Zusammenfassungen',
+      heading: localize('sections.summaries'),
     });
 
     // Layout logic: adapt to number of cards
@@ -172,7 +173,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   if (favoriteEntities.length > 0) {
     cards.push({
       type: 'heading',
-      heading: 'Favoriten',
+      heading: localize('sections.favorites'),
     });
 
     const showState = config.favorites_show_state === true;
@@ -216,7 +217,7 @@ export function createCustomCardsSection(
   if (validCards.length === 0) return null;
 
   const cards: LovelaceCardConfig[] = [
-    { type: 'heading', heading: heading || 'Eigene Karten', icon: icon || 'mdi:cards' },
+    { type: 'heading', heading: heading || localize('sections.custom_cards'), icon: icon || 'mdi:cards' },
   ];
 
   for (const card of validCards) {

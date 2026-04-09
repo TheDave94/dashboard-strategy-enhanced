@@ -5,6 +5,7 @@
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
+import { localize } from '../utils/localize';
 
 class Simon42ViewClimateStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
@@ -67,10 +68,10 @@ class Simon42ViewClimateStrategy extends HTMLElement {
       });
     };
 
-    buildSection(heating, 'Heizen', 'mdi:fire');
-    buildSection(cooling, 'Kühlen', 'mdi:snowflake');
-    buildSection(idle, 'Bereitschaft', 'mdi:thermostat');
-    buildSection(off, 'Aus', 'mdi:power-off');
+    buildSection(heating, localize('climate.heating'), 'mdi:fire');
+    buildSection(cooling, localize('climate.cooling'), 'mdi:snowflake');
+    buildSection(idle, localize('climate.idle'), 'mdi:thermostat');
+    buildSection(off, localize('climate.off'), 'mdi:power-off');
 
     return { type: 'sections', sections };
   }

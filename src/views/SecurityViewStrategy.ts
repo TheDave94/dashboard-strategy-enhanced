@@ -5,6 +5,7 @@
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
+import { localize } from '../utils/localize';
 
 class Simon42ViewSecurityStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
@@ -52,7 +53,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       if (unlocked.length > 0) {
         cards.push({
           type: 'heading',
-          heading: '🔓 Schlösser - Entriegelt',
+          heading: localize('security.locks_unlocked'),
           heading_style: 'subtitle',
           badges: [
             {
@@ -75,7 +76,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (locked.length > 0) {
-        cards.push({ type: 'heading', heading: '🔒 Schlösser - Verriegelt', heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.locks_locked'), heading_style: 'subtitle' });
         cards.push(
           ...locked.map((e) => ({
             type: 'tile',
@@ -97,7 +98,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       if (open.length > 0) {
         cards.push({
           type: 'heading',
-          heading: '🚪 Türen & Tore - Offen',
+          heading: localize('security.doors_open'),
           heading_style: 'subtitle',
           badges: [
             {
@@ -125,7 +126,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: '🚪 Türen & Tore - Geschlossen', heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.doors_closed'), heading_style: 'subtitle' });
         cards.push(
           ...closed.map((e) => ({
             type: 'tile',
@@ -148,7 +149,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       if (open.length > 0) {
         cards.push({
           type: 'heading',
-          heading: '🏠 Garagen - Offen',
+          heading: localize('security.garages_open'),
           heading_style: 'subtitle',
           badges: [
             {
@@ -176,7 +177,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: '🏠 Garagen - Geschlossen', heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.garages_closed'), heading_style: 'subtitle' });
         cards.push(
           ...closed.map((e) => ({
             type: 'tile',
@@ -197,11 +198,11 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       const cards: LovelaceCardConfig[] = [];
 
       if (open.length > 0) {
-        cards.push({ type: 'heading', heading: '🪟 Fenster & Öffnungen - Offen', heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.windows_open'), heading_style: 'subtitle' });
         cards.push(...open.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: '🪟 Fenster & Öffnungen - Geschlossen', heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.windows_closed'), heading_style: 'subtitle' });
         cards.push(...closed.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (cards.length > 0) sections.push({ type: 'grid', cards });

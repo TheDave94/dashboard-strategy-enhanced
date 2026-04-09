@@ -5,6 +5,7 @@
 
 import type { CustomView, CustomCard, CustomBadge, RoomEntities } from '../types/strategy';
 import type { AreaRegistryEntry } from '../types/registries';
+import { localize } from '../utils/localize';
 
 // -- Editor-specific entity shape (enriched for editor UI) ------------
 
@@ -125,22 +126,22 @@ export function renderEditorHTML({
     <div class="card-config">
 
       <div class="section">
-        <div class="section-title">Übersicht</div>
+        <div class="section-title">${localize('editor.section_overview')}</div>
         <div class="form-row">
           <input
             type="checkbox"
             id="show-clock-card"
             ${showClockCard !== false ? 'checked' : ''}
           />
-          <label for="show-clock-card">Uhrzeit-Karte anzeigen</label>
+          <label for="show-clock-card">${localize('editor.show_clock_card')}</label>
         </div>
         <div class="description">
-          Zeigt die Uhrzeit-Karte in der Übersicht an.
+          ${localize('editor.show_clock_card_desc')}
         </div>
         <div class="form-row">
-          <label for="alarm-entity" style="margin-right: 8px; min-width: 120px;">Alarm-Entität:</label>
+          <label for="alarm-entity" style="margin-right: 8px; min-width: 120px;">${localize('editor.alarm_entity')}</label>
           <select id="alarm-entity" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
-            <option value="">Keine (Uhr in voller Breite)</option>
+            <option value="">${localize('editor.alarm_none')}</option>
             ${alarmEntities
               .map(
                 (entity) => `
@@ -153,7 +154,7 @@ export function renderEditorHTML({
           </select>
         </div>
         <div class="description">
-          Wähle eine Alarm-Control-Panel-Entität aus. Wenn die Uhrzeit-Karte aktiv ist, wird das Alarm-Panel daneben angezeigt. Ohne Uhrzeit-Karte erscheint das Alarm-Panel in voller Breite.
+          ${localize('editor.alarm_desc')}
         </div>
         <div class="form-row">
           <input
@@ -163,20 +164,20 @@ export function renderEditorHTML({
             ${!hasSearchCardDeps ? 'disabled' : ''}
           />
           <label for="show-search-card" ${!hasSearchCardDeps ? 'class="disabled-label"' : ''}>
-            Such-Karte anzeigen
+            ${localize('editor.show_search_card')}
           </label>
         </div>
         <div class="description">
           ${
             hasSearchCardDeps
-              ? 'Zeigt die custom:search-card direkt unter der Uhr in der Übersicht an.'
-              : '⚠️ Benötigt <strong>custom:search-card</strong> und <strong>card-tools</strong>. Bitte installieren Sie beide Komponenten, um diese Funktion zu nutzen.'
+              ? localize('editor.show_search_card_desc')
+              : '⚠️ ' + localize('editor.show_search_card_missing')
           }
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Zusammenfassungen</div>
+        <div class="section-title">${localize('editor.section_summaries')}</div>
         <div class="form-row">
           <input
             type="radio"
@@ -185,7 +186,7 @@ export function renderEditorHTML({
             value="2"
             ${summariesColumns === 2 ? 'checked' : ''}
           />
-          <label for="summaries-2-columns">2 Spalten (2x2 Grid)</label>
+          <label for="summaries-2-columns">${localize('editor.columns_2')}</label>
         </div>
         <div class="form-row">
           <input
@@ -195,10 +196,10 @@ export function renderEditorHTML({
             value="4"
             ${summariesColumns === 4 ? 'checked' : ''}
           />
-          <label for="summaries-4-columns">4 Spalten (1x4 Reihe)</label>
+          <label for="summaries-4-columns">${localize('editor.columns_4')}</label>
         </div>
         <div class="description">
-          Wähle aus, wie die Zusammenfassungskarten angezeigt werden sollen. Das Layout passt sich automatisch an, wenn Karten ausgeblendet werden.
+          ${localize('editor.columns_desc')}
         </div>
         <div class="form-row">
           <input
@@ -206,7 +207,7 @@ export function renderEditorHTML({
             id="show-light-summary"
             ${showLightSummary !== false ? 'checked' : ''}
           />
-          <label for="show-light-summary">Licht-Zusammenfassung anzeigen</label>
+          <label for="show-light-summary">${localize('editor.show_light_summary')}</label>
         </div>
         <div class="form-row">
           <input
@@ -214,10 +215,10 @@ export function renderEditorHTML({
             id="group-lights-by-floors"
             ${groupLightsByFloors ? 'checked' : ''}
           />
-          <label for="group-lights-by-floors">Lichter nach Etagen gruppieren</label>
+          <label for="group-lights-by-floors">${localize('editor.group_lights_by_floors')}</label>
         </div>
         <div class="description">
-          Gruppiert die Lichter in der Lichter-Ansicht nach Etagen. Jede Etage erhält einen eigenen Bereich mit Ein-/Ausschalt-Button.
+          ${localize('editor.group_lights_by_floors_desc')}
         </div>
         <div class="form-row">
           <input
@@ -225,7 +226,7 @@ export function renderEditorHTML({
             id="show-covers-summary"
             ${showCoversSummary !== false ? 'checked' : ''}
           />
-          <label for="show-covers-summary">Rollo-Zusammenfassung anzeigen</label>
+          <label for="show-covers-summary">${localize('editor.show_covers_summary')}</label>
         </div>
         <div style="margin-left: 26px; margin-bottom: 8px;">
           <div class="form-row">
@@ -234,10 +235,10 @@ export function renderEditorHTML({
               id="show-partially-open-covers"
               ${showPartiallyOpenCovers ? 'checked' : ''}
             />
-            <label for="show-partially-open-covers">Teiloffene Rollos separat anzeigen</label>
+            <label for="show-partially-open-covers">${localize('editor.show_partially_open_covers')}</label>
           </div>
           <div class="description">
-            Zeigt teiloffene Rollos (weder ganz offen noch geschlossen) in einer eigenen Gruppe an.
+            ${localize('editor.show_partially_open_covers_desc')}
           </div>
         </div>
         <div class="form-row">
@@ -246,7 +247,7 @@ export function renderEditorHTML({
             id="show-security-summary"
             ${showSecuritySummary !== false ? 'checked' : ''}
           />
-          <label for="show-security-summary">Sicherheits-Zusammenfassung anzeigen</label>
+          <label for="show-security-summary">${localize('editor.show_security_summary')}</label>
         </div>
         <div class="form-row">
           <input
@@ -254,10 +255,10 @@ export function renderEditorHTML({
             id="show-climate-summary"
             ${showClimateSummary ? 'checked' : ''}
           />
-          <label for="show-climate-summary">Klima-Zusammenfassung anzeigen</label>
+          <label for="show-climate-summary">${localize('editor.show_climate_summary')}</label>
         </div>
         <div class="description">
-          Zeigt die Klima-Zusammenfassungskarte in der Übersicht an. Zählt aktive Thermostate und Klimageräte.
+          ${localize('editor.show_climate_summary_desc')}
         </div>
         <div class="form-row">
           <input
@@ -265,7 +266,7 @@ export function renderEditorHTML({
             id="show-battery-summary"
             ${showBatterySummary !== false ? 'checked' : ''}
           />
-          <label for="show-battery-summary">Batterie-Zusammenfassung anzeigen</label>
+          <label for="show-battery-summary">${localize('editor.show_battery_summary')}</label>
         </div>
         <div style="margin-left: 26px; margin-bottom: 8px;">
           <div class="form-row">
@@ -274,14 +275,14 @@ export function renderEditorHTML({
               id="hide-mobile-app-batteries"
               ${hideMobileAppBatteries ? 'checked' : ''}
             />
-            <label for="hide-mobile-app-batteries">Mobile-App-Batterien ausblenden</label>
+            <label for="hide-mobile-app-batteries">${localize('editor.hide_mobile_app_batteries')}</label>
           </div>
           <div class="description">
-            Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.
+            ${localize('editor.hide_mobile_app_batteries_desc')}
           </div>
-          <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">Batterie-Schwellwerte</div>
+          <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">${localize('editor.battery_thresholds')}</div>
           <div class="form-row">
-            <label for="battery-critical-threshold" style="min-width: 140px;">Kritisch unter</label>
+            <label for="battery-critical-threshold" style="min-width: 140px;">${localize('editor.battery_critical_below')}</label>
             <input
               type="number"
               id="battery-critical-threshold"
@@ -291,7 +292,7 @@ export function renderEditorHTML({
             /> %
           </div>
           <div class="form-row">
-            <label for="battery-low-threshold" style="min-width: 140px;">Niedrig unter</label>
+            <label for="battery-low-threshold" style="min-width: 140px;">${localize('editor.battery_low_below')}</label>
             <input
               type="number"
               id="battery-low-threshold"
@@ -301,23 +302,23 @@ export function renderEditorHTML({
             /> %
           </div>
           <div class="description">
-            Schwellwerte für die Batterie-Statusgruppen (Kritisch / Niedrig / Gut).
+            ${localize('editor.battery_thresholds_desc')}
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Info-Karten</div>
+        <div class="section-title">${localize('editor.section_info_cards')}</div>
         <div class="form-row">
           <input
             type="checkbox"
             id="show-weather"
             ${showWeather !== false ? 'checked' : ''}
           />
-          <label for="show-weather">Wetter-Karte anzeigen</label>
+          <label for="show-weather">${localize('editor.show_weather')}</label>
         </div>
         <div class="description">
-          Zeigt die Wettervorhersage-Karte in der Übersicht an, wenn eine Wetter-Entität verfügbar ist.
+          ${localize('editor.show_weather_desc')}
         </div>
         <div class="form-row">
           <input
@@ -325,21 +326,21 @@ export function renderEditorHTML({
             id="show-energy"
             ${showEnergy ? 'checked' : ''}
           />
-          <label for="show-energy">Energie-Dashboard anzeigen</label>
+          <label for="show-energy">${localize('editor.show_energy')}</label>
         </div>
         <div class="description">
-          Zeigt die Energie-Verteilungskarte in der Übersicht an, wenn Energiedaten verfügbar sind.
+          ${localize('editor.show_energy_desc')}
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Favoriten</div>
+        <div class="section-title">${localize('editor.section_favorites')}</div>
         <div id="favorites-list" style="margin-bottom: 12px;">
           ${renderFavoritesList(favoriteEntities, allEntities)}
         </div>
         <div style="display: flex; gap: 8px; align-items: flex-start;">
           <select id="favorite-entity-select" style="flex: 1; min-width: 0; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
-            <option value="">Entität auswählen...</option>
+            <option value="">${localize('editor.select_entity')}</option>
             ${allEntities
               .map(
                 (entity) => `
@@ -349,11 +350,11 @@ export function renderEditorHTML({
               .join('')}
           </select>
           <button id="add-favorite-btn" style="flex-shrink: 0; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer; white-space: nowrap;">
-            + Hinzufügen
+            ${localize('editor.add')}
           </button>
         </div>
         <div class="description">
-          Wähle Entitäten aus, die als Favoriten unter den Zusammenfassungen angezeigt werden sollen. Die Entitäten werden als Kacheln angezeigt.
+          ${localize('editor.favorites_desc')}
         </div>
         <div class="form-row">
           <input
@@ -361,7 +362,7 @@ export function renderEditorHTML({
             id="favorites-show-state"
             ${favoritesShowState ? 'checked' : ''}
           />
-          <label for="favorites-show-state">Status anzeigen</label>
+          <label for="favorites-show-state">${localize('editor.show_state')}</label>
         </div>
         <div class="form-row">
           <input
@@ -369,26 +370,26 @@ export function renderEditorHTML({
             id="favorites-hide-last-changed"
             ${favoritesHideLastChanged ? 'checked' : ''}
           />
-          <label for="favorites-hide-last-changed">Zuletzt aktualisiert ausblenden</label>
+          <label for="favorites-hide-last-changed">${localize('editor.hide_last_changed')}</label>
         </div>
       </div>
 
       <div style="border-top: 2px solid var(--divider-color); margin: 24px 0 16px; padding-top: 16px;">
-        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">Bereiche & Räume</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">${localize('editor.section_areas_rooms')}</div>
       </div>
 
       <div class="section">
-        <div class="section-title">Bereiche</div>
+        <div class="section-title">${localize('editor.section_areas')}</div>
         <div class="form-row">
           <input
             type="checkbox"
             id="group-by-floors"
             ${groupByFloors ? 'checked' : ''}
           />
-          <label for="group-by-floors">Bereiche in Etagen gliedern</label>
+          <label for="group-by-floors">${localize('editor.group_by_floors')}</label>
         </div>
         <div class="description">
-          Gruppiert die Bereiche in der Übersicht nach Etagen. Wenn aktiviert, wird für jede Etage eine separate Section erstellt.
+          ${localize('editor.group_by_floors_desc')}
         </div>
         <div class="form-row">
           <input
@@ -396,10 +397,10 @@ export function renderEditorHTML({
             id="show-locks-in-rooms"
             ${showLocksInRooms ? 'checked' : ''}
           />
-          <label for="show-locks-in-rooms">Schlösser in Raum-Ansichten anzeigen</label>
+          <label for="show-locks-in-rooms">${localize('editor.show_locks_in_rooms')}</label>
         </div>
         <div class="description">
-          Zeigt Schlösser (z.B. Nuki) in den jeweiligen Raum-Ansichten an. Schlösser erscheinen unabhängig davon immer in der Sicherheits-Übersicht.
+          ${localize('editor.show_locks_in_rooms_desc')}
         </div>
         <div class="form-row">
           <input
@@ -407,10 +408,10 @@ export function renderEditorHTML({
             id="show-automations-in-rooms"
             ${showAutomationsInRooms ? 'checked' : ''}
           />
-          <label for="show-automations-in-rooms">Automationen in Raum-Ansichten anzeigen</label>
+          <label for="show-automations-in-rooms">${localize('editor.show_automations_in_rooms')}</label>
         </div>
         <div class="description">
-          Zeigt dem Bereich zugeordnete Automationen in den jeweiligen Raum-Ansichten an.
+          ${localize('editor.show_automations_in_rooms_desc')}
         </div>
         <div class="form-row">
           <input
@@ -418,10 +419,10 @@ export function renderEditorHTML({
             id="show-scripts-in-rooms"
             ${showScriptsInRooms ? 'checked' : ''}
           />
-          <label for="show-scripts-in-rooms">Skripte in Raum-Ansichten anzeigen</label>
+          <label for="show-scripts-in-rooms">${localize('editor.show_scripts_in_rooms')}</label>
         </div>
         <div class="description">
-          Zeigt dem Bereich zugeordnete Skripte in den jeweiligen Raum-Ansichten an.
+          ${localize('editor.show_scripts_in_rooms_desc')}
         </div>
         <div class="form-row">
           <input
@@ -429,10 +430,10 @@ export function renderEditorHTML({
             id="show-window-contacts-in-rooms"
             ${showWindowContactsInRooms ? 'checked' : ''}
           />
-          <label for="show-window-contacts-in-rooms">Fensterkontakte in Raum-Ansichten anzeigen</label>
+          <label for="show-window-contacts-in-rooms">${localize('editor.show_window_contacts_in_rooms')}</label>
         </div>
         <div class="description">
-          Zeigt Fensterkontakte als Badges in den jeweiligen Raum-Ansichten an.
+          ${localize('editor.show_window_contacts_in_rooms_desc')}
         </div>
         <div class="form-row">
           <input
@@ -440,10 +441,10 @@ export function renderEditorHTML({
             id="show-door-contacts-in-rooms"
             ${showDoorContactsInRooms ? 'checked' : ''}
           />
-          <label for="show-door-contacts-in-rooms">Türkontakte in Raum-Ansichten anzeigen</label>
+          <label for="show-door-contacts-in-rooms">${localize('editor.show_door_contacts_in_rooms')}</label>
         </div>
         <div class="description">
-          Zeigt Türkontakte als Badges in den jeweiligen Raum-Ansichten an.
+          ${localize('editor.show_door_contacts_in_rooms_desc')}
         </div>
         <div class="form-row">
           <input
@@ -451,13 +452,13 @@ export function renderEditorHTML({
             id="use-default-area-sort"
             ${useDefaultAreaSort ? 'checked' : ''}
           />
-          <label for="use-default-area-sort">Home Assistant Sortierung verwenden</label>
+          <label for="use-default-area-sort">${localize('editor.use_default_area_sort')}</label>
         </div>
         <div class="description">
-          Verwendet die Sortierung der Bereiche aus Home Assistant anstelle der hier 👇 im Dashboard konfigurierten Reihenfolge.
+          ${localize('editor.use_default_area_sort_desc')}
         </div>
         <div class="description" style="margin-left: 0; margin-top: 16px; margin-bottom: 12px;">
-          Wähle aus, welche Bereiche im Dashboard angezeigt werden sollen und in welcher Reihenfolge. Klappe Bereiche auf, um einzelne Entitäten zu verwalten.
+          ${localize('editor.areas_manage_desc')}
         </div>
         <div class="area-list" id="area-list">
           ${renderAreaItems(allAreas, hiddenAreas, areaOrder)}
@@ -465,13 +466,13 @@ export function renderEditorHTML({
       </div>
 
       <div class="section">
-        <div class="section-title">Raum-Pins</div>
+        <div class="section-title">${localize('editor.section_room_pins')}</div>
         <div id="room-pins-list" style="margin-bottom: 12px;">
           ${renderRoomPinsList(roomPinEntities, allEntities, allAreas)}
         </div>
         <div style="display: flex; gap: 8px; align-items: flex-start;">
           <select id="room-pin-entity-select" style="flex: 1; min-width: 0; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);">
-            <option value="">Entität auswählen...</option>
+            <option value="">${localize('editor.select_entity')}</option>
             ${allEntities
               .filter((entity) => entity.area_id || entity.device_area_id)
               .map(
@@ -482,11 +483,11 @@ export function renderEditorHTML({
               .join('')}
           </select>
           <button id="add-room-pin-btn" style="flex-shrink: 0; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer; white-space: nowrap;">
-            + Hinzufügen
+            ${localize('editor.add')}
           </button>
         </div>
         <div class="description">
-          Wähle Entitäten aus, die in ihren zugeordneten Räumen als erstes angezeigt werden sollen. Ideal für Entitäten die normalerweise nicht automatisch erfasst werden (z.B. Wetterstationen, spezielle Sensoren). <strong>Nur Entitäten mit Raum-Zuordnung können ausgewählt werden.</strong> Diese Pins erscheinen nur im jeweiligen Raum, nicht in der Übersicht.
+          ${localize('editor.room_pins_desc')}
         </div>
         <div class="form-row">
           <input
@@ -494,7 +495,7 @@ export function renderEditorHTML({
             id="room-pins-show-state"
             ${roomPinsShowState ? 'checked' : ''}
           />
-          <label for="room-pins-show-state">Status anzeigen</label>
+          <label for="room-pins-show-state">${localize('editor.show_state')}</label>
         </div>
         <div class="form-row">
           <input
@@ -502,22 +503,22 @@ export function renderEditorHTML({
             id="room-pins-hide-last-changed"
             ${roomPinsHideLastChanged ? 'checked' : ''}
           />
-          <label for="room-pins-hide-last-changed">Zuletzt aktualisiert ausblenden</label>
+          <label for="room-pins-hide-last-changed">${localize('editor.hide_last_changed')}</label>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Ansichten</div>
+        <div class="section-title">${localize('editor.section_views')}</div>
         <div class="form-row">
           <input
             type="checkbox"
             id="show-summary-views"
             ${showSummaryViews ? 'checked' : ''}
           />
-          <label for="show-summary-views">Zusammenfassungs-Views anzeigen</label>
+          <label for="show-summary-views">${localize('editor.show_summary_views')}</label>
         </div>
         <div class="description">
-          Zeigt die Zusammenfassungs-Views (Lichter, Rollos, Sicherheit, Batterien) in der oberen Navigation an.
+          ${localize('editor.show_summary_views_desc')}
         </div>
         <div class="form-row">
           <input
@@ -525,60 +526,60 @@ export function renderEditorHTML({
             id="show-room-views"
             ${showRoomViews ? 'checked' : ''}
           />
-          <label for="show-room-views">Raum-Views anzeigen</label>
+          <label for="show-room-views">${localize('editor.show_room_views')}</label>
         </div>
         <div class="description">
-          Zeigt die einzelnen Raum-Views in der oberen Navigation an.
+          ${localize('editor.show_room_views_desc')}
         </div>
       </div>
 
       <div style="border-top: 2px solid var(--divider-color); margin: 24px 0 16px; padding-top: 16px;">
-        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">Erweiterte Funktionen</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">${localize('editor.section_advanced')}</div>
       </div>
 
       <div class="section">
-        <div class="section-title">Eigene Karten</div>
+        <div class="section-title">${localize('editor.section_custom_cards')}</div>
         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input type="text" id="custom-cards-heading" value="${customCardsHeading}" placeholder="Eigene Karten" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+          <input type="text" id="custom-cards-heading" value="${customCardsHeading}" placeholder="${localize('editor.custom_cards_heading_placeholder')}" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
           <input type="text" id="custom-cards-icon" value="${customCardsIcon}" placeholder="mdi:cards" style="flex: 1; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
         </div>
         <div class="description" style="margin-bottom: 8px;">
-          Überschrift und Icon der Section für die eigenen Karten auf dem Dashboard. Leer lassen für Standardwerte.
+          ${localize('editor.custom_cards_desc')}
         </div>
         <div id="custom-cards-list">
           ${renderCustomCardsList(customCards)}
         </div>
         <button id="add-custom-card-btn" style="margin-top: 8px; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer;">
-          + Neue Karte hinzufügen
+          ${localize('editor.add_custom_card')}
         </button>
         <div class="description">
-          Füge eigene Karten zur Übersicht hinzu. Die Karten erscheinen in einer eigenen Section zwischen Zusammenfassung und Bereichen. Tipp: Erstelle die Karte zuerst in einem normalen Dashboard, kopiere den YAML-Code und füge ihn hier ein.
+          ${localize('editor.custom_cards_help')}
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Eigene Badges</div>
+        <div class="section-title">${localize('editor.section_custom_badges')}</div>
         <div id="custom-badges-list">
           ${renderCustomBadgesList(customBadges)}
         </div>
         <button id="add-custom-badge-btn" style="margin-top: 8px; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer;">
-          + Neues Badge hinzufügen
+          ${localize('editor.add_custom_badge')}
         </button>
         <div class="description">
-          Füge eigene Badges zum Header der Übersicht hinzu (neben den Personen-Chips). Beispiel: <code>type: entity</code> + <code>entity: sun.sun</code>
+          ${localize('editor.custom_badges_help')}
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Custom Views</div>
+        <div class="section-title">${localize('editor.section_custom_views')}</div>
         <div id="custom-views-list">
           ${renderCustomViewsList(customViews)}
         </div>
         <button id="add-custom-view-btn" style="margin-top: 8px; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer;">
-          + Neue View hinzufügen
+          ${localize('editor.add_custom_view')}
         </button>
         <div class="description">
-          Erstelle eigene Views mit beliebigen Cards. Tipp: Erstelle die View zuerst in einem normalen Dashboard, kopiere den YAML-Code und füge ihn hier ein.
+          ${localize('editor.custom_views_help')}
         </div>
       </div>
 
@@ -592,7 +593,7 @@ export function renderEditorHTML({
 
 function renderFavoritesList(favoriteEntities: string[], allEntities: EditorEntity[]): string {
   if (!favoriteEntities || favoriteEntities.length === 0) {
-    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Favoriten hinzugefügt</div>';
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">' + localize('editor.no_favorites') + '</div>';
   }
 
   // Erstelle Map für schnellen Zugriff auf Entity-Namen
@@ -627,7 +628,7 @@ export function renderRoomPinsList(
   allAreas: AreaRegistryEntry[]
 ): string {
   if (!roomPinEntities || roomPinEntities.length === 0) {
-    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Raum-Pins hinzugefügt</div>';
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">' + localize('editor.no_room_pins') + '</div>';
   }
 
   // Erstelle Maps für schnellen Zugriff
@@ -641,7 +642,7 @@ export function renderRoomPinsList(
           const entity = entityMap.get(entityId);
           const name = entity?.name || entityId;
           const areaId = entity?.area_id || entity?.device_area_id;
-          const areaName = areaId ? areaMap.get(areaId) || areaId : 'Kein Raum';
+          const areaName = areaId ? areaMap.get(areaId) || areaId : localize('editor.no_room');
 
           return `
           <div class="room-pin-item" data-entity-id="${entityId}" style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--divider-color); background: var(--card-background-color);">
@@ -665,7 +666,7 @@ export function renderRoomPinsList(
 
 export function renderCustomViewsList(customViews: CustomView[]): string {
   if (!customViews || customViews.length === 0) {
-    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine Custom Views erstellt</div>';
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">' + localize('editor.no_custom_views') + '</div>';
   }
 
   return customViews
@@ -673,22 +674,22 @@ export function renderCustomViewsList(customViews: CustomView[]): string {
       const validationMsg = view._yaml_error
         ? `<span style="color: var(--error-color);">❌ ${view._yaml_error}</span>`
         : view.yaml
-          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          ? '<span style="color: var(--success-color, green);">\u2705 ' + localize('editor.yaml_valid') + '</span>'
           : '';
 
       return `
       <div class="custom-view-item" data-index="${index}" style="border: 1px solid var(--divider-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--card-background-color);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong style="font-size: 14px;">${view.title || 'Neue View'}</strong>
+          <strong style="font-size: 14px;">${view.title || localize('editor.new_view')}</strong>
           <button class="remove-custom-view-btn" data-index="${index}" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); cursor: pointer;">✕</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; gap: 8px;">
-            <input type="text" class="custom-view-title" data-index="${index}" value="${view.title || ''}" placeholder="Titel" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
-            <input type="text" class="custom-view-path" data-index="${index}" value="${view.path || ''}" placeholder="Pfad (z.B. mein-view)" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+            <input type="text" class="custom-view-title" data-index="${index}" value="${view.title || ''}" placeholder="${localize('editor.title_placeholder')}" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+            <input type="text" class="custom-view-path" data-index="${index}" value="${view.path || ''}" placeholder="${localize('editor.path_placeholder')}" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
             <input type="text" class="custom-view-icon" data-index="${index}" value="${view.icon || ''}" placeholder="mdi:star" style="flex: 1; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
           </div>
-          <textarea class="custom-view-yaml" data-index="${index}" rows="8" placeholder="YAML-Code hier einfügen..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${view.yaml || ''}</textarea>
+          <textarea class="custom-view-yaml" data-index="${index}" rows="8" placeholder="${localize('editor.yaml_placeholder')}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${view.yaml || ''}</textarea>
           <div class="custom-view-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
             ${validationMsg}
           </div>
@@ -701,7 +702,7 @@ export function renderCustomViewsList(customViews: CustomView[]): string {
 
 export function renderCustomCardsList(customCards: CustomCard[]): string {
   if (!customCards || customCards.length === 0) {
-    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine eigenen Karten erstellt</div>';
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">' + localize('editor.no_custom_cards') + '</div>';
   }
 
   return customCards
@@ -709,18 +710,18 @@ export function renderCustomCardsList(customCards: CustomCard[]): string {
       const validationMsg = card._yaml_error
         ? `<span style="color: var(--error-color);">❌ ${card._yaml_error}</span>`
         : card.yaml
-          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          ? '<span style="color: var(--success-color, green);">\u2705 ' + localize('editor.yaml_valid') + '</span>'
           : '';
 
       return `
       <div class="custom-card-item" data-index="${index}" style="border: 1px solid var(--divider-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--card-background-color);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong style="font-size: 14px;">${card.title || 'Neue Karte'}</strong>
+          <strong style="font-size: 14px;">${card.title || localize('editor.new_card')}</strong>
           <button class="remove-custom-card-btn" data-index="${index}" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); cursor: pointer;">✕</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-          <input type="text" class="custom-card-title" data-index="${index}" value="${card.title || ''}" placeholder="Titel (optional, wird als Heading angezeigt)" style="padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
-          <textarea class="custom-card-yaml" data-index="${index}" rows="6" placeholder="YAML-Code hier einfügen..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${card.yaml || ''}</textarea>
+          <input type="text" class="custom-card-title" data-index="${index}" value="${card.title || ''}" placeholder="${localize('editor.card_title_placeholder')}" style="padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+          <textarea class="custom-card-yaml" data-index="${index}" rows="6" placeholder="${localize('editor.yaml_placeholder')}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${card.yaml || ''}</textarea>
           <div class="custom-card-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
             ${validationMsg}
           </div>
@@ -733,7 +734,7 @@ export function renderCustomCardsList(customCards: CustomCard[]): string {
 
 export function renderCustomBadgesList(customBadges: CustomBadge[]): string {
   if (!customBadges || customBadges.length === 0) {
-    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine eigenen Badges erstellt</div>';
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">' + localize('editor.no_custom_badges') + '</div>';
   }
 
   return customBadges
@@ -741,7 +742,7 @@ export function renderCustomBadgesList(customBadges: CustomBadge[]): string {
       const validationMsg = badge._yaml_error
         ? `<span style="color: var(--error-color);">❌ ${badge._yaml_error}</span>`
         : badge.yaml
-          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          ? '<span style="color: var(--success-color, green);">\u2705 ' + localize('editor.yaml_valid') + '</span>'
           : '';
 
       return `
@@ -762,7 +763,7 @@ export function renderCustomBadgesList(customBadges: CustomBadge[]): string {
 
 function renderAreaItems(allAreas: AreaRegistryEntry[], hiddenAreas: string[], areaOrder: string[]): string {
   if (allAreas.length === 0) {
-    return '<div class="empty-state">Keine Bereiche verfügbar</div>';
+    return '<div class="empty-state">' + localize('editor.no_areas') + '</div>';
   }
 
   return allAreas
@@ -790,7 +791,7 @@ function renderAreaItems(allAreas: AreaRegistryEntry[], hiddenAreas: string[], a
           </button>
         </div>
         <div class="area-content" data-area-id="${area.area_id}" style="display: none;">
-          <div class="loading-placeholder">Lade Entitäten...</div>
+          <div class="loading-placeholder">${localize('editor.loading_entities')}</div>
         </div>
       </div>
     `;
@@ -814,16 +815,16 @@ export function renderAreaEntitiesHTML(
   hass: HassStatesSubset
 ): string {
   const domainGroups: DomainGroup[] = [
-    { key: 'lights', label: 'Beleuchtung', icon: 'mdi:lightbulb' },
-    { key: 'climate', label: 'Klima', icon: 'mdi:thermostat' },
-    { key: 'covers', label: 'Rollos & Jalousien', icon: 'mdi:window-shutter' },
-    { key: 'covers_curtain', label: 'Vorhänge', icon: 'mdi:curtains' },
-    { key: 'media_player', label: 'Medien', icon: 'mdi:speaker' },
-    { key: 'scenes', label: 'Szenen', icon: 'mdi:palette' },
-    { key: 'vacuum', label: 'Staubsauger', icon: 'mdi:robot-vacuum' },
-    { key: 'fan', label: 'Ventilatoren', icon: 'mdi:fan' },
-    { key: 'switches', label: 'Schalter', icon: 'mdi:light-switch' },
-    { key: 'locks', label: 'Schlösser', icon: 'mdi:lock' },
+    { key: 'lights', label: localize('editor.domain_lights'), icon: 'mdi:lightbulb' },
+    { key: 'climate', label: localize('editor.domain_climate'), icon: 'mdi:thermostat' },
+    { key: 'covers', label: localize('editor.domain_covers'), icon: 'mdi:window-shutter' },
+    { key: 'covers_curtain', label: localize('editor.domain_covers_curtain'), icon: 'mdi:curtains' },
+    { key: 'media_player', label: localize('editor.domain_media_player'), icon: 'mdi:speaker' },
+    { key: 'scenes', label: localize('editor.domain_scenes'), icon: 'mdi:palette' },
+    { key: 'vacuum', label: localize('editor.domain_vacuum'), icon: 'mdi:robot-vacuum' },
+    { key: 'fan', label: localize('editor.domain_fan'), icon: 'mdi:fan' },
+    { key: 'switches', label: localize('editor.domain_switches'), icon: 'mdi:light-switch' },
+    { key: 'locks', label: localize('editor.domain_locks'), icon: 'mdi:lock' },
   ];
 
   let html = '<div class="entity-groups">';
@@ -885,7 +886,7 @@ export function renderAreaEntitiesHTML(
   html += '</div>';
 
   if (html === '<div class="entity-groups"></div>') {
-    return '<div class="empty-state">Keine Entitäten in diesem Bereich gefunden</div>';
+    return '<div class="empty-state">' + localize('editor.no_entities_in_area') + '</div>';
   }
 
   return html;

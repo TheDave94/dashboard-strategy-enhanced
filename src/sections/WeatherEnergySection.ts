@@ -7,6 +7,7 @@
 // ====================================================================
 
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
+import { localize } from '../utils/localize';
 
 /**
  * Creates the weather & energy section(s).
@@ -33,7 +34,7 @@ export function createWeatherEnergySection(
         cards: [
           {
             type: 'heading',
-            heading: 'Wetter',
+            heading: localize('sections.weather'),
             heading_style: 'title',
             icon: 'mdi:weather-partly-cloudy',
           },
@@ -53,7 +54,7 @@ export function createWeatherEnergySection(
         cards: [
           {
             type: 'heading',
-            heading: 'Energie',
+            heading: localize('sections.energy'),
             heading_style: 'title',
             icon: 'mdi:lightning-bolt',
           },
@@ -76,7 +77,7 @@ export function createWeatherEnergySection(
   if (weatherEntity && showWeather) {
     cards.push({
       type: 'heading',
-      heading: 'Wetter',
+      heading: localize('sections.weather'),
       heading_style: 'title',
       icon: 'mdi:weather-partly-cloudy',
     });
@@ -91,7 +92,7 @@ export function createWeatherEnergySection(
   if (showEnergy) {
     cards.push({
       type: 'heading',
-      heading: 'Energie',
+      heading: localize('sections.energy'),
       heading_style: 'title',
       icon: 'mdi:lightning-bolt',
     });
