@@ -9,14 +9,22 @@
 Eine modulare und hochkonfigurierbare Dashboard-Strategy fuer Home Assistant, die automatisch Views basierend auf Bereichen, Entitaeten und deren Zustaenden generiert.
 
 <p align="center">
+  <img src="assets/Screenshot-simon42-strategy.png" alt="simon42 Dashboard Strategy — Uebersicht" width="800" />
+</p>
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheRealSimon42&repository=simon42-dashboard-strategy&category=plugin)
+
+---
+
+## Video-Anleitung
+
+<p align="center">
   <a href="https://youtu.be/XU7DfQrfJ2w">
     <img src="assets/video-thumbnail.png" alt="simon42 Dashboard Strategy — Video Tutorial" width="600" />
   </a>
   <br/>
-  <em>Video-Anleitung auf YouTube ansehen</em>
+  <em>Schritt-fuer-Schritt Anleitung auf YouTube ansehen</em>
 </p>
-
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheRealSimon42&repository=simon42-dashboard-strategy&category=plugin)
 
 ---
 
@@ -42,9 +50,15 @@ Wenn dir die simon42 Dashboard Strategy hilft, unterstuetze die Weiterentwicklun
 
 - **Grafischer Konfigurator** — Keine YAML-Kenntnisse erforderlich, Drag & Drop fuer Bereiche
 - **Automatische Raum-Erkennung** — Nutzt Home Assistant Areas, Devices & Floors
-- **Spezialisierte Views** — Lichter, Rollos, Sicherheit, Batterien jeweils mit Status-Gruppierung
+- **Spezialisierte Views** — Lichter, Rollos, Sicherheit, Batterien, Klima — jeweils mit Status-Gruppierung
+- **Zusammenfassungskarten** — Einzeln ein-/ausschaltbar fuer Lichter, Rollos, Sicherheit, Batterien und Klima
+- **Etagen-Gruppierung** — Bereiche und Lichter optional nach Etagen gliedern
+- **Favoriten** — Beliebige Entitaeten als Kacheln auf der Uebersicht anpinnen
+- **Alarm-Panel** — Optionale Alarmanlage neben der Uhr
 - **Granulare Filterung** — Per Label (`no_dboard`), pro Bereich, pro Domain, pro Entity
 - **Batch-Aktionen** — Heading-Badges fuer Gruppensteuerung (alle ein/aus, alle oeffnen/schliessen)
+- **Eigene Karten** `🆕 Beta` — Beliebige Karten via YAML auf der Uebersicht einbinden
+- **Custom Views** — Eigene Dashboard-Views mit beliebigen Cards via YAML
 - **Reaktive Updates** — Echtzeit-Aktualisierung via LitElement Custom Cards
 - **Performance-optimiert** — Code-Split Bundles, Registry-Caching, Tile-Card-Pooling
 
@@ -86,6 +100,10 @@ lovelace:
 
 ## Dashboard erstellen
 
+<p align="center">
+  <img src="assets/simon42-Strategy-Download-DashboardAnlegen-StrategyCodeEinfugen.gif" alt="Dashboard erstellen — Schritt fuer Schritt" width="800" />
+</p>
+
 1. **Einstellungen** → **Dashboards** → **Dashboard hinzufuegen**
 2. **Neues Dashboard von Grund auf**, Name vergeben
 3. Dashboard oeffnen → **Edit-Modus** (oben rechts)
@@ -101,65 +119,171 @@ strategy:
 
 ## Konfiguration
 
-### Basis
+Alle Einstellungen lassen sich bequem ueber den **grafischen Editor** vornehmen (Stift-Icon → Drei Punkte → Dashboard bearbeiten). Die folgenden Abschnitte dokumentieren die verfuegbaren Optionen.
+
+<p align="center">
+  <img src="assets/Editor-oeffnen.gif" alt="Editor oeffnen" width="800" />
+</p>
+
+### Uebersicht
+
+Die Hauptseite des Dashboards zeigt eine Uebersicht mit folgenden Bereichen:
+
+**Uhr & Alarm** — Die Uhr wird standardmaessig angezeigt. Optional kann eine Alarmanlage daneben eingeblendet werden.
+
+**Zusammenfassungen** — Kacheln die den Status aller Lichter, Rollos, Sicherheits-Entitaeten, Batterien und Klimageraete zusammenfassen. Jede Zusammenfassung kann einzeln ein- oder ausgeschaltet werden. Das Layout ist als 2-Spalten-Grid (Standard) oder 4-Spalten-Reihe konfigurierbar.
+
+<p align="center">
+  <img src="assets/Klima-Zusammenfassung.gif" alt="Klima-Zusammenfassung aktivieren" width="800" />
+</p>
+
+**Batterie-Optionen** — Mobile-App-Batterien (Smartphones, Tablets) koennen ausgeblendet werden. Die Schwellwerte fuer die Statusgruppen (Kritisch / Niedrig / Gut) sind frei einstellbar. Nicht erreichbare Sensoren werden automatisch als kritisch eingestuft.
+
+<p align="center">
+  <img src="assets/Batterie-Schwellwerte-und-MobileAppBatt.gif" alt="Batterie-Schwellwerte und Mobile-App-Batterien" width="800" />
+</p>
+
+**Info-Karten** — Optionale Wetter- und Energie-Karten auf der Uebersicht.
+
+**Favoriten** — Beliebige Entitaeten, die als Kacheln unter den Zusammenfassungen erscheinen. Im Editor per Dropdown hinzufuegen.
+
+<p align="center">
+  <img src="assets/Favoriten-entity-hinzufügen.gif" alt="Favoriten hinzufuegen" width="800" />
+</p>
+
+### Bereiche & Raeume
+
+**Etagen-Gruppierung** — Bereiche koennen nach Etagen gegliedert werden. Jede Etage bekommt eine eigene Section mit Ueberschrift.
+
+<p align="center">
+  <img src="assets/Bereiche-nach-Etagen-Gliedern.gif" alt="Bereiche nach Etagen gliedern" width="800" />
+</p>
+
+**Schloesser in Raeumen** — Optional koennen Schloesser (z.B. Nuki) in den Raum-Views angezeigt werden. Unabhaengig davon erscheinen sie immer in der Sicherheits-Uebersicht.
+
+**Bereichssortierung** — Wahlweise die Reihenfolge aus Home Assistant verwenden oder im Editor per Drag & Drop festlegen.
+
+<p align="center">
+  <img src="assets/Home-Assistant-Bereichs-Sortierung-verwenden.gif" alt="HA-Bereichssortierung verwenden" width="800" />
+</p>
+
+**Bereichs-Verwaltung** — Bereiche ein-/ausblenden, Reihenfolge anpassen, Entitaeten pro Bereich und Domain filtern — alles im Editor.
+
+**Raum-Pins** — Spezielle Entitaeten die in ihren zugeordneten Raeumen ganz oben erscheinen. Ideal fuer Entitaeten die nicht automatisch erkannt werden (z.B. Wetterstationen).
+
+**Ansichten** — Summary-Views (Lichter, Rollos, etc.) und Raum-Views koennen optional in der oberen Navigation angezeigt werden.
+
+**Lichter nach Etagen** — In der Lichter-View koennen Lichter nach Etagen gruppiert werden, mit Ein-/Ausschalt-Button pro Etage.
+
+<p align="center">
+  <img src="assets/Lichter-nach-Etagen-Gliedern.gif" alt="Lichter nach Etagen gliedern" width="800" />
+</p>
+
+### Erweiterte Funktionen
+
+#### Eigene Karten `🆕 Beta`
+
+Beliebige Lovelace-Karten via YAML zur Uebersicht hinzufuegen. Die Karten erscheinen in einer eigenen Section zwischen den Zusammenfassungen und den Bereichen. Ueberschrift und Icon der Section sind frei waehlbar.
+
+**Tipp:** Erstelle die Karte zuerst in einem normalen Dashboard, kopiere den YAML-Code und fuege ihn im Editor ein.
 
 ```yaml
-strategy:
-  type: custom:simon42-dashboard
-  show_weather: true
-  show_energy: true
-  show_summary_views: false
-  show_room_views: true
-  show_covers_summary: true
-  group_by_floors: false
-  summaries_columns: 2
-  hide_mobile_app_batteries: false
+# Beispiel: Markdown-Karte
+type: markdown
+content: "Willkommen zuhause!"
 ```
 
-### Entity-Filterung pro Bereich
+<p align="center">
+  <img src="assets/Eigene-Karten-hinzufugen.gif" alt="Eigene Karten hinzufuegen" width="800" />
+</p>
+
+#### Custom Views
+
+Eigene Dashboard-Views mit beliebigen Cards erstellen. Jede Custom View benoetigt einen Titel, Pfad und Icon. Der YAML-Code definiert den Inhalt der View.
 
 ```yaml
-strategy:
-  type: custom:simon42-dashboard
-  areas_display:
-    hidden: [garage]
-    order: [wohnzimmer, kueche, schlafzimmer]
-  areas_options:
-    wohnzimmer:
-      groups_options:
-        lights:
-          hidden: [light.alte_lampe]
-          order: [light.decke, light.couch]
+# Beispiel: View mit Sections-Layout
+type: sections
+sections:
+  - type: grid
+    cards:
+      - type: markdown
+        content: "Meine eigene View"
 ```
 
-### Label-System
+<p align="center">
+  <img src="assets/Custom-View-hinzufugen.gif" alt="Custom View hinzufuegen" width="800" />
+</p>
 
-| Label | Funktion |
-|-------|----------|
-| `no_dboard` | Entity wird global aus dem Dashboard ausgeblendet |
+### Entity-Filterung
+
+Entitaeten koennen auf mehreren Ebenen gefiltert werden:
+
+| Methode | Ebene | Beschreibung |
+|---------|-------|-------------|
+| Label `no_dboard` | Global | Entity wird ueberall ausgeblendet |
+| `groups_options.hidden` | Pro Bereich | Entity nur in bestimmtem Bereich ausblenden |
+| Entity Registry | Automatisch | Hidden/Disabled Entities werden ignoriert |
+| Entity Category | Automatisch | Config/Diagnostic Entities werden ignoriert |
 
 Labels und `groups_options.hidden` ergaenzen sich: Labels filtern global, `hidden` filtert nur im jeweiligen Bereich.
 
-### Filterlogik (Reihenfolge)
+### Alle Optionen (Referenz)
 
-1. `no_dboard` Label → Globale Exklusion
-2. `areas_options.groups_options.hidden` → Bereich-spezifisch
-3. Entity Registry Status → Hidden/Disabled
-4. Entity Category → Config/Diagnostic
-5. State Availability → Muss in `hass.states` existieren
+<details>
+<summary>Vollstaendige Konfigurationsreferenz aufklappen</summary>
 
-### Raum-Pins
+| Option | Typ | Standard | Beschreibung |
+|--------|-----|----------|-------------|
+| `show_clock_card` | boolean | `true` | Uhr auf der Uebersicht |
+| `alarm_entity` | string | — | Alarm-Panel Entity neben der Uhr |
+| `show_search_card` | boolean | `false` | Such-Karte (benoetigt custom:search-card) |
+| `show_light_summary` | boolean | `true` | Lichter-Zusammenfassung |
+| `show_covers_summary` | boolean | `true` | Rollo-Zusammenfassung |
+| `show_security_summary` | boolean | `true` | Sicherheits-Zusammenfassung |
+| `show_climate_summary` | boolean | `false` | Klima-Zusammenfassung |
+| `show_battery_summary` | boolean | `true` | Batterie-Zusammenfassung |
+| `summaries_columns` | 2 \| 4 | `2` | Spalten-Layout der Zusammenfassungen |
+| `hide_mobile_app_batteries` | boolean | `false` | Mobile-App-Batterien ausblenden |
+| `battery_critical_threshold` | number | `20` | Schwellwert fuer kritische Batterien (%) |
+| `battery_low_threshold` | number | `50` | Schwellwert fuer niedrige Batterien (%) |
+| `show_weather` | boolean | `true` | Wetter-Karte |
+| `show_energy` | boolean | `true` | Energie-Dashboard |
+| `favorite_entities` | string[] | `[]` | Favoriten-Entitaeten auf der Uebersicht |
+| `group_by_floors` | boolean | `false` | Bereiche nach Etagen gliedern |
+| `show_locks_in_rooms` | boolean | `false` | Schloesser in Raum-Views |
+| `use_default_area_sort` | boolean | `false` | HA-Sortierung fuer Bereiche verwenden |
+| `areas_display.hidden` | string[] | `[]` | Ausgeblendete Bereiche |
+| `areas_display.order` | string[] | `[]` | Reihenfolge der Bereiche |
+| `areas_options` | object | `{}` | Entity-Filterung pro Bereich |
+| `room_pin_entities` | string[] | `[]` | Raum-Pin Entitaeten |
+| `show_summary_views` | boolean | `false` | Summary-Views in Navigation |
+| `show_room_views` | boolean | `false` | Raum-Views in Navigation |
+| `group_lights_by_floors` | boolean | `false` | Lichter nach Etagen gruppieren |
+| `custom_cards` | object[] | `[]` | Eigene Karten via YAML `🆕 Beta` |
+| `custom_cards_heading` | string | `"Eigene Karten"` | Ueberschrift der Custom Cards Section `🆕 Beta` |
+| `custom_cards_icon` | string | `"mdi:cards"` | Icon der Custom Cards Section `🆕 Beta` |
+| `custom_views` | object[] | `[]` | Eigene Views via YAML |
 
-Spezielle Entitaeten, die nur in ihren zugeordneten Raeumen erscheinen:
+</details>
 
-```yaml
-strategy:
-  type: custom:simon42-dashboard
-  room_pin_entities:
-    - sensor.wetterstation_temperatur
-```
+## Fehlerbehebung
 
-## Architektur
+| Problem | Loesung |
+|---------|---------|
+| Dashboard zeigt alte Version | **Hard-Refresh:** `Cmd+Shift+R` (Mac) / `Ctrl+Shift+R` (Windows) |
+| Aenderungen werden nicht uebernommen | In einem **Incognito-/Privat-Fenster** testen — wenn das Problem dort nicht auftritt, ist es ein Browser-Cache-Problem |
+| Welche Version ist installiert? | Browser-Konsole oeffnen (F12) → Meldung `Simon42 Dashboard Strategy vX.Y.Z loaded` suchen |
+| Strategy-Timeout auf langsamen Verbindungen | Normal bei Slow 4G — HA hat ein festes 5-Sekunden-Limit fuer Custom Elements. Bei normalen Verbindungen kein Problem |
+
+## Contributing
+
+Issues und Pull Requests sind willkommen! Bitte teste PRs gruendlich in einem lokalen HA-Setup.
+
+<details>
+<summary>Architektur</summary>
+
+### Code-Split Bundles
 
 **TypeScript** (ES2020, strict) → **Webpack** → Code-Split Chunks:
 
@@ -167,25 +291,21 @@ strategy:
 |-------|---------|--------|
 | main | ~5 KB | Entry Point, Custom Element Registrierung |
 | lit | ~15 KB | Lit Framework (shared) |
-| core | ~27 KB | Registry, Utils, Overview, Custom Cards |
-| views | ~14 KB | Lichter, Rollos, Sicherheit, Batterien, Raum-Detail |
-| editor | ~84 KB | Konfigurations-UI (nur bei Bedarf geladen) |
-
-Custom Cards (LightsGroupCard, CoversGroupCard, SummaryCard) nutzen **LitElement** mit reaktiven Properties und Tile-Card-Pooling. View-Strategien generieren statische Card-Configs die HA's Rendering-Engine uebernimmt.
-
-Registry liest synchron aus dem `hass`-Objekt und baut pre-computed Maps fuer O(1)-Lookups.
+| core | ~31 KB | Registry, Utils, Overview, Custom Cards |
+| views | ~16 KB | Lichter, Rollos, Sicherheit, Batterien, Klima, Raum-Detail |
+| editor | ~98 KB | Konfigurations-UI (nur bei Bedarf geladen) |
 
 ### Performance-Design
 
 Die Strategy folgt denselben Patterns wie HA's offizielle Home- und Areas-Strategien:
 
-- **Pre-filtered Area-Controls:** Area-Cards bekommen nur Controls die im Raum tatsaechlich existieren (`controls: ['light', 'cover-shutter']`), nicht pauschal alle. Ohne Pre-Filtering muss jede Card selbst alle Entities scannen — bei vielen Raeumen und Entities fuehrt das auf schwachen Geraeten (Tablets) zu massiven Ladezeiten.
-- **Pre-resolved Views:** Alle Views (Raeume, Lichter, etc.) werden in `generate()` vollstaendig aufgeloest statt als Strategy-Stubs zurueckgegeben. Das eliminiert verzoegerte Strategy-Aufloesung bei Navigation (analog zu `expandLovelaceConfigStrategies` im HA Home Panel).
+- **Pre-filtered Area-Controls:** Area-Cards bekommen nur Controls die im Raum tatsaechlich existieren, nicht pauschal alle.
+- **Pre-resolved Views:** Alle Views werden in `generate()` vollstaendig aufgeloest statt als Strategy-Stubs zurueckgegeben.
 - **Eager Chunk Loading:** JS-Chunks werden sofort beim Laden des Entry-Points gestartet, nicht erst wenn `generate()` aufgerufen wird.
+- **Reaktive Custom Cards:** LitElement mit `willUpdate()` — nur relevante State-Aenderungen loesen Re-Renders aus.
+- **Tile-Card-Pooling:** DOM-Elemente werden wiederverwendet statt neu erstellt.
 
-## Contributing
-
-Issues und Pull Requests sind willkommen! Bitte teste PRs gruendlich in einem lokalen HA-Setup.
+</details>
 
 ## Lizenz
 

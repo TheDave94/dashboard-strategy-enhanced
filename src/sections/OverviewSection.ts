@@ -8,7 +8,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { Simon42StrategyConfig, CustomCard } from '../types/strategy';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 
 export interface OverviewSectionParams {
@@ -195,4 +195,34 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     type: 'grid',
     cards,
   };
+}
+
+/**
+ * Creates a section for user-defined custom cards (from YAML config).
+ * Returns null if no valid custom cards are configured.
+ */
+export function createCustomCardsSection(
+  customCards: CustomCard[],
+  heading?: string,
+  icon?: string
+): LovelaceSectionConfig | null {
+  const validCards = customCards.filter((c) => c.parsed_config);
+  if (validCards.length === 0) return null;
+
+  const cards: LovelaceCardConfig[] = [
+    { type: 'heading', heading: heading || 'Eigene Karten', icon: icon || 'mdi:cards' },
+  ];
+
+  for (const card of validCards) {
+    if (Array.isArray(card.parsed_config)) {
+      cards.push(...card.parsed_config);
+    } else {
+      if (card.title) {
+        cards.push({ type: 'heading', heading: card.title });
+      }
+      cards.push(card.parsed_config as LovelaceCardConfig);
+    }
+  }
+
+  return { type: 'grid', cards };
 }

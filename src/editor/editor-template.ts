@@ -3,7 +3,7 @@
 // ====================================================================
 // HTML-Template für den Dashboard Strategy Editor
 
-import type { CustomView, RoomEntities } from '../types/strategy';
+import type { CustomView, CustomCard, RoomEntities } from '../types/strategy';
 import type { AreaRegistryEntry } from '../types/registries';
 
 // -- Editor-specific entity shape (enriched for editor UI) ------------
@@ -52,6 +52,9 @@ export interface EditorHTMLParams {
   showLocksInRooms: boolean;
   useDefaultAreaSort: boolean;
   customViews: CustomView[];
+  customCards: CustomCard[];
+  customCardsHeading: string;
+  customCardsIcon: string;
 }
 
 // -- Hass-like subset needed by renderAreaEntitiesHTML -----------------
@@ -94,6 +97,9 @@ export function renderEditorHTML({
   showLocksInRooms,
   useDefaultAreaSort,
   customViews,
+  customCards,
+  customCardsHeading,
+  customCardsIcon,
 }: EditorHTMLParams): string {
   return `
     <div class="card-config">
@@ -212,14 +218,6 @@ export function renderEditorHTML({
         <div class="form-row">
           <input
             type="checkbox"
-            id="show-battery-summary"
-            ${showBatterySummary !== false ? 'checked' : ''}
-          />
-          <label for="show-battery-summary">Batterie-Zusammenfassung anzeigen</label>
-        </div>
-        <div class="form-row">
-          <input
-            type="checkbox"
             id="show-climate-summary"
             ${showClimateSummary ? 'checked' : ''}
           />
@@ -231,36 +229,73 @@ export function renderEditorHTML({
         <div class="form-row">
           <input
             type="checkbox"
-            id="hide-mobile-app-batteries"
-            ${hideMobileAppBatteries ? 'checked' : ''}
+            id="show-battery-summary"
+            ${showBatterySummary !== false ? 'checked' : ''}
           />
-          <label for="hide-mobile-app-batteries">Mobile-App-Batterien ausblenden</label>
+          <label for="show-battery-summary">Batterie-Zusammenfassung anzeigen</label>
+        </div>
+        <div style="margin-left: 26px; margin-bottom: 8px;">
+          <div class="form-row">
+            <input
+              type="checkbox"
+              id="hide-mobile-app-batteries"
+              ${hideMobileAppBatteries ? 'checked' : ''}
+            />
+            <label for="hide-mobile-app-batteries">Mobile-App-Batterien ausblenden</label>
+          </div>
+          <div class="description">
+            Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.
+          </div>
+          <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">Batterie-Schwellwerte</div>
+          <div class="form-row">
+            <label for="battery-critical-threshold" style="min-width: 140px;">Kritisch unter</label>
+            <input
+              type="number"
+              id="battery-critical-threshold"
+              min="1" max="99"
+              value="${batteryCriticalThreshold}"
+              style="width: 60px; padding: 6px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);"
+            /> %
+          </div>
+          <div class="form-row">
+            <label for="battery-low-threshold" style="min-width: 140px;">Niedrig unter</label>
+            <input
+              type="number"
+              id="battery-low-threshold"
+              min="1" max="99"
+              value="${batteryLowThreshold}"
+              style="width: 60px; padding: 6px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);"
+            /> %
+          </div>
+          <div class="description">
+            Schwellwerte für die Batterie-Statusgruppen (Kritisch / Niedrig / Gut).
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Info-Karten</div>
+        <div class="form-row">
+          <input
+            type="checkbox"
+            id="show-weather"
+            ${showWeather !== false ? 'checked' : ''}
+          />
+          <label for="show-weather">Wetter-Karte anzeigen</label>
         </div>
         <div class="description">
-          Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.
-        </div>
-        <div class="form-row" style="margin-top: 8px;">
-          <label for="battery-critical-threshold" style="min-width: 140px;">Kritisch unter</label>
-          <input
-            type="number"
-            id="battery-critical-threshold"
-            min="1" max="99"
-            value="${batteryCriticalThreshold}"
-            style="width: 60px; padding: 6px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);"
-          /> %
+          Zeigt die Wettervorhersage-Karte in der Übersicht an, wenn eine Wetter-Entität verfügbar ist.
         </div>
         <div class="form-row">
-          <label for="battery-low-threshold" style="min-width: 140px;">Niedrig unter</label>
           <input
-            type="number"
-            id="battery-low-threshold"
-            min="1" max="99"
-            value="${batteryLowThreshold}"
-            style="width: 60px; padding: 6px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);"
-          /> %
+            type="checkbox"
+            id="show-energy"
+            ${showEnergy ? 'checked' : ''}
+          />
+          <label for="show-energy">Energie-Dashboard anzeigen</label>
         </div>
         <div class="description">
-          Schwellwerte für die Batterie-Statusgruppen (Kritisch / Niedrig / Gut).
+          Zeigt die Energie-Verteilungskarte in der Übersicht an, wenn Energiedaten verfügbar sind.
         </div>
       </div>
 
@@ -287,6 +322,10 @@ export function renderEditorHTML({
         <div class="description">
           Wähle Entitäten aus, die als Favoriten unter den Zusammenfassungen angezeigt werden sollen. Die Entitäten werden als Kacheln angezeigt.
         </div>
+      </div>
+
+      <div style="border-top: 2px solid var(--divider-color); margin: 24px 0 16px; padding-top: 16px;">
+        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">Bereiche & Räume</div>
       </div>
 
       <div class="section">
@@ -359,32 +398,6 @@ export function renderEditorHTML({
       </div>
 
       <div class="section">
-        <div class="section-title">Info-Karten</div>
-        <div class="form-row">
-          <input
-            type="checkbox"
-            id="show-weather"
-            ${showWeather !== false ? 'checked' : ''}
-          />
-          <label for="show-weather">Wetter-Karte anzeigen</label>
-        </div>
-        <div class="description">
-          Zeigt die Wettervorhersage-Karte in der Übersicht an, wenn eine Wetter-Entität verfügbar ist.
-        </div>
-        <div class="form-row">
-          <input
-            type="checkbox"
-            id="show-energy"
-            ${showEnergy ? 'checked' : ''}
-          />
-          <label for="show-energy">Energie-Dashboard anzeigen</label>
-        </div>
-        <div class="description">
-          Zeigt die Energie-Verteilungskarte in der Übersicht an, wenn Energiedaten verfügbar sind.
-        </div>
-      </div>
-
-      <div class="section">
         <div class="section-title">Ansichten</div>
         <div class="form-row">
           <input
@@ -407,6 +420,30 @@ export function renderEditorHTML({
         </div>
         <div class="description">
           Zeigt die einzelnen Raum-Views in der oberen Navigation an.
+        </div>
+      </div>
+
+      <div style="border-top: 2px solid var(--divider-color); margin: 24px 0 16px; padding-top: 16px;">
+        <div style="font-size: 16px; font-weight: 600; color: var(--primary-text-color); margin-bottom: 4px;">Erweiterte Funktionen</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Eigene Karten</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <input type="text" id="custom-cards-heading" value="${customCardsHeading}" placeholder="Eigene Karten" style="flex: 2; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+          <input type="text" id="custom-cards-icon" value="${customCardsIcon}" placeholder="mdi:cards" style="flex: 1; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+        </div>
+        <div class="description" style="margin-bottom: 8px;">
+          Überschrift und Icon der Section für die eigenen Karten auf dem Dashboard. Leer lassen für Standardwerte.
+        </div>
+        <div id="custom-cards-list">
+          ${renderCustomCardsList(customCards)}
+        </div>
+        <button id="add-custom-card-btn" style="margin-top: 8px; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer;">
+          + Neue Karte hinzufügen
+        </button>
+        <div class="description">
+          Füge eigene Karten zur Übersicht hinzu. Die Karten erscheinen in einer eigenen Section zwischen Zusammenfassung und Bereichen. Tipp: Erstelle die Karte zuerst in einem normalen Dashboard, kopiere den YAML-Code und füge ihn hier ein.
         </div>
       </div>
 
@@ -531,6 +568,38 @@ export function renderCustomViewsList(customViews: CustomView[]): string {
           </div>
           <textarea class="custom-view-yaml" data-index="${index}" rows="8" placeholder="YAML-Code hier einfügen..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${view.yaml || ''}</textarea>
           <div class="custom-view-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
+            ${validationMsg}
+          </div>
+        </div>
+      </div>
+    `;
+    })
+    .join('');
+}
+
+export function renderCustomCardsList(customCards: CustomCard[]): string {
+  if (!customCards || customCards.length === 0) {
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine eigenen Karten erstellt</div>';
+  }
+
+  return customCards
+    .map((card: CustomCard, index: number) => {
+      const validationMsg = card._yaml_error
+        ? `<span style="color: var(--error-color);">❌ ${card._yaml_error}</span>`
+        : card.yaml
+          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          : '';
+
+      return `
+      <div class="custom-card-item" data-index="${index}" style="border: 1px solid var(--divider-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--card-background-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="font-size: 14px;">${card.title || 'Neue Karte'}</strong>
+          <button class="remove-custom-card-btn" data-index="${index}" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); cursor: pointer;">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <input type="text" class="custom-card-title" data-index="${index}" value="${card.title || ''}" placeholder="Titel (optional, wird als Heading angezeigt)" style="padding: 6px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color);" />
+          <textarea class="custom-card-yaml" data-index="${index}" rows="6" placeholder="YAML-Code hier einfügen..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${card.yaml || ''}</textarea>
+          <div class="custom-card-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
             ${validationMsg}
           </div>
         </div>

@@ -13,7 +13,7 @@ import { Registry } from '../Registry';
 import { collectPersons, findWeatherEntity, findDummySensor } from '../utils/entity-filter';
 import { getVisibleAreas } from '../utils/name-utils';
 import { createPersonBadges } from '../utils/badge-builder';
-import { createOverviewSection } from '../sections/OverviewSection';
+import { createOverviewSection, createCustomCardsSection } from '../sections/OverviewSection';
 import { createAreasSection } from '../sections/AreasSection';
 import { createWeatherEnergySection } from '../sections/WeatherEnergySection';
 import { createOverviewView } from '../utils/view-builder';
@@ -54,8 +54,14 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     );
 
     const overviewSection = createOverviewSection({ someSensorId, showSearchCard, config: dashboardConfig, hass });
+    const customCardsSection = createCustomCardsSection(
+      dashboardConfig.custom_cards || [],
+      dashboardConfig.custom_cards_heading,
+      dashboardConfig.custom_cards_icon
+    );
     const overviewSections: LovelaceSectionConfig[] = [
       ...(overviewSection ? [overviewSection] : []),
+      ...(customCardsSection ? [customCardsSection] : []),
       ...(Array.isArray(areasSections) ? areasSections : [areasSections]),
       ...(weatherEnergySection
         ? Array.isArray(weatherEnergySection)

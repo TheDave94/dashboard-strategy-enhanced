@@ -4,7 +4,7 @@
 
 import yaml from 'js-yaml';
 import { getEditorStyles } from './editor-styles';
-import { renderEditorHTML, renderCustomViewsList } from './editor-template';
+import { renderEditorHTML, renderCustomViewsList, renderCustomCardsList } from './editor-template';
 import {
   attachWeatherCheckboxListener,
   attachEnergyCheckboxListener,
@@ -29,7 +29,7 @@ import {
 } from './editor-handlers';
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { Simon42StrategyConfig, CustomView } from '../types/strategy';
+import type { Simon42StrategyConfig, CustomView, CustomCard } from '../types/strategy';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -153,6 +153,9 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const useDefaultAreaSort = this._config.use_default_area_sort === true;
     const customViews = this._config.custom_views || [];
+    const customCards = this._config.custom_cards || [];
+    const customCardsHeading = this._config.custom_cards_heading || '';
+    const customCardsIcon = this._config.custom_cards_icon || '';
     const summariesColumns = this._config.summaries_columns || 2;
     const alarmEntity = this._config.alarm_entity || '';
     const favoriteEntities = this._config.favorite_entities || [];
@@ -212,6 +215,9 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         showLocksInRooms,
         useDefaultAreaSort,
         customViews,
+        customCards,
+        customCardsHeading,
+        customCardsIcon,
       })}
     `;
 
@@ -234,6 +240,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachShowLocksInRoomsCheckboxListener(this, (show: boolean) => this._showLocksInRoomsChanged(show));
     attachUseDefaultAreaSortCheckboxListener(this, (val: boolean) => this._useDefaultAreaSortChanged(val));
     this._attachCustomViewsListeners();
+    this._attachCustomCardsListeners();
     this._attachSummariesColumnsListener();
     this._attachAlarmEntityListener();
     this._attachFavoritesListeners();
@@ -761,6 +768,170 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     }
   }
 
+  // -- Custom Cards ------------------------------------------------------
+
+  _attachCustomCardsListeners(): void {
+    const addBtn = this.querySelector('#add-custom-card-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => this._addCustomCard());
+    }
+
+    const headingInput = this.querySelector('#custom-cards-heading') as HTMLInputElement | null;
+    if (headingInput) {
+      headingInput.addEventListener('change', () => {
+        const newConfig: Simon42StrategyConfig = { ...this._config };
+        if (headingInput.value.trim()) {
+          newConfig.custom_cards_heading = headingInput.value.trim();
+        } else {
+          delete newConfig.custom_cards_heading;
+        }
+        this._config = newConfig;
+        this._fireConfigChanged(newConfig);
+      });
+    }
+
+    const iconInput = this.querySelector('#custom-cards-icon') as HTMLInputElement | null;
+    if (iconInput) {
+      iconInput.addEventListener('change', () => {
+        const newConfig: Simon42StrategyConfig = { ...this._config };
+        if (iconInput.value.trim()) {
+          newConfig.custom_cards_icon = iconInput.value.trim();
+        } else {
+          delete newConfig.custom_cards_icon;
+        }
+        this._config = newConfig;
+        this._fireConfigChanged(newConfig);
+      });
+    }
+
+    this.querySelectorAll('.remove-custom-card-btn').forEach((btn) => {
+      btn.addEventListener('click', (e: Event) => {
+        const index = parseInt((e.target as HTMLElement).dataset.index || '0', 10);
+        this._removeCustomCard(index);
+      });
+    });
+
+    this.querySelectorAll('.custom-card-title').forEach((input) => {
+      input.addEventListener('change', (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const index = parseInt(target.dataset.index || '0', 10);
+        this._updateCustomCardField(index, 'title', target.value);
+      });
+    });
+
+    this.querySelectorAll('.custom-card-yaml').forEach((textarea) => {
+      textarea.addEventListener('change', (e: Event) => {
+        const target = e.target as HTMLTextAreaElement;
+        const index = parseInt(target.dataset.index || '0', 10);
+        this._updateCustomCardYaml(index, target.value);
+      });
+    });
+  }
+
+  _addCustomCard(): void {
+    const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
+    customCards.push({
+      title: '',
+      yaml: '',
+      parsed_config: undefined,
+    } as CustomCard);
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      custom_cards: customCards,
+    };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+    this._updateCustomCardsList();
+  }
+
+  _removeCustomCard(index: number): void {
+    const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
+    customCards.splice(index, 1);
+
+    const newConfig: Simon42StrategyConfig = { ...this._config };
+    if (customCards.length === 0) {
+      delete newConfig.custom_cards;
+    } else {
+      newConfig.custom_cards = customCards;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+    this._updateCustomCardsList();
+  }
+
+  _updateCustomCardField(index: number, field: string, value: string): void {
+    const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
+    if (!customCards[index]) return;
+
+    customCards[index] = { ...customCards[index], [field]: value };
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      custom_cards: customCards,
+    };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _updateCustomCardYaml(index: number, yamlString: string): void {
+    const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
+    if (!customCards[index]) return;
+
+    const updated: CustomCard = {
+      ...customCards[index],
+      yaml: yamlString,
+    };
+    delete updated._yaml_error;
+
+    if (yamlString.trim()) {
+      try {
+        const parsed = yaml.load(yamlString);
+        if (parsed && typeof parsed === 'object') {
+          updated.parsed_config = parsed as Record<string, any>;
+        } else {
+          updated._yaml_error = 'YAML muss ein Objekt oder Array ergeben';
+          updated.parsed_config = undefined;
+        }
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message?.split('\n')[0] : 'Ungültiges YAML';
+        updated._yaml_error = message || 'Ungültiges YAML';
+        updated.parsed_config = undefined;
+      }
+    } else {
+      updated.parsed_config = undefined;
+    }
+
+    customCards[index] = updated;
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      custom_cards: customCards,
+    };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+
+    const validationEl = this.querySelector(`.custom-card-validation[data-index="${index}"]`);
+    if (validationEl) {
+      if (updated._yaml_error) {
+        validationEl.innerHTML = `<span style="color: var(--error-color, red);">❌ ${updated._yaml_error}</span>`;
+      } else if (yamlString.trim()) {
+        validationEl.innerHTML = '<span style="color: var(--success-color, green);">✅ YAML gültig</span>';
+      } else {
+        validationEl.innerHTML = '';
+      }
+    }
+  }
+
+  _updateCustomCardsList(): void {
+    const container = this.querySelector('#custom-cards-list');
+    if (container) {
+      container.innerHTML = renderCustomCardsList(this._config.custom_cards || []);
+      this._attachCustomCardsListeners();
+    }
+  }
+
   // -- Toggle handlers --------------------------------------------------
 
   _showWeatherChanged(showWeather: boolean): void {
@@ -1244,6 +1415,13 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     if (cleanConfig.custom_views) {
       cleanConfig.custom_views = cleanConfig.custom_views.map((cv) => {
         const clean = { ...cv };
+        delete clean._yaml_error;
+        return clean;
+      });
+    }
+    if (cleanConfig.custom_cards) {
+      cleanConfig.custom_cards = cleanConfig.custom_cards.map((cc) => {
+        const clean = { ...cc };
         delete clean._yaml_error;
         return clean;
       });

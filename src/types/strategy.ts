@@ -43,6 +43,11 @@ export interface Simon42StrategyConfig {
 
   // Custom views
   custom_views?: CustomView[];
+
+  // Custom cards (shown as own section on overview)
+  custom_cards?: CustomCard[];
+  custom_cards_heading?: string;
+  custom_cards_icon?: string;
 }
 
 // -- Area Management --------------------------------------------------
@@ -74,6 +79,19 @@ export interface CustomView {
   /** Raw YAML string entered by the user in the editor */
   yaml?: string;
   /** Parsed Lovelace view config (generated from yaml) */
+  parsed_config?: Record<string, any> | null;
+  /** YAML parse error message, if any */
+  _yaml_error?: string;
+}
+
+// -- Custom Cards -----------------------------------------------------
+
+export interface CustomCard {
+  /** Optional title shown as heading above the card */
+  title?: string;
+  /** Raw YAML string entered by the user in the editor */
+  yaml?: string;
+  /** Parsed Lovelace card config (generated from yaml) */
   parsed_config?: Record<string, any> | null;
   /** YAML parse error message, if any */
   _yaml_error?: string;
