@@ -63,6 +63,7 @@ Wenn dir die simon42 Dashboard Strategy hilft, unterstütze die Weiterentwicklun
 - **Eigene Badges** `🆕 Beta` — Beliebige Badges via YAML im Header (neben Personen-Chips)
 - **Custom Views** — Eigene Dashboard-Views mit beliebigen Cards via YAML
 - **Reaktive Updates** — Echtzeit-Aktualisierung via LitElement Custom Cards
+- **Mehrsprachig** `🆕 Beta` — Deutsch und Englisch, automatische Erkennung aus HA-Einstellungen, Fallback auf Englisch
 - **Performance-optimiert** — Code-Split Bundles, Registry-Caching, Tile-Card-Pooling
 
 ## Installation
@@ -351,6 +352,17 @@ Das passiert, wenn die alte Resource-URL noch registriert ist und die JS-Datei d
 
 </details>
 
+## Sprache / Language
+
+Die Strategy erkennt automatisch die Sprache aus deinen Home Assistant Einstellungen (**Einstellungen → Allgemein → Sprache**). Aktuell unterstützt:
+
+| Sprache | Status |
+|---------|--------|
+| 🇩🇪 Deutsch | Vollständig |
+| 🇬🇧 English | Vollständig |
+
+**Weitere Sprachen hinzufügen:** Erstelle eine neue Datei `src/translations/<code>.json` (z.B. `fr.json`) nach dem Muster der bestehenden Dateien und öffne einen Pull Request. Der Aufwand ist gering — es müssen nur die Strings übersetzt werden, kein Code.
+
 ## Contributing
 
 Issues und Pull Requests sind willkommen! Bitte teste PRs gründlich in einem lokalen HA-Setup.
@@ -364,11 +376,11 @@ Issues und Pull Requests sind willkommen! Bitte teste PRs gründlich in einem lo
 
 | Chunk | Größe | Inhalt |
 |-------|-------|--------|
-| main | ~5 KB | Entry Point, Custom Element Registrierung |
+| main | ~6 KB | Entry Point, Custom Element Registrierung |
 | lit | ~15 KB | Lit Framework (shared) |
-| core | ~31 KB | Registry, Utils, Overview, Custom Cards |
-| views | ~16 KB | Lichter, Rollos, Sicherheit, Batterien, Klima, Raum-Detail |
-| editor | ~98 KB | Konfigurations-UI (nur bei Bedarf geladen) |
+| core | ~51 KB | Registry, Utils, Translations, Overview, Custom Cards |
+| views | ~19 KB | Lichter, Rollos, Sicherheit, Batterien, Klima, Raum-Detail |
+| editor | ~110 KB | Konfigurations-UI (nur bei Bedarf geladen) |
 
 ### Performance-Design
 
