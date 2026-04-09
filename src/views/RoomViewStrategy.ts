@@ -152,14 +152,11 @@ class Simon42ViewRoomStrategy extends HTMLElement {
           if (!isNaN(val) && val < 20) sensorEntities.battery.push(entityId);
           continue;
         }
-        if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') {
-          sensorEntities.temperature.push(entityId);
-          continue;
-        }
-        if (deviceClass === 'humidity' || unit === '%') {
-          sensorEntities.humidity.push(entityId);
-          continue;
-        }
+        // Temperature and humidity badges are only shown when explicitly
+        // assigned in HA area settings (area.temperature_entity_id / humidity_entity_id).
+        // No auto-detection — avoids wrong sensors (e.g. heater temperature).
+        if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') continue;
+        if (deviceClass === 'humidity' || unit === '%') continue;
         if (deviceClass === 'pm25' || entityId.includes('pm_2_5') || entityId.includes('pm25')) {
           sensorEntities.pm25.push(entityId);
           continue;
@@ -242,10 +239,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       tap_action: { action: 'more-info' },
     });
 
-    const temp = primaryTemp || sensorEntities.temperature[0];
-    if (temp) badges.push(badgeConfig(temp, 'red'));
-    const hum = primaryHumidity || sensorEntities.humidity[0];
-    if (hum) badges.push(badgeConfig(hum, 'indigo'));
+    if (primaryTemp) badges.push(badgeConfig(primaryTemp, 'red'));
+    if (primaryHumidity) badges.push(badgeConfig(primaryHumidity, 'indigo'));
     if (sensorEntities.pm25[0]) badges.push(badgeConfig(sensorEntities.pm25[0], 'orange'));
     if (sensorEntities.pm10[0]) badges.push(badgeConfig(sensorEntities.pm10[0], 'orange'));
     if (sensorEntities.co2[0]) badges.push(badgeConfig(sensorEntities.co2[0], 'green'));
