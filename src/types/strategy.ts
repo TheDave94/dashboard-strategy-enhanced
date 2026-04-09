@@ -51,6 +51,9 @@ export interface Simon42StrategyConfig {
   custom_cards?: CustomCard[];
   custom_cards_heading?: string;
   custom_cards_icon?: string;
+
+  // Custom badges (shown in header next to person chips)
+  custom_badges?: CustomBadge[];
 }
 
 // -- Area Management --------------------------------------------------
@@ -82,6 +85,17 @@ export interface CustomView {
   /** Raw YAML string entered by the user in the editor */
   yaml?: string;
   /** Parsed Lovelace view config (generated from yaml) */
+  parsed_config?: Record<string, any> | null;
+  /** YAML parse error message, if any */
+  _yaml_error?: string;
+}
+
+// -- Custom Badges ----------------------------------------------------
+
+export interface CustomBadge {
+  /** Raw YAML string entered by the user in the editor */
+  yaml?: string;
+  /** Parsed Lovelace badge config (generated from yaml) */
   parsed_config?: Record<string, any> | null;
   /** YAML parse error message, if any */
   _yaml_error?: string;

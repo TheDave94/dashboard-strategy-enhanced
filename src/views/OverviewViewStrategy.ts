@@ -8,7 +8,7 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { Simon42StrategyConfig } from '../types/strategy';
-import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
+import type { LovelaceViewConfig, LovelaceSectionConfig, LovelaceBadgeConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { collectPersons, findWeatherEntity, findDummySensor } from '../utils/entity-filter';
 import { getVisibleAreas } from '../utils/name-utils';
@@ -74,7 +74,12 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     timeEnd('overview-generate');
     debugLog(`Overview: ${overviewSections.length} sections, ${totalCards} cards, ${personBadges.length} badges`);
 
-    return createOverviewView(overviewSections, personBadges);
+    // Custom badges from YAML config
+    const customBadges = (dashboardConfig.custom_badges || [])
+      .filter((b) => b.parsed_config)
+      .map((b) => b.parsed_config as LovelaceBadgeConfig);
+
+    return createOverviewView(overviewSections, [...personBadges, ...customBadges]);
   }
 }
 

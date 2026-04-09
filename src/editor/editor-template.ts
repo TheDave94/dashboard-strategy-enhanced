@@ -3,7 +3,7 @@
 // ====================================================================
 // HTML-Template für den Dashboard Strategy Editor
 
-import type { CustomView, CustomCard, RoomEntities } from '../types/strategy';
+import type { CustomView, CustomCard, CustomBadge, RoomEntities } from '../types/strategy';
 import type { AreaRegistryEntry } from '../types/registries';
 
 // -- Editor-specific entity shape (enriched for editor UI) ------------
@@ -58,6 +58,7 @@ export interface EditorHTMLParams {
   customCards: CustomCard[];
   customCardsHeading: string;
   customCardsIcon: string;
+  customBadges: CustomBadge[];
 }
 
 // -- Hass-like subset needed by renderAreaEntitiesHTML -----------------
@@ -106,6 +107,7 @@ export function renderEditorHTML({
   customCards,
   customCardsHeading,
   customCardsIcon,
+  customBadges,
 }: EditorHTMLParams): string {
   return `
     <div class="card-config">
@@ -489,6 +491,19 @@ export function renderEditorHTML({
       </div>
 
       <div class="section">
+        <div class="section-title">Eigene Badges</div>
+        <div id="custom-badges-list">
+          ${renderCustomBadgesList(customBadges)}
+        </div>
+        <button id="add-custom-badge-btn" style="margin-top: 8px; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--primary-color); color: var(--text-primary-color); cursor: pointer;">
+          + Neues Badge hinzufügen
+        </button>
+        <div class="description">
+          Füge eigene Badges zum Header der Übersicht hinzu (neben den Personen-Chips). Beispiel: <code>type: entity</code> + <code>entity: sun.sun</code>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-title">Custom Views</div>
         <div id="custom-views-list">
           ${renderCustomViewsList(customViews)}
@@ -643,6 +658,35 @@ export function renderCustomCardsList(customCards: CustomCard[]): string {
           <div class="custom-card-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
             ${validationMsg}
           </div>
+        </div>
+      </div>
+    `;
+    })
+    .join('');
+}
+
+export function renderCustomBadgesList(customBadges: CustomBadge[]): string {
+  if (!customBadges || customBadges.length === 0) {
+    return '<div class="empty-state" style="padding: 12px; text-align: center; color: var(--secondary-text-color); font-style: italic;">Keine eigenen Badges erstellt</div>';
+  }
+
+  return customBadges
+    .map((badge: CustomBadge, index: number) => {
+      const validationMsg = badge._yaml_error
+        ? `<span style="color: var(--error-color);">❌ ${badge._yaml_error}</span>`
+        : badge.yaml
+          ? '<span style="color: var(--success-color, green);">✅ YAML gültig</span>'
+          : '';
+
+      return `
+      <div class="custom-badge-item" data-index="${index}" style="border: 1px solid var(--divider-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--card-background-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="font-size: 14px;">Badge ${index + 1}</strong>
+          <button class="remove-custom-badge-btn" data-index="${index}" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); cursor: pointer;">✕</button>
+        </div>
+        <textarea class="custom-badge-yaml" data-index="${index}" rows="4" placeholder="type: entity&#10;entity: sun.sun" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;">${badge.yaml || ''}</textarea>
+        <div class="custom-badge-validation" data-index="${index}" style="font-size: 12px; min-height: 16px;">
+          ${validationMsg}
         </div>
       </div>
     `;

@@ -60,6 +60,7 @@ Wenn dir die simon42 Dashboard Strategy hilft, unterstütze die Weiterentwicklun
 - **Batch-Aktionen** — Heading-Badges für Gruppensteuerung (alle ein/aus, alle öffnen/schließen)
 - **Automationen & Skripte in Räumen** `🆕 Beta` — Bereichs-zugeordnete Automationen und Skripte in Raum-Views anzeigen
 - **Eigene Karten** `🆕 Beta` — Beliebige Karten via YAML auf der Übersicht einbinden
+- **Eigene Badges** `🆕 Beta` — Beliebige Badges via YAML im Header (neben Personen-Chips)
 - **Custom Views** — Eigene Dashboard-Views mit beliebigen Cards via YAML
 - **Reaktive Updates** — Echtzeit-Aktualisierung via LitElement Custom Cards
 - **Performance-optimiert** — Code-Split Bundles, Registry-Caching, Tile-Card-Pooling
@@ -233,6 +234,19 @@ content: "Willkommen zuhause!"
   <img src="assets/Eigene-Karten-hinzufugen.gif" alt="Eigene Karten hinzufügen" width="800" />
 </p>
 
+#### Eigene Badges `🆕 Beta`
+
+Beliebige Badges via YAML zum Header der Übersicht hinzufügen — sie erscheinen neben den Personen-Chips.
+
+```yaml
+# Beispiel: Sonnen-Badge
+type: entity
+show_name: false
+show_state: true
+show_icon: true
+entity: sun.sun
+```
+
 #### Custom Views
 
 Eigene Dashboard-Views mit beliebigen Cards erstellen. Jede Custom View benötigt einen Titel, Pfad und Icon. Der YAML-Code definiert den Inhalt der View.
@@ -301,6 +315,7 @@ Entitäten können auf mehreren Ebenen gefiltert werden:
 | `custom_cards` | object[] | `[]` | Eigene Karten via YAML `🆕 Beta` |
 | `custom_cards_heading` | string | `"Eigene Karten"` | Überschrift der Custom Cards Section `🆕 Beta` |
 | `custom_cards_icon` | string | `"mdi:cards"` | Icon der Custom Cards Section `🆕 Beta` |
+| `custom_badges` | object[] | `[]` | Eigene Badges im Header via YAML `🆕 Beta` |
 | `custom_views` | object[] | `[]` | Eigene Views via YAML |
 
 </details>

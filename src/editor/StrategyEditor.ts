@@ -4,7 +4,7 @@
 
 import yaml from 'js-yaml';
 import { getEditorStyles } from './editor-styles';
-import { renderEditorHTML, renderCustomViewsList, renderCustomCardsList } from './editor-template';
+import { renderEditorHTML, renderCustomViewsList, renderCustomCardsList, renderCustomBadgesList } from './editor-template';
 import {
   attachWeatherCheckboxListener,
   attachEnergyCheckboxListener,
@@ -32,7 +32,7 @@ import {
 } from './editor-handlers';
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { Simon42StrategyConfig, CustomView, CustomCard } from '../types/strategy';
+import type { Simon42StrategyConfig, CustomView, CustomCard, CustomBadge } from '../types/strategy';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -162,6 +162,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const customCards = this._config.custom_cards || [];
     const customCardsHeading = this._config.custom_cards_heading || '';
     const customCardsIcon = this._config.custom_cards_icon || '';
+    const customBadges = this._config.custom_badges || [];
     const summariesColumns = this._config.summaries_columns || 2;
     const alarmEntity = this._config.alarm_entity || '';
     const favoriteEntities = this._config.favorite_entities || [];
@@ -227,6 +228,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         customCards,
         customCardsHeading,
         customCardsIcon,
+        customBadges,
       })}
     `;
 
@@ -253,6 +255,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     attachUseDefaultAreaSortCheckboxListener(this, (val: boolean) => this._useDefaultAreaSortChanged(val));
     this._attachCustomViewsListeners();
     this._attachCustomCardsListeners();
+    this._attachCustomBadgesListeners();
     this._attachSummariesColumnsListener();
     this._attachAlarmEntityListener();
     this._attachFavoritesListeners();
@@ -944,6 +947,119 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     }
   }
 
+  // -- Custom Badges -----------------------------------------------------
+
+  _attachCustomBadgesListeners(): void {
+    const addBtn = this.querySelector('#add-custom-badge-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => this._addCustomBadge());
+    }
+
+    this.querySelectorAll('.remove-custom-badge-btn').forEach((btn) => {
+      btn.addEventListener('click', (e: Event) => {
+        const index = parseInt((e.target as HTMLElement).dataset.index || '0', 10);
+        this._removeCustomBadge(index);
+      });
+    });
+
+    this.querySelectorAll('.custom-badge-yaml').forEach((textarea) => {
+      textarea.addEventListener('change', (e: Event) => {
+        const target = e.target as HTMLTextAreaElement;
+        const index = parseInt(target.dataset.index || '0', 10);
+        this._updateCustomBadgeYaml(index, target.value);
+      });
+    });
+  }
+
+  _addCustomBadge(): void {
+    const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
+    customBadges.push({
+      yaml: '',
+      parsed_config: undefined,
+    } as CustomBadge);
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      custom_badges: customBadges,
+    };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+    this._updateCustomBadgesList();
+  }
+
+  _removeCustomBadge(index: number): void {
+    const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
+    customBadges.splice(index, 1);
+
+    const newConfig: Simon42StrategyConfig = { ...this._config };
+    if (customBadges.length === 0) {
+      delete newConfig.custom_badges;
+    } else {
+      newConfig.custom_badges = customBadges;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+    this._updateCustomBadgesList();
+  }
+
+  _updateCustomBadgeYaml(index: number, yamlString: string): void {
+    const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
+    if (!customBadges[index]) return;
+
+    const updated: CustomBadge = {
+      ...customBadges[index],
+      yaml: yamlString,
+    };
+    delete updated._yaml_error;
+
+    if (yamlString.trim()) {
+      try {
+        const parsed = yaml.load(yamlString);
+        if (parsed && typeof parsed === 'object') {
+          updated.parsed_config = parsed as Record<string, any>;
+        } else {
+          updated._yaml_error = 'YAML muss ein Objekt ergeben';
+          updated.parsed_config = undefined;
+        }
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message?.split('\n')[0] : 'Ungültiges YAML';
+        updated._yaml_error = message || 'Ungültiges YAML';
+        updated.parsed_config = undefined;
+      }
+    } else {
+      updated.parsed_config = undefined;
+    }
+
+    customBadges[index] = updated;
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      custom_badges: customBadges,
+    };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+
+    const validationEl = this.querySelector(`.custom-badge-validation[data-index="${index}"]`);
+    if (validationEl) {
+      if (updated._yaml_error) {
+        validationEl.innerHTML = `<span style="color: var(--error-color, red);">❌ ${updated._yaml_error}</span>`;
+      } else if (yamlString.trim()) {
+        validationEl.innerHTML = '<span style="color: var(--success-color, green);">✅ YAML gültig</span>';
+      } else {
+        validationEl.innerHTML = '';
+      }
+    }
+  }
+
+  _updateCustomBadgesList(): void {
+    const container = this.querySelector('#custom-badges-list');
+    if (container) {
+      container.innerHTML = renderCustomBadgesList(this._config.custom_badges || []);
+      this._attachCustomBadgesListeners();
+    }
+  }
+
   // -- Toggle handlers --------------------------------------------------
 
   _showWeatherChanged(showWeather: boolean): void {
@@ -1458,6 +1574,13 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     if (cleanConfig.custom_cards) {
       cleanConfig.custom_cards = cleanConfig.custom_cards.map((cc) => {
         const clean = { ...cc };
+        delete clean._yaml_error;
+        return clean;
+      });
+    }
+    if (cleanConfig.custom_badges) {
+      cleanConfig.custom_badges = cleanConfig.custom_badges.map((cb) => {
+        const clean = { ...cb };
         delete clean._yaml_error;
         return clean;
       });
