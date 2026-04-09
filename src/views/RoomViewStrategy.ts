@@ -357,18 +357,57 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       });
     };
 
-    domainSection(roomEntities.lights, 'Beleuchtung', 'mdi:lightbulb', (e) => {
-      const state = hass.states[e];
-      const hasBrightness = state && lightSupportsBrightness(state);
-      return {
-        type: 'tile',
-        entity: e,
-        name: stripAreaName(e, area, hass),
-        ...(hasBrightness ? { features: [{ type: 'light-brightness' }], features_position: 'inline' } : {}),
-        vertical: false,
-        state_content: 'last_changed',
-      };
-    });
+    // Lights section with batch on/off badges (visibility-based, evaluated by HA frontend)
+    if (roomEntities.lights.length > 0) {
+      const lightsOffConditions = roomEntities.lights.map((e) => ({
+        condition: 'state' as const, entity: e, state: 'off',
+      }));
+      const lightsOnConditions = roomEntities.lights.map((e) => ({
+        condition: 'state' as const, entity: e, state: 'on',
+      }));
+      const badges = [
+        {
+          type: 'button',
+          icon: 'mdi:lightbulb-on',
+          text: 'Alle ein',
+          tap_action: {
+            action: 'perform-action',
+            perform_action: 'light.turn_on',
+            target: { entity_id: roomEntities.lights },
+          },
+          visibility: [{ condition: 'or', conditions: lightsOffConditions }],
+        },
+        {
+          type: 'button',
+          icon: 'mdi:lightbulb-off',
+          text: 'Alle aus',
+          tap_action: {
+            action: 'perform-action',
+            perform_action: 'light.turn_off',
+            target: { entity_id: roomEntities.lights },
+          },
+          visibility: [{ condition: 'or', conditions: lightsOnConditions }],
+        },
+      ];
+      sections.push({
+        type: 'grid',
+        cards: [
+          { type: 'heading', heading: 'Beleuchtung', heading_style: 'title', icon: 'mdi:lightbulb', badges },
+          ...roomEntities.lights.map((e) => {
+            const state = hass.states[e];
+            const hasBrightness = state && lightSupportsBrightness(state);
+            return {
+              type: 'tile',
+              entity: e,
+              name: stripAreaName(e, area, hass),
+              ...(hasBrightness ? { features: [{ type: 'light-brightness' }], features_position: 'inline' } : {}),
+              vertical: false,
+              state_content: 'last_changed',
+            };
+          }),
+        ],
+      });
+    }
 
     domainSection(roomEntities.locks, 'Schlösser', 'mdi:lock', (e) => ({
       type: 'tile',
