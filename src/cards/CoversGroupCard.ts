@@ -18,6 +18,11 @@ interface CoversGroupConfig {
   group_type: 'open' | 'closed' | 'partially_open';
   show_partially_open?: boolean;
   device_classes?: string[];
+  heading_open?: string;
+  heading_closed?: string;
+  heading_partial?: string;
+  batch_open_text?: string;
+  batch_close_text?: string;
 }
 
 // Pre-compiled RegExps for cover type name stripping
@@ -37,6 +42,8 @@ const COVER_TERMS = [
   'Shade',
   'Shutter',
   'Window',
+  'Markise',
+  'Awning',
 ];
 const COVER_TERM_REGEXPS = COVER_TERMS.map((term) => new RegExp(`^${term}\\s+|\\s+${term}$`, 'gi'));
 
@@ -188,17 +195,20 @@ class Simon42CoversGroupCard extends LitElement {
 
   private _buildHeadingConfig(covers: string[]): any {
     const groupType = this._config.group_type;
+    const openText = this._config.batch_open_text || 'Alle öffnen';
+    const closeText = this._config.batch_close_text || 'Alle schließen';
 
     if (groupType === 'partially_open') {
+      const headingLabel = this._config.heading_partial || 'Teiloffene Rollos & Vorhänge';
       return {
         type: 'heading',
-        heading: `Teiloffene Rollos & Vorhänge (${covers.length})`,
+        heading: `${headingLabel} (${covers.length})`,
         icon: 'mdi:blinds-horizontal',
         badges: [
           {
             type: 'button',
             icon: 'mdi:arrow-up',
-            text: 'Alle öffnen',
+            text: openText,
             tap_action: {
               action: 'perform-action',
               perform_action: 'cover.open_cover',
@@ -208,7 +218,7 @@ class Simon42CoversGroupCard extends LitElement {
           {
             type: 'button',
             icon: 'mdi:arrow-down',
-            text: 'Alle schließen',
+            text: closeText,
             tap_action: {
               action: 'perform-action',
               perform_action: 'cover.close_cover',
@@ -220,15 +230,18 @@ class Simon42CoversGroupCard extends LitElement {
     }
 
     const isOpen = groupType === 'open';
+    const headingLabel = isOpen
+      ? (this._config.heading_open || 'Offene Rollos & Vorhänge')
+      : (this._config.heading_closed || 'Geschlossene Rollos & Vorhänge');
     return {
       type: 'heading',
-      heading: `${isOpen ? 'Offene Rollos & Vorhänge' : 'Geschlossene Rollos & Vorhänge'} (${covers.length})`,
+      heading: `${headingLabel} (${covers.length})`,
       icon: isOpen ? 'mdi:blinds-horizontal' : 'mdi:blinds',
       badges: [
         {
           type: 'button',
           icon: isOpen ? 'mdi:arrow-down' : 'mdi:arrow-up',
-          text: isOpen ? 'Alle schließen' : 'Alle öffnen',
+          text: isOpen ? closeText : openText,
           tap_action: {
             action: 'perform-action',
             perform_action: isOpen ? 'cover.close_cover' : 'cover.open_cover',

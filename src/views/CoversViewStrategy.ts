@@ -8,14 +8,20 @@ class Simon42ViewCoversStrategy extends HTMLElement {
   static async generate(config: any, _hass: any): Promise<LovelaceViewConfig> {
     const strategyConfig = config.config || {};
     const showPartiallyOpen = strategyConfig.show_partially_open_covers === true;
-    const deviceClasses = config.device_classes || ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'];
 
+    // Separate awnings from other covers — awnings have inverted open/close semantics
+    const allDeviceClasses = config.device_classes || ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'];
+    const coverClasses = allDeviceClasses.filter((dc: string) => dc !== 'awning');
+    const hasAwnings = allDeviceClasses.includes('awning');
+
+    const baseConfig = { entities: config.entities, config: config.config };
+
+    // Rollos & Vorhänge
     const cards: any[] = [
       {
         type: 'custom:simon42-covers-group-card',
-        entities: config.entities,
-        config: config.config,
-        device_classes: deviceClasses,
+        ...baseConfig,
+        device_classes: coverClasses,
         group_type: 'open',
         show_partially_open: showPartiallyOpen,
       },
@@ -24,9 +30,8 @@ class Simon42ViewCoversStrategy extends HTMLElement {
     if (showPartiallyOpen) {
       cards.push({
         type: 'custom:simon42-covers-group-card',
-        entities: config.entities,
-        config: config.config,
-        device_classes: deviceClasses,
+        ...baseConfig,
+        device_classes: coverClasses,
         group_type: 'partially_open',
         show_partially_open: true,
       });
@@ -34,12 +39,47 @@ class Simon42ViewCoversStrategy extends HTMLElement {
 
     cards.push({
       type: 'custom:simon42-covers-group-card',
-      entities: config.entities,
-      config: config.config,
-      device_classes: deviceClasses,
+      ...baseConfig,
+      device_classes: coverClasses,
       group_type: 'closed',
       show_partially_open: showPartiallyOpen,
     });
+
+    // Markisen (separate group with own headings/batch actions)
+    if (hasAwnings) {
+      const awningConfig = {
+        ...baseConfig,
+        device_classes: ['awning'],
+        heading_open: 'Ausgefahrene Markisen',
+        heading_closed: 'Eingefahrene Markisen',
+        heading_partial: 'Teilweise ausgefahrene Markisen',
+        batch_open_text: 'Alle ausfahren',
+        batch_close_text: 'Alle einfahren',
+      };
+
+      cards.push({
+        type: 'custom:simon42-covers-group-card',
+        ...awningConfig,
+        group_type: 'open',
+        show_partially_open: showPartiallyOpen,
+      });
+
+      if (showPartiallyOpen) {
+        cards.push({
+          type: 'custom:simon42-covers-group-card',
+          ...awningConfig,
+          group_type: 'partially_open',
+          show_partially_open: true,
+        });
+      }
+
+      cards.push({
+        type: 'custom:simon42-covers-group-card',
+        ...awningConfig,
+        group_type: 'closed',
+        show_partially_open: showPartiallyOpen,
+      });
+    }
 
     return {
       type: 'sections',
