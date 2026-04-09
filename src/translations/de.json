@@ -140,7 +140,7 @@
     "group_by_floors": "Bereiche in Etagen gliedern",
     "group_by_floors_desc": "Gruppiert die Bereiche in der Übersicht nach Etagen. Wenn aktiviert, wird für jede Etage eine separate Section erstellt.",
     "show_switches_on_areas": "Schalter auf Bereichskarten anzeigen",
-    "show_switches_on_areas_desc": "Zeigt Schalter (Switches) als Controls auf den Bereichskarten in der Übersicht an. Home Assistant blendet diese standardmäßig aus.",
+    "show_switches_on_areas_desc": "Zeigt Schalter (Switches) als Controls auf den Bereichskarten in der Übersicht an. ⚠️ Stelle sicher, dass alle Schalter, die nicht geschaltet werden können oder sollen, über die Entitäts-Einstellungen auf 'Nicht sichtbar' gestellt sind!",
     "show_locks_in_rooms": "Schlösser in Raum-Ansichten anzeigen",
     "show_locks_in_rooms_desc": "Zeigt Schlösser (z.B. Nuki) in den jeweiligen Raum-Ansichten an. Schlösser erscheinen unabhängig davon immer in der Sicherheits-Übersicht.",
     "show_automations_in_rooms": "Automationen in Raum-Ansichten anzeigen",
