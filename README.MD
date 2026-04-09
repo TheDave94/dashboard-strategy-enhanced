@@ -112,8 +112,12 @@ Die Strategy generiert das Dashboard automatisch aus deiner Home Assistant Konfi
 
 **Unerwuenschte Entitaeten ausblenden** — Nicht jede Entitaet soll im Dashboard auftauchen. Es gibt zwei Wege:
 
-- **Label `no_dboard`** — Weise einer Entitaet in Home Assistant das Label `no_dboard` zu, um sie global aus dem gesamten Dashboard auszublenden.
+- **Label `no_dboard`** — Erstelle in Home Assistant unter **Einstellungen → Labels** ein Label `no_dboard` und weise es Entitaeten zu, um sie global aus dem gesamten Dashboard auszublenden.
 - **Entity verstecken** — Setze eine Entitaet in den HA-Einstellungen auf "Versteckt" (`hidden_by: user`). Versteckte Entitaeten werden automatisch ignoriert.
+
+<p align="center">
+  <img src="assets/no-dboard-label.png" alt="Label no_dboard in Home Assistant erstellen" width="800" />
+</p>
 
 Mehr zur Filterung findest du im Abschnitt [Entity-Filterung](#entity-filterung).
 
