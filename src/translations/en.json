@@ -139,6 +139,8 @@
     "section_areas": "Areas",
     "group_by_floors": "Group areas by floors",
     "group_by_floors_desc": "Groups areas on the overview by floors. When enabled, a separate section is created for each floor.",
+    "show_switches_on_areas": "Show switches on area cards",
+    "show_switches_on_areas_desc": "Shows switches as controls on the area cards in the overview. Home Assistant hides these by default.",
     "show_locks_in_rooms": "Show locks in room views",
     "show_locks_in_rooms_desc": "Shows locks (e.g. Nuki) in the respective room views. Locks always appear in the security overview regardless.",
     "show_automations_in_rooms": "Show automations in room views",

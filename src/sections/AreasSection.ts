@@ -12,10 +12,11 @@ import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 
-// Area control domains to check (same as HA, excluding 'switch')
+// Area control domains to check (same as HA, with optional 'switch')
 const CONTROL_DOMAINS = [
   'light',
   'fan',
+  'switch',
   'cover-shutter',
   'cover-blind',
   'cover-curtain',
@@ -50,6 +51,7 @@ function getAreaControls(areaId: string, hass: HomeAssistant): ControlDomain[] {
 
     if (domain === 'light') found.add('light');
     else if (domain === 'fan') found.add('fan');
+    else if (domain === 'switch' && Registry.config.show_switches_on_areas) found.add('switch');
     else if (domain === 'cover' && deviceClass) {
       const key = `cover-${deviceClass}` as ControlDomain;
       if (CONTROL_DOMAINS.includes(key)) found.add(key);

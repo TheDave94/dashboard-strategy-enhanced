@@ -219,6 +219,18 @@ export function attachRoomPinsHideLastChangedCheckboxListener(
   }
 }
 
+export function attachShowSwitchesOnAreasCheckboxListener(
+  element: HTMLElement,
+  callback: (checked: boolean) => void
+): void {
+  const checkbox = element.querySelector('#show-switches-on-areas') as HTMLInputElement | null;
+  if (checkbox) {
+    checkbox.addEventListener('change', (e: Event) => {
+      callback((e.target as HTMLInputElement).checked);
+    });
+  }
+}
+
 export function attachShowLocksInRoomsCheckboxListener(
   element: HTMLElement,
   callback: (checked: boolean) => void

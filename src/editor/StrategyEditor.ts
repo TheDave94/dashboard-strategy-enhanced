@@ -25,6 +25,7 @@ import {
   attachHideMobileAppBatteriesCheckboxListener,
   attachRoomPinsShowStateCheckboxListener,
   attachRoomPinsHideLastChangedCheckboxListener,
+  attachShowSwitchesOnAreasCheckboxListener,
   attachShowLocksInRoomsCheckboxListener,
   attachShowAutomationsInRoomsCheckboxListener,
   attachShowScriptsInRoomsCheckboxListener,
@@ -164,6 +165,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     const batteryLowThreshold = this._config.battery_low_threshold ?? 50;
     const roomPinsShowState = this._config.room_pins_show_state === true;
     const roomPinsHideLastChanged = this._config.room_pins_hide_last_changed === true;
+    const showSwitchesOnAreas = this._config.show_switches_on_areas === true;
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const showAutomationsInRooms = this._config.show_automations_in_rooms === true;
     const showScriptsInRooms = this._config.show_scripts_in_rooms === true;
@@ -236,6 +238,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
         batteryLowThreshold,
         roomPinsShowState,
         roomPinsHideLastChanged,
+        showSwitchesOnAreas,
         showLocksInRooms,
         showAutomationsInRooms,
         showScriptsInRooms,
@@ -271,6 +274,7 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     this._attachBatteryThresholdListeners();
     attachRoomPinsShowStateCheckboxListener(this, (val: boolean) => this._roomPinsShowStateChanged(val));
     attachRoomPinsHideLastChangedCheckboxListener(this, (val: boolean) => this._roomPinsHideLastChangedChanged(val));
+    attachShowSwitchesOnAreasCheckboxListener(this, (show: boolean) => this._showSwitchesOnAreasChanged(show));
     attachShowLocksInRoomsCheckboxListener(this, (show: boolean) => this._showLocksInRoomsChanged(show));
     attachShowAutomationsInRoomsCheckboxListener(this, (show: boolean) => this._showAutomationsInRoomsChanged(show));
     attachShowScriptsInRoomsCheckboxListener(this, (show: boolean) => this._showScriptsInRoomsChanged(show));
@@ -1374,6 +1378,22 @@ class Simon42DashboardStrategyEditor extends HTMLElement {
     if (!this._config || !this._hass) return;
     const newConfig: Simon42StrategyConfig = { ...this._config, room_pins_hide_last_changed: hide };
     if (hide === false) delete newConfig.room_pins_hide_last_changed;
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  _showSwitchesOnAreasChanged(show: boolean): void {
+    if (!this._config || !this._hass) return;
+
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      show_switches_on_areas: show,
+    };
+
+    if (show === false) {
+      delete newConfig.show_switches_on_areas;
+    }
+
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
