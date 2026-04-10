@@ -276,8 +276,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     if (sensorEntities.motion[0]) badges.push(badgeConfig(sensorEntities.motion[0], 'yellow'));
     if (sensorEntities.occupancy[0]) badges.push(badgeConfig(sensorEntities.occupancy[0], 'cyan'));
     if (sensorEntities.absolute_humidity[0]) badges.push(badgeConfig(sensorEntities.absolute_humidity[0], 'blue'));
-    if (sensorEntities.window[0]) badges.push(badgeConfig(sensorEntities.window[0], 'teal'));
-    if (sensorEntities.door[0]) badges.push(badgeConfig(sensorEntities.door[0], 'teal'));
+    for (const id of sensorEntities.window) badges.push(badgeConfig(id, 'teal'));
+    for (const id of sensorEntities.door) badges.push(badgeConfig(id, 'teal'));
     if (sensorEntities.smoke[0]) badges.push(badgeConfig(sensorEntities.smoke[0], 'red'));
     if (sensorEntities.gas[0]) badges.push(badgeConfig(sensorEntities.gas[0], 'red'));
 
