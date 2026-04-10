@@ -159,6 +159,8 @@ export interface SensorEntities {
   battery: string[];
   window: string[];
   door: string[];
+  smoke: string[];
+  gas: string[];
 }
 
 // -- Person Data (used in overview badges) ----------------------------

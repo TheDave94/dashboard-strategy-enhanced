@@ -1,5 +1,5 @@
 // ====================================================================
-// VIEW STRATEGY — SECURITY (Locks, Doors, Garages, Windows)
+// VIEW STRATEGY — SECURITY (Locks, Doors, Garages, Windows, Smoke/Gas)
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
@@ -21,6 +21,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
     const doors: string[] = [];
     const garages: string[] = [];
     const windows: string[] = [];
+    const smokeGas: string[] = [];
 
     for (const id of [
       ...allVisibleByDomain('lock'),
@@ -39,6 +40,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         else if (deviceClass === 'door' || deviceClass === 'gate') doors.push(id);
       } else if (id.startsWith('binary_sensor.')) {
         if (deviceClass && ['door', 'window', 'garage_door', 'opening'].includes(deviceClass)) windows.push(id);
+        else if (deviceClass && ['smoke', 'gas'].includes(deviceClass)) smokeGas.push(id);
       }
     }
 
@@ -55,6 +57,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
           type: 'heading',
           heading: localize('security.locks_unlocked'),
           heading_style: 'subtitle',
+          icon: 'mdi:lock-open',
           badges: [
             {
               type: 'entity',
@@ -76,7 +79,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (locked.length > 0) {
-        cards.push({ type: 'heading', heading: localize('security.locks_locked'), heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.locks_locked'), heading_style: 'subtitle', icon: 'mdi:lock' });
         cards.push(
           ...locked.map((e) => ({
             type: 'tile',
@@ -100,6 +103,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
           type: 'heading',
           heading: localize('security.doors_open'),
           heading_style: 'subtitle',
+          icon: 'mdi:door-open',
           badges: [
             {
               type: 'entity',
@@ -126,7 +130,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: localize('security.doors_closed'), heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.doors_closed'), heading_style: 'subtitle', icon: 'mdi:door-closed' });
         cards.push(
           ...closed.map((e) => ({
             type: 'tile',
@@ -151,6 +155,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
           type: 'heading',
           heading: localize('security.garages_open'),
           heading_style: 'subtitle',
+          icon: 'mdi:garage-open',
           badges: [
             {
               type: 'entity',
@@ -177,7 +182,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         );
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: localize('security.garages_closed'), heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.garages_closed'), heading_style: 'subtitle', icon: 'mdi:garage' });
         cards.push(
           ...closed.map((e) => ({
             type: 'tile',
@@ -198,12 +203,29 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       const cards: LovelaceCardConfig[] = [];
 
       if (open.length > 0) {
-        cards.push({ type: 'heading', heading: localize('security.windows_open'), heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.windows_open'), heading_style: 'subtitle', icon: 'mdi:window-open' });
         cards.push(...open.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (closed.length > 0) {
-        cards.push({ type: 'heading', heading: localize('security.windows_closed'), heading_style: 'subtitle' });
+        cards.push({ type: 'heading', heading: localize('security.windows_closed'), heading_style: 'subtitle', icon: 'mdi:window-closed' });
         cards.push(...closed.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
+      }
+      if (cards.length > 0) sections.push({ type: 'grid', cards });
+    }
+
+    // Smoke/Gas detectors
+    if (smokeGas.length > 0) {
+      const active = smokeGas.filter((e) => hass.states[e]?.state === 'on');
+      const inactive = smokeGas.filter((e) => hass.states[e]?.state === 'off');
+      const cards: LovelaceCardConfig[] = [];
+
+      if (active.length > 0) {
+        cards.push({ type: 'heading', heading: localize('security.smoke_gas_active'), heading_style: 'subtitle', icon: 'mdi:smoke-detector-alert' });
+        cards.push(...active.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
+      }
+      if (inactive.length > 0) {
+        cards.push({ type: 'heading', heading: localize('security.smoke_gas_inactive'), heading_style: 'subtitle', icon: 'mdi:smoke-detector' });
+        cards.push(...inactive.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (cards.length > 0) sections.push({ type: 'grid', cards });
     }

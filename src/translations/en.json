@@ -56,14 +56,16 @@
     "awnings_close_all": "Retract all"
   },
   "security": {
-    "locks_unlocked": "🔓 Locks - Unlocked",
-    "locks_locked": "🔒 Locks - Locked",
-    "doors_open": "🚪 Doors & Gates - Open",
-    "doors_closed": "🚪 Doors & Gates - Closed",
-    "garages_open": "🏠 Garages - Open",
-    "garages_closed": "🏠 Garages - Closed",
-    "windows_open": "🪟 Windows & Openings - Open",
-    "windows_closed": "🪟 Windows & Openings - Closed"
+    "locks_unlocked": "Locks - Unlocked",
+    "locks_locked": "Locks - Locked",
+    "doors_open": "Doors & Gates - Open",
+    "doors_closed": "Doors & Gates - Closed",
+    "garages_open": "Garages - Open",
+    "garages_closed": "Garages - Closed",
+    "windows_open": "Windows & Openings - Open",
+    "windows_closed": "Windows & Openings - Closed",
+    "smoke_gas_active": "Smoke & Gas Detectors - Alarm",
+    "smoke_gas_inactive": "Smoke & Gas Detectors - No Alarm"
   },
   "batteries": {
     "critical": "Critical",

@@ -56,14 +56,16 @@
     "awnings_close_all": "Alle einfahren"
   },
   "security": {
-    "locks_unlocked": "🔓 Schlösser - Entriegelt",
-    "locks_locked": "🔒 Schlösser - Verriegelt",
-    "doors_open": "🚪 Türen & Tore - Offen",
-    "doors_closed": "🚪 Türen & Tore - Geschlossen",
-    "garages_open": "🏠 Garagen - Offen",
-    "garages_closed": "🏠 Garagen - Geschlossen",
-    "windows_open": "🪟 Fenster & Öffnungen - Offen",
-    "windows_closed": "🪟 Fenster & Öffnungen - Geschlossen"
+    "locks_unlocked": "Schlösser - Entriegelt",
+    "locks_locked": "Schlösser - Verriegelt",
+    "doors_open": "Türen & Tore - Offen",
+    "doors_closed": "Türen & Tore - Geschlossen",
+    "garages_open": "Garagen - Offen",
+    "garages_closed": "Garagen - Geschlossen",
+    "windows_open": "Fenster & Öffnungen - Offen",
+    "windows_closed": "Fenster & Öffnungen - Geschlossen",
+    "smoke_gas_active": "Rauch- & Gasmelder - Alarm",
+    "smoke_gas_inactive": "Rauch- & Gasmelder - Kein Alarm"
   },
   "batteries": {
     "critical": "Kritisch",

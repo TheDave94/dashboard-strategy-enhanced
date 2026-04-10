@@ -81,6 +81,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       battery: [],
       window: [],
       door: [],
+      smoke: [],
+      gas: [],
     };
 
     // Main categorization loop — use pre-filtered visible entities from Registry
@@ -203,6 +205,14 @@ class Simon42ViewRoomStrategy extends HTMLElement {
           sensorEntities.door.push(entityId);
           continue;
         }
+        if (deviceClass === 'smoke') {
+          sensorEntities.smoke.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'gas') {
+          sensorEntities.gas.push(entityId);
+          continue;
+        }
       }
     }
 
@@ -268,6 +278,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     if (sensorEntities.absolute_humidity[0]) badges.push(badgeConfig(sensorEntities.absolute_humidity[0], 'blue'));
     if (sensorEntities.window[0]) badges.push(badgeConfig(sensorEntities.window[0], 'teal'));
     if (sensorEntities.door[0]) badges.push(badgeConfig(sensorEntities.door[0], 'teal'));
+    if (sensorEntities.smoke[0]) badges.push(badgeConfig(sensorEntities.smoke[0], 'red'));
+    if (sensorEntities.gas[0]) badges.push(badgeConfig(sensorEntities.gas[0], 'red'));
 
     // === SECTIONS ===
     const sections: LovelaceSectionConfig[] = [];
