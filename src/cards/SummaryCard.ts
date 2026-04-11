@@ -7,6 +7,7 @@ import type { HomeAssistant, HassEntity } from '../types/homeassistant';
 import { Registry } from '../Registry';
 import { trackHassUpdate, debugLog, timeStart, timeEnd } from '../utils/debug';
 import { localize } from '../utils/localize';
+import { getBatteryEntities } from '../utils/entity-filter';
 
 declare global {
   interface Window {
@@ -175,36 +176,7 @@ class Simon42SummaryCard extends LitElement {
       }
 
       case 'batteries': {
-        const sensorIds = Registry.getEntityIdsForDomain('sensor');
-        const bsIds = Registry.getEntityIdsForDomain('binary_sensor');
-        const allDomainIds = [...sensorIds, ...bsIds];
-
-        const batteryEntities = allDomainIds.filter((id) => {
-          const state = hass.states[id];
-          if (!state) return false;
-          const isBatterySensor = id.includes('battery') || state.attributes?.device_class === 'battery';
-          if (!isBatterySensor) return false;
-          if (Registry.isExcludedByLabel(id)) return false;
-          if (Registry.isHiddenByConfig(id)) return false;
-          const entry = Registry.getEntity(id);
-          if (entry?.hidden) return false;
-          if (this._config.hide_mobile_app_batteries && entry?.platform === 'mobile_app') return false;
-          return true;
-        });
-
-        const sensorDeviceIds = new Set<string>();
-        for (const id of batteryEntities) {
-          if (id.startsWith('sensor.')) {
-            const deviceId = hass.entities[id]?.device_id;
-            if (deviceId) sensorDeviceIds.add(deviceId);
-          }
-        }
-
-        result = batteryEntities.filter((id) => {
-          if (!id.startsWith('binary_sensor.')) return true;
-          const deviceId = hass.entities[id]?.device_id;
-          return !deviceId || !sensorDeviceIds.has(deviceId);
-        });
+        result = getBatteryEntities(hass, this._config);
         break;
       }
 
