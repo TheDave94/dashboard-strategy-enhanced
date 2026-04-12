@@ -59,3 +59,45 @@ export function findDummySensor(hass: HomeAssistant): string {
   }
   return 'sun.sun';
 }
+
+
+export function getBatteryEntities(hass: HomeAssistant, config: Simon42StrategyConfig): string[] {
+  const sensorIds = Registry.getEntityIdsForDomain('sensor');
+  const binarySensorIds = Registry.getEntityIdsForDomain('binary_sensor');
+
+  // Filter battery entities — exclude hidden/no_dboard but keep diagnostic
+  const batteryEntities = [...sensorIds, ...binarySensorIds].filter((entityId) => {
+    const state = hass.states[entityId];
+    if (!state) return false;
+
+    // Exclude hidden and no_dboard entities (but NOT diagnostic — batteries are often diagnostic)
+    if (Registry.isExcludedByLabel(entityId)) return false;
+    if (Registry.isHiddenByConfig(entityId)) return false;
+
+    const entry = Registry.getEntity(entityId);
+    if (entry?.hidden) return false;
+    // Platform-specific filter: hide mobile_app batteries if configured
+    if (config?.hide_mobile_app_batteries) {
+      if (entry?.platform === 'mobile_app') return false;
+    }
+
+    if (entityId.startsWith('binary_sensor.') && entityId.includes('battery')) return true;
+    if (state.attributes?.device_class === 'battery' && state.attributes?.unit_of_measurement === '%') return true;
+    return false;
+  });
+
+  // Deduplication: remove binary_sensor if %-sensor exists on same device
+  const sensorDeviceIds = new Set<string>();
+  for (const id of batteryEntities) {
+    if (id.startsWith('sensor.')) {
+      const deviceId = hass.entities[id]?.device_id;
+      if (deviceId) sensorDeviceIds.add(deviceId);
+    }
+  }
+
+  return batteryEntities.filter((id) => {
+    if (!id.startsWith('binary_sensor.')) return true;
+    const deviceId = hass.entities[id]?.device_id;
+    return !deviceId || !sensorDeviceIds.has(deviceId);
+  })
+}

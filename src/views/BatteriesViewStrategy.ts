@@ -6,58 +6,14 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
+import { getBatteryEntities } from '../utils/entity-filter';
 
 class Simon42ViewBatteriesStrategy extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
     // Ensure Registry is initialized (idempotent — no-op if already done)
     Registry.initialize(hass, config.config || {});
 
-    // Use raw (unfiltered) domain maps — battery sensors are often entity_category
-    // "diagnostic" which getVisibleEntityIdsForDomain() would exclude.
-    // We still filter out no_dboard and config-hidden below.
-    const sensorIds = Registry.getEntityIdsForDomain('sensor');
-    const binarySensorIds = Registry.getEntityIdsForDomain('binary_sensor');
-
-    // Filter battery entities — exclude hidden/no_dboard but keep diagnostic
-    const batteryEntities = [...sensorIds, ...binarySensorIds].filter((entityId) => {
-      const state = hass.states[entityId];
-      if (!state) return false;
-
-      // Exclude hidden and no_dboard entities (but NOT diagnostic — batteries are often diagnostic)
-      if (Registry.isExcludedByLabel(entityId)) return false;
-      if (Registry.isHiddenByConfig(entityId)) return false;
-      const entry = Registry.getEntity(entityId);
-      if (entry?.hidden) return false;
-
-      const isBattery = entityId.includes('battery') || state.attributes?.device_class === 'battery';
-      if (!isBattery) return false;
-
-      // Platform-specific filter: hide mobile_app batteries if configured
-      if (config.config?.hide_mobile_app_batteries) {
-        const registryEntry = Registry.getEntity(entityId);
-        if (registryEntry?.platform === 'mobile_app') return false;
-      }
-
-      if (entityId.startsWith('binary_sensor.')) return true;
-      const stateVal = state.state;
-      if (stateVal === 'unavailable' || stateVal === 'unknown') return true;
-      const value = parseFloat(stateVal);
-      return !isNaN(value);
-    });
-
-    // Deduplication: remove binary_sensor if %-sensor exists on same device
-    const sensorDeviceIds = new Set<string>();
-    for (const id of batteryEntities) {
-      if (id.startsWith('sensor.')) {
-        const deviceId = Registry.getEntity(id)?.device_id;
-        if (deviceId) sensorDeviceIds.add(deviceId);
-      }
-    }
-    const dedupedEntities = batteryEntities.filter((id) => {
-      if (!id.startsWith('binary_sensor.')) return true;
-      const deviceId = Registry.getEntity(id)?.device_id;
-      return !deviceId || !sensorDeviceIds.has(deviceId);
-    });
+    const batteryEntities = getBatteryEntities(hass, config.config);
 
     // Group by status
     const strategyConfig = config.config || {};
@@ -67,7 +23,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
     const low: string[] = [];
     const good: string[] = [];
 
-    for (const entityId of dedupedEntities) {
+    for (const entityId of batteryEntities) {
       const state = hass.states[entityId];
       if (entityId.startsWith('binary_sensor.')) {
         (state.state === 'on' ? critical : good).push(entityId);
