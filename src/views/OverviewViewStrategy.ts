@@ -109,8 +109,23 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       ['overview', overviewSection],
       ['custom_cards', customCardsSection],
       ['areas', areasSections],
-      ['weather', createWeatherSection(weatherEntity ?? null, showWeather)],
-      ['energy', createEnergySection(showEnergy, dashboardConfig.energy_link_dashboard !== false)],
+      [
+        'weather',
+        createWeatherSection(
+          weatherEntity ?? null,
+          showWeather,
+          dashboardConfig.show_weather_forecast_card !== false,
+          dashboardConfig.weather_sensors || []
+        ),
+      ],
+      [
+        'energy',
+        createEnergySection(
+          showEnergy,
+          dashboardConfig.energy_link_dashboard !== false,
+          dashboardConfig.show_energy_distribution_card !== false
+        ),
+      ],
     ]);
 
     // Assemble in configured order, appending assigned custom cards to each section

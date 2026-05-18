@@ -23,7 +23,17 @@ export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
 export interface Simon42StrategyConfig {
   // Global toggles
   show_weather?: boolean; // default: true
+  show_weather_forecast_card?: boolean; // default: true — set false to keep the
+  // `weather` section + heading but omit the built-in weather-forecast card
+  // (lets custom_cards target=weather supply their own weather UI in this slot)
+  weather_sensors?: WeatherSensorConfig[]; // optional inline icon+value row
+  // rendered at the top of the weather section. Useful for displaying local
+  // outdoor sensors (temperature, humidity, wind, pressure...) alongside or
+  // in place of the built-in forecast card.
   show_energy?: boolean; // default: true
+  show_energy_distribution_card?: boolean; // default: true — same behaviour for
+  // the energy section: false keeps the section so custom_cards can render
+  // here without the built-in energy-distribution card alongside
   show_search_card?: boolean; // default: false
   show_summary_views?: boolean; // default: false
   show_room_views?: boolean; // default: false
@@ -99,6 +109,24 @@ export interface GroupOptions {
   names_visible?: string[]; // Override show_name to true (used by badges group)
   names_hidden?: string[]; // Override show_name to false (used by badges group)
   [key: string]: unknown;
+}
+
+// -- Weather Sensors --------------------------------------------------
+
+/**
+ * Inline sensor display in the weather section header. Rendered as an
+ * icon + value (+ optional unit) using a markdown card with text_only.
+ * The value is read via a template, so the entity's live state is used.
+ */
+export interface WeatherSensorConfig {
+  /** Entity id, e.g. `sensor.outdoor_temperature`. Required. */
+  entity: string;
+  /** MDI icon to show before the value. Default: `mdi:gauge`. */
+  icon?: string;
+  /** Unit string appended to the value, e.g. `"°C"` or `"km/h"`. */
+  unit?: string;
+  /** Round the numeric value to N decimals. Omit to show raw state. */
+  round?: number;
 }
 
 // -- Custom Views -----------------------------------------------------
