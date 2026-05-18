@@ -9,26 +9,79 @@ import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelac
 import type { WeatherSensorConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
 
+// Entity ids follow `domain.object_id` where each part is lowercase
+// letters/digits/underscores. Anything else is a malformed config value
+// that we silently drop to avoid breaking markdown templates downstream.
+const ENTITY_ID_RE = /^[a-z_]+\.[a-z0-9_]+$/;
+
+// MDI / similar icon ids: `set:slug` with lowercase letters/digits/hyphens.
+// Anything outside this set could break out of the HTML attribute below.
+const ICON_RE = /^[a-z]+:[a-z0-9-]+$/;
+
+/**
+ * HTML-escape a string so it can be safely embedded in markdown content.
+ * Markdown card with `text_only: true` strips card chrome but the renderer
+ * still interprets inline HTML, so user-controlled values must be escaped.
+ */
+function escapeHtml(input: string): string {
+  return input.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      default: return c;
+    }
+  });
+}
+
 /**
  * Build an inline markdown row of icon+value pairs from a weather_sensors
- * config array. Returns null if no sensors are configured.
+ * config array. Returns null if no sensors are configured or if every
+ * entry is invalid.
  *
  * Each entry renders as `<ha-icon icon="..."></ha-icon> <value> <unit>`,
  * separated by non-breaking spaces. Uses text_only so the markdown blends
  * into the section without extra card chrome.
+ *
+ * Defensive normalization on every field:
+ *   - `entity`: required and must match ENTITY_ID_RE; entries with bad
+ *     ids are dropped (they would otherwise let a poisoned config inject
+ *     into the Jinja template).
+ *   - `icon`: must match ICON_RE; falls back to `mdi:gauge` otherwise.
+ *     Prevents attribute break-out inside `<ha-icon icon="...">`.
+ *   - `unit`: free text, HTML-escaped before concatenation.
+ *   - `round`: must be a finite non-negative integer; ignored otherwise.
+ *
+ * The strategy generates Lovelace YAML — the config is trusted in the
+ * single-user case, but we still validate so that copy-pasted community
+ * templates can't smuggle in HTML or template injection.
  */
 function buildWeatherSensorRow(sensors: WeatherSensorConfig[]): LovelaceCardConfig | null {
   if (sensors.length === 0) return null;
 
-  const parts = sensors.map((s) => {
-    const icon = s.icon || 'mdi:gauge';
+  const parts: string[] = [];
+  for (const s of sensors) {
+    if (!s || typeof s.entity !== 'string' || !ENTITY_ID_RE.test(s.entity)) continue;
+
+    const icon = typeof s.icon === 'string' && ICON_RE.test(s.icon) ? s.icon : 'mdi:gauge';
+    const round =
+      typeof s.round === 'number' && Number.isInteger(s.round) && s.round >= 0
+        ? s.round
+        : undefined;
+
     const valueExpr =
-      s.round !== undefined
-        ? `{{ states("${s.entity}") | float | round(${s.round}) }}`
+      round !== undefined
+        ? `{{ states("${s.entity}") | float(0) | round(${round}) }}`
         : `{{ states("${s.entity}") }}`;
-    const unit = s.unit ? ` ${s.unit}` : '';
-    return `<ha-icon icon="${icon}"></ha-icon> ${valueExpr}${unit}`;
-  });
+
+    const unit = typeof s.unit === 'string' && s.unit.length > 0 ? ` ${escapeHtml(s.unit)}` : '';
+
+    parts.push(`<ha-icon icon="${icon}"></ha-icon> ${valueExpr}${unit}`);
+  }
+
+  if (parts.length === 0) return null;
 
   return {
     type: 'markdown',
