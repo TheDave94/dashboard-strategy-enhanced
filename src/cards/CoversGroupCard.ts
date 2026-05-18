@@ -9,6 +9,11 @@ import { Registry } from '../Registry';
 import { trackHassUpdate } from '../utils/debug';
 import { localize } from '../utils/localize';
 
+interface LovelaceCardElement extends HTMLElement {
+  hass?: HomeAssistant;
+  setConfig(config: Record<string, unknown>): void;
+}
+
 declare global {
   interface Window {
     customCards?: Array<{ type: string; name: string; description: string }>;
@@ -74,7 +79,7 @@ class Simon42CoversGroupCard extends LitElement {
   // Reusable card pool
   private _tileCards: Map<string, any> = new Map();
   private _headingCard: any = null;
-  private _floorHeadingCards: Map<string, any> = new Map();
+  private _floorHeadingCards: Map<string, LovelaceCardElement> = new Map();
 
   static styles = css`
     :host {
@@ -239,6 +244,7 @@ class Simon42CoversGroupCard extends LitElement {
     ];
 
     return sortedKeys.map((floorId) => {
+      // eslint-disable-next-line security/detect-object-injection -- floorId comes from HA floor registry keys
       const floor = floorId ? floors[floorId] : null;
       return {
         floorId,
@@ -267,7 +273,7 @@ class Simon42CoversGroupCard extends LitElement {
     return name.trim() || state.attributes.friendly_name || entityId;
   }
 
-  private _buildHeadingConfig(covers: string[], floorLabel?: string, floorIcon?: string): any {
+  private _buildHeadingConfig(covers: string[], floorLabel?: string, floorIcon?: string): Record<string, unknown> {
     const groupType = this._config.group_type;
     const openText = this._config.batch_open_text || localize('covers.open_all');
     const closeText = this._config.batch_close_text || localize('covers.close_all');
@@ -391,10 +397,10 @@ class Simon42CoversGroupCard extends LitElement {
     `;
   }
 
-  private _getOrCreateFloorHeadingCard(key: string): any {
+  private _getOrCreateFloorHeadingCard(key: string): LovelaceCardElement {
     let card = this._floorHeadingCards.get(key);
     if (card) return card;
-    card = document.createElement('hui-heading-card');
+    card = document.createElement('hui-heading-card') as LovelaceCardElement;
     this._floorHeadingCards.set(key, card);
     return card;
   }
