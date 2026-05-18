@@ -317,6 +317,8 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         cards.push(...inactive.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (cards.length > 0) sections.push({ type: 'grid', cards });
+    }
+
     // User-picked extra entities (smart appliances, custom sensors, etc.)
     const extraEntities: string[] = (config.config?.security_extra_entities || []).filter(
       // eslint-disable-next-line security/detect-object-injection -- entity IDs are user-picked from the editor entity registry

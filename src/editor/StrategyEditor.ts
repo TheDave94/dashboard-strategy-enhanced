@@ -172,6 +172,16 @@ class Simon42DashboardStrategyEditor extends LitElement {
     return Object.keys(this._hass.states)
       .filter((entityId) => entityId.startsWith('weather.'))
       .map((entityId) => {
+        // eslint-disable-next-line security/detect-object-injection -- entityId iterated from hass.states keys
+        const stateObj = this._hass!.states[entityId];
+        return {
+          entity_id: entityId,
+          name: stateObj.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' '),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   /** Sensor entities reporting power (W / kW). For the optional live power badge. */
   private _getPowerSensorEntities(): AlarmEntityOption[] {
     if (!this._hass) return [];
@@ -1118,35 +1128,17 @@ class Simon42DashboardStrategyEditor extends LitElement {
     ['weather', { icon: 'mdi:weather-partly-cloudy', labelKey: 'sections.weather' }],
     ['energy', { icon: 'mdi:lightning-bolt', labelKey: 'sections.energy' }],
     ['plants', { icon: 'mdi:flower-tulip', labelKey: 'sections.plants' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'plants';
     ['agenda', { icon: 'mdi:calendar', labelKey: 'sections.agenda' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'agenda';
     ['todos', { icon: 'mdi:format-list-checks', labelKey: 'sections.todos' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'todos';
     ['persons', { icon: 'mdi:account-group', labelKey: 'sections.persons' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'persons';
     ['vacuums', { icon: 'mdi:robot-vacuum', labelKey: 'sections.vacuums' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'vacuums';
     ['maintenance', { icon: 'mdi:update', labelKey: 'sections.maintenance' }],
   ]);
 
   private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'maintenance';
+    return key === 'weather' || key === 'energy'
+      || key === 'plants' || key === 'agenda' || key === 'todos'
+      || key === 'persons' || key === 'vacuums' || key === 'maintenance';
   }
 
   private _toggleSectionVisibility(key: SectionKey, visible: boolean): void {
@@ -1249,6 +1241,9 @@ class Simon42DashboardStrategyEditor extends LitElement {
                     <option value="forecast_twice_daily" ?selected=${weatherPresentation === 'forecast_twice_daily'}>${localize('editor.weather_presentation_forecast_twice_daily')}</option>
                     <option value="tile" ?selected=${weatherPresentation === 'tile'}>${localize('editor.weather_presentation_tile')}</option>
                     <option value="none" ?selected=${weatherPresentation === 'none'}>${localize('editor.weather_presentation_none')}</option>
+                  </select>
+                </div>
+              ` : nothing}
               ${key === 'weather' && showWeather && weatherEntities.length > 1 ? html`
                 <div class="section-order-sub" style="flex-wrap: wrap;">
                   <label for="weather-entity">${localize('editor.weather_entity')}</label>
@@ -1316,22 +1311,37 @@ class Simon42DashboardStrategyEditor extends LitElement {
             `)}
           </div>
         </details>
+
         <div style="margin-top: 12px;">
           ${this._renderCheckbox('show-unavailable-alert-badge', localize('editor.show_unavailable_alert_badge'),
             this._config.show_unavailable_alert_badge === true,
             (checked) => this._toggleChanged('show_unavailable_alert_badge', checked, false))}
           <div class="description">${localize('editor.show_unavailable_alert_badge_desc')}</div>
+        </div>
+
         <div style="margin-top: 12px;">
           ${this._renderCheckbox('show-now-playing-badge', localize('editor.show_now_playing_badge'),
             this._config.show_now_playing_badge === true,
             (checked) => this._toggleChanged('show_now_playing_badge', checked, false))}
           <div class="description">${localize('editor.show_now_playing_badge_desc')}</div>
+        </div>
+
         <div style="margin-top: 12px;">
           ${this._renderCheckbox('show-sun-badge', localize('editor.show_sun_badge'),
             this._config.show_sun_badge === true,
             (checked) => this._toggleChanged('show_sun_badge', checked, false))}
           <div class="description">${localize('editor.show_sun_badge_desc')}</div>
         </div>
+
+        <div style="margin-top: 12px;">
+          ${this._renderCheckbox('show-updates-badge', localize('editor.show_updates_badge'),
+            this._config.show_updates_badge === true,
+            (checked) => this._toggleChanged('show_updates_badge', checked, false))}
+          <div class="description">${localize('editor.show_updates_badge_desc')}</div>
+        </div>
+
+        <details style="margin-top: 12px;">
+          <summary style="cursor: pointer; font-size: 13px; font-weight: 500; color: var(--primary-text-color); padding: 4px 0;">
             ${localize('editor.section_visibility')}
           </summary>
           <div style="margin-left: 14px; margin-top: 6px;">
@@ -1364,12 +1374,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
             })}
           </div>
         </details>
-        <div style="margin-top: 12px;">
-          ${this._renderCheckbox('show-updates-badge', localize('editor.show_updates_badge'),
-            this._config.show_updates_badge === true,
-            (checked) => this._toggleChanged('show_updates_badge', checked, false))}
-          <div class="description">${localize('editor.show_updates_badge_desc')}</div>
-        </div>
       </div>
     `;
   }
@@ -1387,6 +1391,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
       delete updated.hidden_section_headings;
     } else {
       updated.hidden_section_headings = next;
+    }
+    this._fireConfigChanged(updated);
+  }
+
   private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
     const updated: Simon42StrategyConfig = { ...this._config };
     const current = { ...(updated.section_visibility || {}) };
@@ -1583,7 +1591,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const batteryCriticalThreshold = this._config.battery_critical_threshold ?? 20;
     const batteryLowThreshold = this._config.battery_low_threshold ?? 50;
     const showAreaInBatteryView = this._config.show_area_in_battery_view === true;
-    const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'good' ? 'good' : 'critical';
     const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'critical' ? 'critical' : 'good';
 
     return html`
@@ -1759,6 +1766,26 @@ class Simon42DashboardStrategyEditor extends LitElement {
             }
           </div>
         ` : nothing}
+      </div>
+    `;
+  }
+
+  private _addSecurityExtraEntity(entityId: string): void {
+    const current = this._config.security_extra_entities || [];
+    if (current.includes(entityId)) return;
+    const updated: Simon42StrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
+    this._fireConfigChanged(updated);
+  }
+
+  private _removeSecurityExtraEntity(entityId: string): void {
+    const current = this._config.security_extra_entities || [];
+    const next = current.filter((e) => e !== entityId);
+    const updated: Simon42StrategyConfig = { ...this._config };
+    if (next.length === 0) delete updated.security_extra_entities;
+    else updated.security_extra_entities = next;
+    this._fireConfigChanged(updated);
+  }
+
   private _renderLightFavoritesSection(): TemplateResult {
     const lightFavs = this._config.light_favorite_entities || [];
     const allEntities = this._getAllEntitiesForSelect();
@@ -1811,21 +1838,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
     `;
   }
 
-  private _addSecurityExtraEntity(entityId: string): void {
-    const current = this._config.security_extra_entities || [];
-    if (current.includes(entityId)) return;
-    const updated: Simon42StrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
-    this._fireConfigChanged(updated);
-  }
-
-  private _removeSecurityExtraEntity(entityId: string): void {
-    const current = this._config.security_extra_entities || [];
-    const next = current.filter((e) => e !== entityId);
-    const updated: Simon42StrategyConfig = { ...this._config };
-    if (next.length === 0) {
-      delete updated.security_extra_entities;
-    } else {
-      updated.security_extra_entities = next;
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
     const updated: Simon42StrategyConfig = { ...this._config };
     // 'good' is now the default → omit the key when matching default
@@ -1833,6 +1845,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
       delete updated.unavailable_batteries_bucket;
     } else {
       updated.unavailable_batteries_bucket = bucket;
+    }
+    this._fireConfigChanged(updated);
+  }
+
   private _lightsSortByChanged(sortBy: 'last_changed' | 'name'): void {
     const updated: Simon42StrategyConfig = { ...this._config };
     if (sortBy === 'last_changed') {
@@ -1840,6 +1856,9 @@ class Simon42DashboardStrategyEditor extends LitElement {
     } else {
       updated.lights_sort_by = sortBy;
     }
+    this._fireConfigChanged(updated);
+  }
+
   private _addLightFavorite(entityId: string): void {
     const current = this._config.light_favorite_entities || [];
     if (current.includes(entityId)) return;

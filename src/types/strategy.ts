@@ -8,12 +8,18 @@
 
 // -- Section Ordering -------------------------------------------------
 
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'plants';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'agenda';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'todos';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'persons';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'vacuums';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'maintenance';
+export type SectionKey =
+  | 'overview'
+  | 'custom_cards'
+  | 'areas'
+  | 'weather'
+  | 'energy'
+  | 'plants'
+  | 'agenda'
+  | 'todos'
+  | 'persons'
+  | 'vacuums'
+  | 'maintenance';
 
 export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'overview',
@@ -33,7 +39,12 @@ export type HeadingKey =
   | 'areas'
   | 'areas_other'
   | 'weather'
-  | 'energy';
+  | 'energy'
+  | 'agenda'
+  | 'todos'
+  | 'persons'
+  | 'vacuums'
+  | 'maintenance';
 
 export const ALL_HEADING_KEYS: HeadingKey[] = [
   'overview',
@@ -101,7 +112,6 @@ export interface Simon42StrategyConfig {
   battery_critical_threshold?: number; // default: 20
   battery_low_threshold?: number; // default: 50
   show_area_in_battery_view?: boolean; // default: false
-  unavailable_batteries_bucket?: 'critical' | 'good'; // default: 'critical'
   unavailable_batteries_bucket?: 'critical' | 'good'; // default: 'good'
   show_locks_in_rooms?: boolean; // default: false
   show_automations_in_rooms?: boolean; // default: false

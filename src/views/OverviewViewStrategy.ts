@@ -31,12 +31,19 @@ import { timeStart, timeEnd, debugLog } from '../utils/debug';
  * appends any missing keys at the end (forward compatibility).
  */
 function normalizeSectionsOrder(order: SectionKey[]): SectionKey[] {
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'plants']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'agenda']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'todos']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'persons']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'vacuums']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'maintenance']);
+  const validKeys = new Set<SectionKey>([
+    'overview',
+    'custom_cards',
+    'areas',
+    'weather',
+    'energy',
+    'plants',
+    'agenda',
+    'todos',
+    'persons',
+    'vacuums',
+    'maintenance',
+  ]);
   const seen = new Set<SectionKey>();
   const result: SectionKey[] = [];
   for (const key of order) {
@@ -118,14 +125,13 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     const someSensorId = findDummySensor(hass);
 
     // Person badges (default-on; user can suppress via config to swap in
-    // their own person badges through custom_badges instead)
+    // their own person badges through custom_badges instead).
+    // Zone-aware: HA's person.state already returns the zone name when the
+    // person is in a non-home zone, so the 'with_state' layout surfaces
+    // "Work" / "Office" / etc. automatically.
     const showPersonBadges = dashboardConfig.show_person_badges !== false;
-    const personBadges = showPersonBadges ? createPersonBadges(persons, hass) : [];
-    // Person badges (zone-aware: HA's person.state already returns the zone
-    // name when the person is in a non-home zone, so the 'with_state' layout
-    // surfaces "Work" / "Office" / etc. automatically).
     const personBadgeLayout = dashboardConfig.person_badge_layout || 'with_state';
-    const personBadges = createPersonBadges(persons, hass, personBadgeLayout);
+    const personBadges = showPersonBadges ? createPersonBadges(persons, hass, personBadgeLayout) : [];
 
     // Config flags
     const showWeather = dashboardConfig.show_weather !== false;
@@ -258,19 +264,20 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       });
     }
 
-    return createOverviewView(overviewSections, [...personBadges, ...powerBadges, ...customBadges]);
     // Optional "unavailable entities" alert badge — count entities whose
     // state is "unavailable", skipping ones the user hid (no_dboard label,
     // hidden_by, or hidden via Registry config). Auto-hide at zero.
     const alertBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_unavailable_alert_badge === true) {
       let count = 0;
+      let someSensorId: string | undefined;
       for (const [entityId, state] of Object.entries(hass.states)) {
         if (state.state !== 'unavailable') continue;
         if (Registry.isExcludedByLabel(entityId)) continue;
         if (Registry.isHiddenByConfig(entityId)) continue;
         const entry = Registry.getEntity(entityId);
         if (entry?.hidden) continue;
+        if (!someSensorId) someSensorId = entityId;
         count++;
       }
       if (count > 0 && someSensorId) {
@@ -281,12 +288,16 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           icon: 'mdi:alert-circle-outline',
           color: 'red',
           show_state: false,
+        });
+      }
+    }
+
     // Optional "now playing" badge — first media_player in 'playing' state
     const nowPlayingBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_now_playing_badge === true) {
       const playing = Registry.getVisibleEntityIdsForDomain('media_player').find((id) => {
-        // eslint-disable-next-line security/detect-object-injection -- entity IDs from Registry
-        return hass.states[id]?.state === 'playing';
+        const st = Reflect.get(hass.states as Record<string, unknown>, id) as { state?: string } | undefined;
+        return st?.state === 'playing';
       });
       if (playing) {
         nowPlayingBadges.push({
@@ -296,6 +307,10 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           color: 'green',
           show_state: false,
           tap_action: { action: 'more-info' },
+        });
+      }
+    }
+
     // Optional "pending updates count" badge — Registry-filtered update.* in state 'on'.
     const updatesBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_updates_badge === true) {
@@ -321,14 +336,13 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
-    return createOverviewView(overviewSections, [...personBadges, ...alertBadges, ...customBadges]);
-    return createOverviewView(overviewSections, [...personBadges, ...nowPlayingBadges, ...customBadges]);
     // Optional sun badge — shows sun.sun with next sunrise/sunset
     // (state_content auto-picks next_dawn/next_dusk from HA's sun integration).
     // Auto-hide when no sun.sun entity present.
     const sunBadges: LovelaceBadgeConfig[] = [];
-    if (dashboardConfig.show_sun_badge === true && hass.states['sun.sun']) {
-      const isAbove = hass.states['sun.sun'].state === 'above_horizon';
+    const sunState = Reflect.get(hass.states as Record<string, unknown>, 'sun.sun') as { state?: string } | undefined;
+    if (dashboardConfig.show_sun_badge === true && sunState) {
+      const isAbove = sunState.state === 'above_horizon';
       sunBadges.push({
         type: 'entity',
         entity: 'sun.sun',
@@ -339,8 +353,15 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       });
     }
 
-    return createOverviewView(overviewSections, [...personBadges, ...sunBadges, ...customBadges]);
-    return createOverviewView(overviewSections, [...personBadges, ...updatesBadges, ...customBadges]);
+    return createOverviewView(overviewSections, [
+      ...personBadges,
+      ...powerBadges,
+      ...alertBadges,
+      ...nowPlayingBadges,
+      ...updatesBadges,
+      ...sunBadges,
+      ...customBadges,
+    ]);
   }
 }
 
