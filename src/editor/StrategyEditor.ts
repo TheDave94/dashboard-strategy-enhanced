@@ -1289,6 +1289,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _renderOverviewSection(): TemplateResult {
     const showClockCard = this._config.show_clock_card !== false;
     const showSearchCard = this._config.show_search_card === true;
+    const showPersonBadges = this._config.show_person_badges !== false;
     const hasSearchCardDeps = this._checkSearchCardDependencies();
     const alarmEntity = this._config.alarm_entity || '';
     const alarmEntities = this._getAlarmEntities();
@@ -1324,6 +1325,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
             ? localize('editor.show_search_card_desc')
             : html`<span>&#x26A0;&#xFE0F; ${unsafeHTML(localize('editor.show_search_card_missing'))}</span>`}
         </div>
+
+        ${this._renderCheckbox('show-person-badges', localize('editor.show_person_badges'), showPersonBadges,
+          (checked) => this._toggleChanged('show_person_badges', checked, true))}
+        <div class="description">${localize('editor.show_person_badges_desc')}</div>
       </div>
     `;
   }

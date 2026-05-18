@@ -138,6 +138,8 @@
     "show_search_card": "Such-Karte anzeigen",
     "show_search_card_desc": "Zeigt die custom:search-card direkt unter der Uhr in der Übersicht an.",
     "show_search_card_missing": "Benötigt <strong>custom:search-card</strong> und <strong>card-tools</strong>. Bitte installieren Sie beide Komponenten, um diese Funktion zu nutzen.",
+    "show_person_badges": "Personen-Badges im Header anzeigen",
+    "show_person_badges_desc": "Automatisch erzeugte Personen-Chips erscheinen standardmäßig im Übersicht-Header. Deaktivieren, wenn du eigene Personen-Badges über Eigene Badges einbindest.",
     "section_summaries": "Zusammenfassungen",
     "columns_2": "2 Spalten (2x2 Grid)",
     "columns_4": "4 Spalten (1x4 Reihe)",

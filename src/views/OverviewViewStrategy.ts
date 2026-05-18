@@ -106,8 +106,10 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
         : findWeatherEntity(hass);
     const someSensorId = findDummySensor(hass);
 
-    // Person badges
-    const personBadges = createPersonBadges(persons, hass);
+    // Person badges (default-on; user can suppress via config to swap in
+    // their own person badges through custom_badges instead)
+    const showPersonBadges = dashboardConfig.show_person_badges !== false;
+    const personBadges = showPersonBadges ? createPersonBadges(persons, hass) : [];
 
     // Config flags
     const showWeather = dashboardConfig.show_weather !== false;
