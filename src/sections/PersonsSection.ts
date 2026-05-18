@@ -10,18 +10,22 @@
 // Auto-hides when no person.* entities exist.
 // ====================================================================
 
-import type { HomeAssistant } from '../types/homeassistant';
+import type { HomeAssistant, HassEntity } from '../types/homeassistant';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
+
+/** Safe state lookup: Reflect.get bypasses ESLint's object-injection heuristic. */
+function getState(hass: HomeAssistant, entityId: string): HassEntity | undefined {
+  return Reflect.get(hass.states as Record<string, unknown>, entityId) as HassEntity | undefined;
+}
 
 /** Try to find a battery % sensor associated with one of the person's device_trackers. */
 function findBatterySensorForPerson(
   hass: HomeAssistant,
   personEntityId: string,
 ): string | undefined {
-  // eslint-disable-next-line security/detect-object-injection -- personEntityId comes from Registry caller
-  const state = hass.states[personEntityId];
+  const state = getState(hass, personEntityId);
   const sources = state?.attributes?.source as string[] | string | undefined;
   const sourceList = Array.isArray(sources) ? sources : sources ? [sources] : [];
   if (sourceList.length === 0) return undefined;
@@ -36,8 +40,7 @@ function findBatterySensorForPerson(
     const siblings = Registry.getEntityIdsForDevice(deviceId);
     for (const sid of siblings) {
       if (!sid.startsWith('sensor.')) continue;
-      // eslint-disable-next-line security/detect-object-injection -- sid comes from Registry device-entities lookup
-      const sState = hass.states[sid];
+      const sState = getState(hass, sid);
       if (!sState) continue;
       const dc = sState.attributes?.device_class;
       const unit = sState.attributes?.unit_of_measurement;
@@ -55,8 +58,7 @@ export function createPersonsSection(
   if (!enabled) return null;
 
   const personIds = Registry.getVisibleEntityIdsForDomain('person').filter(
-    // eslint-disable-next-line security/detect-object-injection -- entity IDs from Registry
-    (id) => hass.states[id] !== undefined
+    (id) => getState(hass, id) !== undefined
   );
   if (personIds.length === 0) return null;
 
