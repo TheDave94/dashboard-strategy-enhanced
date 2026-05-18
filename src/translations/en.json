@@ -107,6 +107,8 @@
     "section_order_desc": "Drag sections to reorder them on the overview page. Empty sections are hidden automatically.",
     "section_hidden": "hidden",
     "energy_link_dashboard": "Link to energy dashboard",
+    "weather_entity": "Weather entity:",
+    "weather_entity_auto": "Auto-detect (first available)",
     "target_section": "Show in",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",

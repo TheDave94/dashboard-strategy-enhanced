@@ -162,6 +162,20 @@ class Simon42DashboardStrategyEditor extends LitElement {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
+  private _getWeatherEntities(): AlarmEntityOption[] {
+    if (!this._hass) return [];
+    return Object.keys(this._hass.states)
+      .filter((entityId) => entityId.startsWith('weather.'))
+      .map((entityId) => {
+        const stateObj = this._hass!.states[entityId];
+        return {
+          entity_id: entityId,
+          name: stateObj.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' '),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   private _getFilteredEntities(query: string, filterWithArea = false): EntitySelectOption[] {
     if (!this._hass || query.length < 2) return [];
     const q = query.toLowerCase();
@@ -1088,6 +1102,9 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const order = this._getSectionsOrder();
     const energyLinkDashboard = this._config.energy_link_dashboard !== false;
     const showEnergy = this._config.show_energy !== false;
+    const showWeather = this._config.show_weather !== false;
+    const weatherEntity = this._config.weather_entity || '';
+    const weatherEntities = this._getWeatherEntities();
 
     return html`
       <div class="section">
@@ -1123,6 +1140,21 @@ class Simon42DashboardStrategyEditor extends LitElement {
                   </label>
                 ` : nothing}
               </div>
+              ${key === 'weather' && showWeather && weatherEntities.length > 1 ? html`
+                <div class="section-order-sub" style="flex-wrap: wrap;">
+                  <label for="weather-entity">${localize('editor.weather_entity')}</label>
+                  <select id="weather-entity"
+                    .value=${weatherEntity}
+                    @change=${this._weatherEntityChanged}>
+                    <option value="" ?selected=${!weatherEntity}>${localize('editor.weather_entity_auto')}</option>
+                    ${weatherEntities.map((entity) => html`
+                      <option value=${entity.entity_id} ?selected=${entity.entity_id === weatherEntity}>
+                        ${entity.name}
+                      </option>
+                    `)}
+                  </select>
+                </div>
+              ` : nothing}
               ${key === 'energy' && showEnergy ? html`
                 <div class="section-order-sub">
                   <input type="checkbox" id="energy-link-dashboard"
@@ -2184,6 +2216,23 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     if (!entityId || entityId === '') {
       delete newConfig.alarm_entity;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  private _weatherEntityChanged(e: Event): void {
+    if (!this._hass) return;
+
+    const entityId = (e.target as HTMLSelectElement).value;
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      weather_entity: entityId,
+    };
+
+    if (!entityId || entityId === '') {
+      delete newConfig.weather_entity;
     }
 
     this._config = newConfig;
