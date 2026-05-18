@@ -1421,6 +1421,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const showAutomationsInRooms = this._config.show_automations_in_rooms === true;
     const showScriptsInRooms = this._config.show_scripts_in_rooms === true;
+    const showCamerasInRooms = this._config.show_cameras_in_rooms !== false;
     const useDefaultAreaSort = this._config.use_default_area_sort === true;
 
     const allAreas = Object.values(this._hass!.areas).sort((a, b) => a.name.localeCompare(b.name));
@@ -1454,6 +1455,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-scripts-in-rooms', localize('editor.show_scripts_in_rooms'), showScriptsInRooms,
           (checked) => this._toggleChanged('show_scripts_in_rooms', checked, false))}
         <div class="description">${localize('editor.show_scripts_in_rooms_desc')}</div>
+
+        ${this._renderCheckbox('show-cameras-in-rooms', localize('editor.show_cameras_in_rooms'), showCamerasInRooms,
+          (checked) => this._toggleChanged('show_cameras_in_rooms', checked, true))}
+        <div class="description">${localize('editor.show_cameras_in_rooms_desc')}</div>
 
         ${this._renderCheckbox('use-default-area-sort', localize('editor.use_default_area_sort'), useDefaultAreaSort,
           (checked) => this._toggleChanged('use_default_area_sort', checked, false))}

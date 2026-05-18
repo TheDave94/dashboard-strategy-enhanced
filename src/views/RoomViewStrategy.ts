@@ -142,7 +142,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         roomEntities.scripts.push(entityId);
         continue;
       }
-      if (domain === 'camera') {
+      if (domain === 'camera' && dashboardConfig.show_cameras_in_rooms !== false) {
         roomEntities.cameras.push(entityId);
         continue;
       }

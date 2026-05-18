@@ -164,6 +164,8 @@
     "show_automations_in_rooms_desc": "Zeigt dem Bereich zugeordnete Automationen in den jeweiligen Raum-Ansichten an.",
     "show_scripts_in_rooms": "Skripte in Raum-Ansichten anzeigen",
     "show_scripts_in_rooms_desc": "Zeigt dem Bereich zugeordnete Skripte in den jeweiligen Raum-Ansichten an.",
+    "show_cameras_in_rooms": "Kameras in Raum-Ansichten anzeigen",
+    "show_cameras_in_rooms_desc": "Zeigt dem Bereich zugeordnete Kameras in den jeweiligen Raum-Ansichten an. Deaktivieren, um Kameras aus dem Dashboard zu nehmen, ohne sie global auf „nicht sichtbar“ zu stellen.",
     "show_window_contacts_in_rooms": "Fensterkontakte in Raum-Ansichten anzeigen",
     "show_window_contacts_in_rooms_desc": "Zeigt Fensterkontakte als Badges in den jeweiligen Raum-Ansichten an.",
     "show_door_contacts_in_rooms": "Türkontakte in Raum-Ansichten anzeigen",

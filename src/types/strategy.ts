@@ -43,6 +43,7 @@ export interface Simon42StrategyConfig {
   show_locks_in_rooms?: boolean; // default: false
   show_automations_in_rooms?: boolean; // default: false
   show_scripts_in_rooms?: boolean; // default: false
+  show_cameras_in_rooms?: boolean; // default: true
   show_window_contacts_in_rooms?: boolean; // default: false
   show_door_contacts_in_rooms?: boolean; // default: false
   show_switches_on_areas?: boolean; // default: false
