@@ -12,6 +12,7 @@ export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'en
 export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'agenda';
 export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'todos';
 export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'persons';
+export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'vacuums';
 
 export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'overview',
@@ -45,6 +46,7 @@ export const ALL_HEADING_KEYS: HeadingKey[] = [
   'agenda',
   'todos',
   'persons',
+  'vacuums',
 ];
 
 // -- Main Strategy Config ---------------------------------------------
@@ -112,6 +114,7 @@ export interface Simon42StrategyConfig {
   power_badge_entity?: string; // default: unset (no badge). Pick a sensor (e.g. main grid power in W).
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
+  show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
