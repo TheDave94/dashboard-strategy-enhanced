@@ -151,7 +151,9 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
 
     // Motorized windows (cover.* with device_class=window — e.g. Velux electric)
     if (motorizedWindows.length > 0) {
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const open = motorizedWindows.filter((e) => hass.states[e]?.state === 'open');
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const closed = motorizedWindows.filter((e) => hass.states[e]?.state === 'closed');
       const cards: LovelaceCardConfig[] = [];
 
