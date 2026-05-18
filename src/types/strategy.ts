@@ -40,6 +40,7 @@ export interface Simon42StrategyConfig {
   hide_mobile_app_batteries?: boolean; // default: false
   battery_critical_threshold?: number; // default: 20
   battery_low_threshold?: number; // default: 50
+  show_area_in_battery_view?: boolean; // default: false
   show_locks_in_rooms?: boolean; // default: false
   show_automations_in_rooms?: boolean; // default: false
   show_scripts_in_rooms?: boolean; // default: false
