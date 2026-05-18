@@ -121,8 +121,8 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     const overviewSections: LovelaceSectionConfig[] = [];
     for (const key of sectionsOrder) {
       // eslint-disable-next-line security/detect-object-injection -- key is a typed SectionKey, not user-supplied
-      const rule = sectionVisibility[key];
-      if (rule?.entity) {
+      const rule: { entity?: string; state?: string } | undefined = sectionVisibility[key];
+      if (rule && rule.entity) {
         // eslint-disable-next-line security/detect-object-injection -- entity ID is user-picked
         const entState = hass.states[rule.entity];
         if (!entState || entState.state !== rule.state) continue;
