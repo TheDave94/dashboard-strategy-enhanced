@@ -79,14 +79,25 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     });
   }
 
-  // Add search card if enabled
+  // Add search card if enabled. Two variants: the HACS-installed
+  // custom:search-card (default, inline input) or a native markdown hint
+  // pointing at HA's built-in global search (no external dependency).
   if (showSearchCard) {
-    cards.push({
-      type: 'custom:search-card',
-      grid_options: {
-        columns: 'full',
-      },
-    });
+    const variant = config.search_card_variant === 'tip' ? 'tip' : 'custom';
+    if (variant === 'tip') {
+      cards.push({
+        type: 'markdown',
+        content:
+          '### 🔍 ' + localize('editor.search_card_tip_title') + '\n\n' +
+          localize('editor.search_card_tip_body'),
+        grid_options: { columns: 'full' },
+      });
+    } else {
+      cards.push({
+        type: 'custom:search-card',
+        grid_options: { columns: 'full' },
+      });
+    }
   }
 
   // Summaries columns (default: 2)
