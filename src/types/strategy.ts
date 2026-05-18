@@ -8,7 +8,7 @@
 
 // -- Section Ordering -------------------------------------------------
 
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy';
+export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'agenda';
 
 export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'overview',
@@ -16,6 +16,7 @@ export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'areas',
   'weather',
   'energy',
+  'agenda',
 ];
 
 // -- Main Strategy Config ---------------------------------------------
@@ -48,6 +49,8 @@ export interface Simon42StrategyConfig {
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
   energy_link_dashboard?: boolean; // default: true
+  show_agenda_section?: boolean; // default: false (auto-hides when no calendars)
+  agenda_calendar_entities?: string[]; // default: [] → all visible calendars
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
