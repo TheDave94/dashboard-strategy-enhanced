@@ -47,6 +47,9 @@ export interface Simon42StrategyConfig {
   show_door_contacts_in_rooms?: boolean; // default: false
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
+  show_person_badges?: boolean; // default: true — set false to suppress the
+  // auto-generated person chip badges (useful when supplying replacement
+  // badges via custom_badges)
   energy_link_dashboard?: boolean; // default: true
 
   // Layout
