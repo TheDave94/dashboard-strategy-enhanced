@@ -23,6 +23,7 @@ export function createPlantsSection(
   if (!enabled) return null;
 
   const plantIds = Registry.getVisibleEntityIdsForDomain('plant').filter(
+    // eslint-disable-next-line security/detect-object-injection -- entity IDs from Registry
     (id) => hass.states[id] !== undefined
   );
   if (plantIds.length === 0) return null;
