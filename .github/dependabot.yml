@@ -1,0 +1,21 @@
+# ============================================================================
+# Dependabot — GitHub Actions version updates
+# ============================================================================
+# Watches every `uses:` in .github/workflows/ and opens a PR whenever an
+# upstream action publishes a newer release. Required for sustainable
+# SHA-pinning: dependabot updates the SHA + comment (e.g. `# v4`) together
+# so the workflow stays both pinned and current.
+#
+# To extend coverage: add `package-ecosystem: npm` for dependency updates,
+# or schedule changes to `daily` / `weekly` per maintainer preference.
+# ============================================================================
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
