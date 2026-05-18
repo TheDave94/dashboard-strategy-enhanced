@@ -1059,6 +1059,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
         return this._config.show_weather === false;
       case 'energy':
         return this._config.show_energy === false;
+      case 'persons':
+        return this._config.show_persons_section !== true;
       default:
         return false;
     }
@@ -1070,10 +1072,11 @@ class Simon42DashboardStrategyEditor extends LitElement {
     ['areas', { icon: 'mdi:floor-plan', labelKey: 'sections.areas' }],
     ['weather', { icon: 'mdi:weather-partly-cloudy', labelKey: 'sections.weather' }],
     ['energy', { icon: 'mdi:lightning-bolt', labelKey: 'sections.energy' }],
+    ['persons', { icon: 'mdi:account-group', labelKey: 'sections.persons' }],
   ]);
 
   private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy';
+    return key === 'weather' || key === 'energy' || key === 'persons';
   }
 
   private _toggleSectionVisibility(key: SectionKey, visible: boolean): void {
@@ -1081,6 +1084,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
       this._toggleChanged('show_weather', visible, true);
     } else if (key === 'energy') {
       this._toggleChanged('show_energy', visible, true);
+    } else if (key === 'persons') {
+      this._toggleChanged('show_persons_section', visible, false);
     }
   }
 
