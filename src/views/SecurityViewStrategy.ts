@@ -237,7 +237,9 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
 
     // Water leak / moisture sensors
     if (waterLeak.length > 0) {
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const active = waterLeak.filter((e) => hass.states[e]?.state === 'on');
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const inactive = waterLeak.filter((e) => hass.states[e]?.state === 'off');
       const cards: LovelaceCardConfig[] = [];
 
