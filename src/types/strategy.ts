@@ -48,6 +48,7 @@ export interface Simon42StrategyConfig {
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
   energy_link_dashboard?: boolean; // default: true
+  power_badge_entity?: string; // default: unset (no badge). Pick a sensor (e.g. main grid power in W).
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
