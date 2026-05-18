@@ -58,6 +58,7 @@ export interface Simon42StrategyConfig {
   favorites_hide_last_changed?: boolean; // default: false
   room_pins_show_state?: boolean; // default: false
   room_pins_hide_last_changed?: boolean; // default: false
+  room_pins_position?: 'top' | 'bottom'; // default: 'top' (matches docs)
 
   // Special entities
   alarm_entity?: string;
