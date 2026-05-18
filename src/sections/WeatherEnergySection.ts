@@ -63,7 +63,7 @@ function buildWeatherSensorRow(sensors: WeatherSensorConfig[]): LovelaceCardConf
 
   const parts: string[] = [];
   for (const s of sensors) {
-    if (!s || typeof s.entity !== 'string' || !ENTITY_ID_RE.test(s.entity)) continue;
+    if (typeof s.entity !== 'string' || !ENTITY_ID_RE.test(s.entity)) continue;
 
     const icon = typeof s.icon === 'string' && ICON_RE.test(s.icon) ? s.icon : 'mdi:gauge';
     const round =
