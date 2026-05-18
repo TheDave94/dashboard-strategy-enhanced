@@ -1258,6 +1258,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const nestedLightGroups = this._config.nested_light_groups === true;
     const showCoversSummary = this._config.show_covers_summary !== false;
     const showPartiallyOpenCovers = this._config.show_partially_open_covers === true;
+    const groupCoversByFloors = this._config.group_covers_by_floors === true;
     const showSecuritySummary = this._config.show_security_summary !== false;
     const showClimateSummary = this._config.show_climate_summary === true;
     const showBatterySummary = this._config.show_battery_summary !== false;
@@ -1301,6 +1302,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
           ${this._renderCheckbox('show-partially-open-covers', localize('editor.show_partially_open_covers'), showPartiallyOpenCovers,
             (checked) => this._toggleChanged('show_partially_open_covers', checked, false))}
           <div class="description">${localize('editor.show_partially_open_covers_desc')}</div>
+
+          ${this._renderCheckbox('group-covers-by-floors', localize('editor.group_covers_by_floors'), groupCoversByFloors,
+            (checked) => this._toggleChanged('group_covers_by_floors', checked, false))}
+          <div class="description">${localize('editor.group_covers_by_floors_desc')}</div>
         </div>
 
         ${this._renderCheckbox('show-security-summary', localize('editor.show_security_summary'), showSecuritySummary,

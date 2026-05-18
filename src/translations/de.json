@@ -129,6 +129,8 @@
     "show_covers_summary": "Rollo-Zusammenfassung anzeigen",
     "show_partially_open_covers": "Teiloffene Rollos separat anzeigen",
     "show_partially_open_covers_desc": "Zeigt teiloffene Rollos (weder ganz offen noch geschlossen) in einer eigenen Gruppe an.",
+    "group_covers_by_floors": "Rollos nach Etagen gruppieren",
+    "group_covers_by_floors_desc": "Gruppiert die Rollos in der Rollos-Ansicht nach Etagen. Jede Etage erhält einen eigenen Unterabschnitt mit dem Etagennamen als Überschrift. Betrifft die Hauptgruppe; Markisen und Fenster bleiben ungeteilt.",
     "show_security_summary": "Sicherheits-Zusammenfassung anzeigen",
     "show_climate_summary": "Klima-Zusammenfassung anzeigen",
     "show_climate_summary_desc": "Zeigt die Klima-Zusammenfassungskarte in der Übersicht an. Zählt aktive Thermostate und Klimageräte.",
