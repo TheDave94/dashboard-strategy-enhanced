@@ -121,6 +121,13 @@ export interface Simon42StrategyConfig {
   show_maintenance_section?: boolean; // default: false (auto-hides when nothing pending)
   hide_unavailable_in_rooms?: boolean; // default: true (skip unavailable in room views)
   person_badge_layout?: 'minimal' | 'with_state' | 'with_state_and_time'; // default: 'with_state'
+  /**
+   * Per-section conditional visibility. Keyed by SectionKey. When set, the
+   * section is only rendered when hass.states[entity].state === state.
+   * Example: { agenda: { entity: 'calendar.workday_sensor', state: 'on' } }
+   * → agenda section only on workdays.
+   */
+  section_visibility?: Record<string, { entity: string; state: string }>;
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER

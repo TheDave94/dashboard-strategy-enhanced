@@ -201,10 +201,18 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       ['maintenance', createMaintenanceSection(hass, dashboardConfig.show_maintenance_section === true)],
     ]);
 
+    // Per-section conditional visibility (e.g. show agenda only on workdays).
+    const sectionVisibility = dashboardConfig.section_visibility || {};
+
     // Assemble in configured order, appending assigned custom cards to each section
     const sectionsOrder = normalizeSectionsOrder(dashboardConfig.sections_order ?? DEFAULT_SECTIONS_ORDER);
     const overviewSections: LovelaceSectionConfig[] = [];
     for (const key of sectionsOrder) {
+      const rule = Reflect.get(sectionVisibility, key) as { entity?: string; state?: string } | undefined;
+      if (rule?.entity) {
+        const entState = Reflect.get(hass.states as Record<string, unknown>, rule.entity) as { state?: string } | undefined;
+        if (!entState || entState.state !== rule.state) continue;
+      }
       const result = sectionMap.get(key);
       if (!result) continue;
       if (Array.isArray(result)) {
