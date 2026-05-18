@@ -175,6 +175,8 @@
     "hide_mobile_app_batteries_desc": "Hides batteries from smartphones, tablets, and watches (Mobile App) from the battery overview and summary.",
     "show_area_in_battery_view": "Show area name on battery tiles",
     "show_area_in_battery_view_desc": "Prepends the area name to each battery tile in the batteries view (e.g. \"Living Room • Window Battery\"). Helps distinguish identically named contact sensors that differ only by room.",
+    "hide_battery_notes_entities": "Hide Battery Notes helper entities",
+    "hide_battery_notes_entities_desc": "Hides helper entities created by the HACS Battery Notes integration (battery_type, battery_quantity, battery_low) from the battery view and summary. They're useful elsewhere but aren't real battery levels.",
     "battery_thresholds": "Battery thresholds",
     "battery_critical_below": "Critical below",
     "battery_low_below": "Low below",

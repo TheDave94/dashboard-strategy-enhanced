@@ -77,6 +77,7 @@ export interface Simon42StrategyConfig {
   show_battery_summary?: boolean; // default: true
   show_climate_summary?: boolean; // default: false
   hide_mobile_app_batteries?: boolean; // default: false
+  hide_battery_notes_entities?: boolean; // default: false
   battery_critical_threshold?: number; // default: 20
   battery_low_threshold?: number; // default: 50
   show_area_in_battery_view?: boolean; // default: false

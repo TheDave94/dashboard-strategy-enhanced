@@ -87,6 +87,13 @@ export function getBatteryEntities(hass: HomeAssistant, config: Simon42StrategyC
     if (config.hide_mobile_app_batteries) {
       if (entry?.platform === 'mobile_app') return false;
     }
+    // Platform-specific filter: hide Battery Notes helper entities if configured.
+    // Battery Notes (HACS integration) creates auxiliary entities per device —
+    // *_battery_type, *_battery_quantity, *_battery_low — that aren't real
+    // battery levels and shouldn't be grouped into Critical/Low/Good.
+    if (config.hide_battery_notes_entities) {
+      if (entry?.platform === 'battery_notes') return false;
+    }
 
     if (entityId.startsWith('binary_sensor.') && entityId.includes('battery')) return true;
     if (state.attributes?.device_class === 'battery' && state.attributes?.unit_of_measurement === '%') return true;
