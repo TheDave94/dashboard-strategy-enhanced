@@ -77,6 +77,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     // exists in this hass instance, otherwise fall back to auto-discovery.
     const configuredWeather = dashboardConfig.weather_entity;
     const weatherEntity =
+      // eslint-disable-next-line security/detect-object-injection -- entity ID is user-picked from the editor weather.* dropdown
       configuredWeather && hass.states[configuredWeather]
         ? configuredWeather
         : findWeatherEntity(hass);
