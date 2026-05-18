@@ -151,6 +151,8 @@
     "show_unavailable_alert_badge_desc": "Adds a small red badge to the overview header showing the count of entities whose state is \"unavailable\" (broken integration, dead battery, offline device). Auto-hidden when the count is zero. Respects the no_dboard label and per-entity hidden flags.",
     "show_now_playing_badge": "Show \"now playing\" badge",
     "show_now_playing_badge_desc": "Adds a small green badge to the overview header showing the first media_player whose state is \"playing\". Click opens the media controls. Auto-hidden when nothing is playing.",
+    "show_sun_badge": "Show sun badge (sunrise/sunset)",
+    "show_sun_badge_desc": "Adds a small badge to the overview header that shows whether the sun is up, and links to the next sunrise/sunset time on tap. Auto-hidden if your HA has no sun.sun entity (the built-in sun integration is enabled by default in most installs).",
     "target_section": "Show in",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",

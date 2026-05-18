@@ -115,6 +115,7 @@ export interface Simon42StrategyConfig {
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
+  show_sun_badge?: boolean; // default: false (requires HA sun integration / sun.sun entity)
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
