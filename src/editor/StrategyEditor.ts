@@ -1520,14 +1520,107 @@ class Simon42DashboardStrategyEditor extends LitElement {
     `;
   }
 
+  // Per device-class defaults used when adding a sensor via the picker.
+  // Each entry covers:
+  //   icon    — MDI fallback when the entity has no explicit attributes.icon
+  //   round   — display precision matching how that quantity is normally read
+  //             (humidity in whole percent, temperature in 0.1 °C steps, etc.)
+  // Users can still override any field afterwards in the editor row.
+  private static readonly _DEVICE_CLASS_DEFAULTS: Record<
+    string,
+    { icon: string; round?: number }
+  > = {
+    temperature: { icon: 'mdi:thermometer', round: 1 },
+    apparent_temperature: { icon: 'mdi:thermometer-lines', round: 1 },
+    humidity: { icon: 'mdi:water-percent', round: 0 },
+    moisture: { icon: 'mdi:water-percent', round: 0 },
+    pressure: { icon: 'mdi:gauge', round: 0 },
+    atmospheric_pressure: { icon: 'mdi:gauge', round: 0 },
+    wind_speed: { icon: 'mdi:weather-windy', round: 1 },
+    wind_direction: { icon: 'mdi:compass', round: 0 },
+    illuminance: { icon: 'mdi:brightness-5', round: 0 },
+    irradiance: { icon: 'mdi:weather-sunny', round: 0 },
+    precipitation: { icon: 'mdi:weather-rainy', round: 1 },
+    precipitation_intensity: { icon: 'mdi:weather-pouring', round: 1 },
+    voc: { icon: 'mdi:cloud-outline', round: 0 },
+    pm25: { icon: 'mdi:weather-fog', round: 0 },
+    pm10: { icon: 'mdi:weather-fog', round: 0 },
+    co2: { icon: 'mdi:molecule-co2', round: 0 },
+    co: { icon: 'mdi:molecule-co', round: 1 },
+    aqi: { icon: 'mdi:air-filter', round: 0 },
+    ozone: { icon: 'mdi:cloud-outline', round: 0 },
+    sulphur_dioxide: { icon: 'mdi:cloud-outline', round: 0 },
+    nitrogen_dioxide: { icon: 'mdi:cloud-outline', round: 0 },
+    nitrogen_monoxide: { icon: 'mdi:cloud-outline', round: 0 },
+    ammonia: { icon: 'mdi:cloud-outline', round: 0 },
+    distance: { icon: 'mdi:ruler', round: 1 },
+    speed: { icon: 'mdi:speedometer', round: 1 },
+    uv_index: { icon: 'mdi:weather-sunny-alert', round: 1 },
+  };
+
+  // Validation regex mirrors the runtime guard in WeatherEnergySection.
+  // Only icons that pass this go into the saved config — keeps malformed
+  // pre-fills from being silently accepted.
+  private static readonly _ICON_RE = /^[a-z]+:[a-z0-9-]+$/;
+
+  /**
+   * Derive sensible defaults for icon, unit, round from the entity's HA
+   * registry / state attributes. Used as pre-fill when a sensor is added
+   * via the picker; the user can still edit any field afterwards.
+   *
+   * Resolution order:
+   *   icon  — entity.attributes.icon → device_class lookup → omitted
+   *   unit  — entity.attributes.unit_of_measurement → omitted
+   *   round — device_class lookup → omitted (no inference from state)
+   *
+   * Inferring round from the current state value is unreliable (`37` and
+   * `37.0` both happen for the same humidity sensor), so the table above
+   * is the single source of truth.
+   */
+  private _inferWeatherSensorDefaults(entityId: string): {
+    icon?: string;
+    unit?: string;
+    round?: number;
+  } {
+    const state = this._hass?.states[entityId];
+    const attrs = (state?.attributes || {}) as Record<string, unknown>;
+    const out: { icon?: string; unit?: string; round?: number } = {};
+
+    const deviceClass = typeof attrs.device_class === 'string' ? attrs.device_class : undefined;
+    const classDefaults = deviceClass
+      ? Simon42DashboardStrategyEditor._DEVICE_CLASS_DEFAULTS[deviceClass]
+      : undefined;
+
+    // Icon: prefer explicit entity icon → device_class map → omit
+    const explicitIcon = typeof attrs.icon === 'string' ? attrs.icon : undefined;
+    const icon = explicitIcon || classDefaults?.icon;
+    if (icon && Simon42DashboardStrategyEditor._ICON_RE.test(icon)) {
+      out.icon = icon;
+    }
+
+    // Unit: straight passthrough of unit_of_measurement if present
+    const unit = typeof attrs.unit_of_measurement === 'string' ? attrs.unit_of_measurement : undefined;
+    if (unit && unit.length > 0) out.unit = unit;
+
+    // Decimals: device_class table only — no state-precision inference
+    if (classDefaults && classDefaults.round !== undefined) {
+      out.round = classDefaults.round;
+    }
+
+    return out;
+  }
+
   private _addWeatherSensor(entityId: string): void {
     if (!this._hass) return;
     const current = this._config.weather_sensors || [];
     if (current.some((s) => s.entity === entityId)) return;
 
+    const defaults = this._inferWeatherSensorDefaults(entityId);
+    const newEntry: WeatherSensorConfig = { entity: entityId, ...defaults };
+
     const newConfig: Simon42StrategyConfig = {
       ...this._config,
-      weather_sensors: [...current, { entity: entityId }],
+      weather_sensors: [...current, newEntry],
     };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
