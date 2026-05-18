@@ -182,6 +182,31 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     }
   }
 
+  // Light favorites — quick toggle row using HA's native glance card
+  const lightFavs = (config.light_favorite_entities || []).filter(
+    (id) => id.startsWith('light.') && Reflect.get(hass.states as Record<string, unknown>, id) !== undefined
+  );
+  if (lightFavs.length > 0) {
+    cards.push({
+      type: 'heading',
+      heading: localize('sections.light_favorites'),
+      icon: 'mdi:lightbulb-group',
+    });
+    cards.push({
+      type: 'glance',
+      show_name: true,
+      show_icon: true,
+      show_state: false,
+      columns: Math.min(lightFavs.length, 5),
+      entities: lightFavs.map((entityId) => ({
+        entity: entityId,
+        tap_action: { action: 'toggle' },
+        hold_action: { action: 'more-info' },
+      })),
+      grid_options: { columns: 'full' },
+    });
+  }
+
   // Favorites section
   const favoriteEntities = (config.favorite_entities || []).filter((entityId) => hass.states[entityId] !== undefined);
 
