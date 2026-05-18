@@ -160,6 +160,8 @@
     "show_battery_summary": "Batterie-Zusammenfassung anzeigen",
     "hide_mobile_app_batteries": "Mobile-App-Batterien ausblenden",
     "hide_mobile_app_batteries_desc": "Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.",
+    "show_area_in_battery_view": "Bereichsname auf Batterie-Kacheln anzeigen",
+    "show_area_in_battery_view_desc": "Stellt den Bereichsnamen vor jeder Batterie-Kachel in der Batterien-Ansicht voran (z.B. „Wohnzimmer • Fenster-Batterie“). Hilfreich, wenn mehrere gleichnamige Kontaktsensoren nur über den Raum unterscheidbar sind.",
     "battery_thresholds": "Batterie-Schwellwerte",
     "battery_critical_below": "Kritisch unter",
     "battery_low_below": "Niedrig unter",
