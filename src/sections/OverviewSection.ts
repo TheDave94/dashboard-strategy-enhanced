@@ -225,11 +225,39 @@ export function createCustomCardsSection(
       cards.push(...card.parsed_config);
     } else {
       if (card.title) {
-        cards.push({ type: 'heading', heading: card.title });
+        cards.push(buildTitleHeading(card.title, card.parsed_config));
       }
       cards.push(card.parsed_config as LovelaceCardConfig);
     }
   }
 
   return { type: 'grid', cards };
+}
+
+/**
+ * Build a `heading` card for a custom_cards entry's title. If the user's
+ * card is a `conditional` card (or carries its own `visibility:` block),
+ * the same conditions are mirrored onto the heading so the heading
+ * hides/shows together with the user's card — otherwise a hidden
+ * conditional leaves an orphaned title visible (issue #224).
+ */
+function buildTitleHeading(title: string, parsedConfig: unknown): LovelaceCardConfig {
+  const heading: LovelaceCardConfig = { type: 'heading', heading: title };
+  const inherited = inheritVisibilityFromCard(parsedConfig);
+  if (inherited) (heading as { visibility?: unknown }).visibility = inherited;
+  return heading;
+}
+
+/**
+ * Returns the condition list a custom card uses to gate its own visibility:
+ *   - `conditional` cards: their `conditions:` array
+ *   - any card with an explicit `visibility:` array
+ * Otherwise undefined (no gating to mirror).
+ */
+function inheritVisibilityFromCard(parsedConfig: unknown): unknown[] | undefined {
+  if (!parsedConfig || typeof parsedConfig !== 'object') return undefined;
+  const pc = parsedConfig as { type?: string; conditions?: unknown; visibility?: unknown };
+  if (pc.type === 'conditional' && Array.isArray(pc.conditions)) return pc.conditions;
+  if (Array.isArray(pc.visibility)) return pc.visibility;
+  return undefined;
 }

@@ -41,6 +41,22 @@ function normalizeSectionsOrder(order: SectionKey[]): SectionKey[] {
 }
 
 /**
+ * If the card gates its own visibility via a `conditional` wrapper or an
+ * explicit `visibility:` block, return the condition list so the strategy
+ * can mirror it onto a sibling heading. Returns undefined for plain cards.
+ *
+ * Without this, a hidden conditional custom card leaves an orphaned title
+ * visible — see issue #224.
+ */
+function inheritVisibilityFromCard(parsedConfig: unknown): unknown[] | undefined {
+  if (!parsedConfig || typeof parsedConfig !== 'object') return undefined;
+  const pc = parsedConfig as { type?: string; conditions?: unknown; visibility?: unknown };
+  if (pc.type === 'conditional' && Array.isArray(pc.conditions)) return pc.conditions;
+  if (Array.isArray(pc.visibility)) return pc.visibility;
+  return undefined;
+}
+
+/**
  * Renders custom cards into an array of LovelaceCardConfigs (without section wrapper).
  * Used to append assigned custom cards to existing sections.
  */
@@ -52,7 +68,14 @@ function renderCustomCards(cards: CustomCard[]): LovelaceCardConfig[] {
       result.push(...card.parsed_config);
     } else {
       if (card.title) {
-        result.push({ type: 'heading', heading: card.title, heading_style: 'subtitle' });
+        const headingCard: LovelaceCardConfig = {
+          type: 'heading',
+          heading: card.title,
+          heading_style: 'subtitle',
+        };
+        const inherited = inheritVisibilityFromCard(card.parsed_config);
+        if (inherited) (headingCard as { visibility?: unknown }).visibility = inherited;
+        result.push(headingCard);
       }
       result.push(card.parsed_config as LovelaceCardConfig);
     }
