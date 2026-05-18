@@ -1082,6 +1082,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
         return this._config.show_plants_section !== true;
       case 'agenda':
         return this._config.show_agenda_section !== true;
+      case 'todos':
+        return this._config.show_todos_section !== true;
       default:
         return false;
     }
@@ -1103,6 +1105,11 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   private _isSectionToggleable(key: SectionKey): boolean {
     return key === 'weather' || key === 'energy' || key === 'agenda';
+    ['todos', { icon: 'mdi:format-list-checks', labelKey: 'sections.todos' }],
+  ]);
+
+  private _isSectionToggleable(key: SectionKey): boolean {
+    return key === 'weather' || key === 'energy' || key === 'todos';
   }
 
   private _toggleSectionVisibility(key: SectionKey, visible: boolean): void {
@@ -1114,6 +1121,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
       this._toggleChanged('show_plants_section', visible, false);
     } else if (key === 'agenda') {
       this._toggleChanged('show_agenda_section', visible, false);
+    } else if (key === 'todos') {
+      this._toggleChanged('show_todos_section', visible, false);
     }
   }
 

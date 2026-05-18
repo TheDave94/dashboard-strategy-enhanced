@@ -19,6 +19,7 @@ import { createAreasSection } from '../sections/AreasSection';
 import { createWeatherSection, createEnergySection } from '../sections/WeatherEnergySection';
 import { createPlantsSection } from '../sections/PlantsSection';
 import { createAgendaSection } from '../sections/AgendaSection';
+import { createTodosSection } from '../sections/TodosSection';
 import { createOverviewView } from '../utils/view-builder';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 
@@ -29,6 +30,7 @@ import { timeStart, timeEnd, debugLog } from '../utils/debug';
 function normalizeSectionsOrder(order: SectionKey[]): SectionKey[] {
   const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'plants']);
   const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'agenda']);
+  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'todos']);
   const seen = new Set<SectionKey>();
   const result: SectionKey[] = [];
   for (const key of order) {
@@ -182,6 +184,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
         dashboardConfig.show_agenda_section === true,
         dashboardConfig.agenda_calendar_entities,
       )],
+      ['todos', createTodosSection(hass, dashboardConfig.show_todos_section === true, dashboardConfig.todos_entities)],
     ]);
 
     // Assemble in configured order, appending assigned custom cards to each section
