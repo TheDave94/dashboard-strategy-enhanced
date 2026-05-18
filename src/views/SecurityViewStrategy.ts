@@ -42,6 +42,15 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       } else if (id.startsWith('binary_sensor.')) {
         const entry = Registry.getEntity(id);
         if (entry?.platform && SECURITY_EXCLUDED_PLATFORMS.has(entry.platform)) continue;
+        // Drop relay-style devices that incidentally expose an opening
+        // binary_sensor (e.g. SONOFF ZBMINIR2/L2 — they're switches whose
+        // "opening" state mirrors the relay, not a real door/window contact).
+        // Heuristic: if the same parent device also exposes a switch.*
+        // entity, the binary_sensor is the relay-state indicator.
+        if (deviceClass === 'opening' && entry?.device_id) {
+          const siblings = Registry.getEntityIdsForDevice(entry.device_id);
+          if (siblings.some((sid) => sid.startsWith('switch.'))) continue;
+        }
         if (deviceClass && ['door', 'window', 'garage_door', 'opening'].includes(deviceClass)) windows.push(id);
         else if (deviceClass && ['smoke', 'gas'].includes(deviceClass)) smokeGas.push(id);
       }
