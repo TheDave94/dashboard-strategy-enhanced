@@ -135,6 +135,8 @@
     "show_battery_summary": "Batterie-Zusammenfassung anzeigen",
     "hide_mobile_app_batteries": "Mobile-App-Batterien ausblenden",
     "hide_mobile_app_batteries_desc": "Blendet Batterien von Smartphones, Tablets und Watches (Mobile App) in der Batterie-Übersicht und -Zusammenfassung aus.",
+    "hide_battery_notes_entities": "Battery-Notes-Hilfsentitäten ausblenden",
+    "hide_battery_notes_entities_desc": "Blendet die von der HACS-Integration „Battery Notes“ erzeugten Hilfsentitäten (battery_type, battery_quantity, battery_low) in der Batterie-Übersicht und -Zusammenfassung aus. In anderen Dashboards bleiben sie nutzbar — hier sind sie aber kein echter Ladestand.",
     "battery_thresholds": "Batterie-Schwellwerte",
     "battery_critical_below": "Kritisch unter",
     "battery_low_below": "Niedrig unter",

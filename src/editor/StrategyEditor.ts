@@ -1262,6 +1262,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const showClimateSummary = this._config.show_climate_summary === true;
     const showBatterySummary = this._config.show_battery_summary !== false;
     const hideMobileAppBatteries = this._config.hide_mobile_app_batteries === true;
+    const hideBatteryNotesEntities = this._config.hide_battery_notes_entities === true;
     const batteryCriticalThreshold = this._config.battery_critical_threshold ?? 20;
     const batteryLowThreshold = this._config.battery_low_threshold ?? 50;
 
@@ -1317,6 +1318,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
           ${this._renderCheckbox('hide-mobile-app-batteries', localize('editor.hide_mobile_app_batteries'), hideMobileAppBatteries,
             (checked) => this._toggleChanged('hide_mobile_app_batteries', checked, false))}
           <div class="description">${localize('editor.hide_mobile_app_batteries_desc')}</div>
+
+          ${this._renderCheckbox('hide-battery-notes-entities', localize('editor.hide_battery_notes_entities'), hideBatteryNotesEntities,
+            (checked) => this._toggleChanged('hide_battery_notes_entities', checked, false))}
+          <div class="description">${localize('editor.hide_battery_notes_entities_desc')}</div>
 
           <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">
             ${localize('editor.battery_thresholds')}
