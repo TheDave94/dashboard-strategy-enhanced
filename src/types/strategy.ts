@@ -25,6 +25,14 @@ export interface Simon42StrategyConfig {
   show_weather?: boolean; // default: true
   show_energy?: boolean; // default: true
   show_search_card?: boolean; // default: false
+  /**
+   * Which kind of search affordance to render when show_search_card is true.
+   * - 'custom' (default): the existing custom:search-card from HACS — true
+   *   inline search input, but needs custom:search-card + card-tools installed.
+   * - 'tip': a small HA-native markdown card hinting the global search shortcut
+   *   (Cmd/Ctrl+E). No HACS dependency. Less powerful but works out of the box.
+   */
+  search_card_variant?: 'custom' | 'tip';
   show_summary_views?: boolean; // default: false
   show_room_views?: boolean; // default: false
   group_by_floors?: boolean; // default: false
