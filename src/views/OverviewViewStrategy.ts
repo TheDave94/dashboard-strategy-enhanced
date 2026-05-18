@@ -113,10 +113,20 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       ['energy', createEnergySection(showEnergy, dashboardConfig.energy_link_dashboard !== false)],
     ]);
 
+    // Per-section conditional visibility (e.g. show agenda only on workdays).
+    const sectionVisibility = dashboardConfig.section_visibility || {};
+
     // Assemble in configured order, appending assigned custom cards to each section
     const sectionsOrder = normalizeSectionsOrder(dashboardConfig.sections_order ?? DEFAULT_SECTIONS_ORDER);
     const overviewSections: LovelaceSectionConfig[] = [];
     for (const key of sectionsOrder) {
+      // eslint-disable-next-line security/detect-object-injection -- key is a typed SectionKey, not user-supplied
+      const rule = sectionVisibility[key];
+      if (rule && rule.entity) {
+        // eslint-disable-next-line security/detect-object-injection -- entity ID is user-picked
+        const entState = hass.states[rule.entity];
+        if (!entState || entState.state !== rule.state) continue;
+      }
       const result = sectionMap.get(key);
       if (!result) continue;
       if (Array.isArray(result)) {

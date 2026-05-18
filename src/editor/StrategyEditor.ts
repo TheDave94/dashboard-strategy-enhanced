@@ -1134,8 +1134,61 @@ class Simon42DashboardStrategyEditor extends LitElement {
             `;
           })}
         </div>
+
+        <details style="margin-top: 12px;">
+          <summary style="cursor: pointer; font-size: 13px; font-weight: 500; color: var(--primary-text-color); padding: 4px 0;">
+            ${localize('editor.section_visibility')}
+          </summary>
+          <div style="margin-left: 14px; margin-top: 6px;">
+            <div class="description" style="margin-left: 0; margin-bottom: 8px;">
+              ${localize('editor.section_visibility_desc')}
+            </div>
+            ${order.map((key) => {
+              const meta = Simon42DashboardStrategyEditor._sectionMeta.get(key);
+              if (!meta) return nothing;
+              const rule = this._config.section_visibility?.[key];
+              return html`
+                <div style="border: 1px solid var(--divider-color); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+                  <div style="font-weight: 500; margin-bottom: 6px;">${localize(meta.labelKey)}</div>
+                  <div class="form-row">
+                    <label for="visibility-entity-${key}" style="min-width: 80px; font-size: 12px;">${localize('editor.section_visibility_entity')}</label>
+                    <input type="text" id="visibility-entity-${key}" style="flex: 1;"
+                      placeholder="calendar.workday_sensor"
+                      .value=${rule?.entity || ''}
+                      @change=${(e: Event) => this._sectionVisibilityChanged(key, 'entity', (e.target as HTMLInputElement).value)} />
+                  </div>
+                  <div class="form-row">
+                    <label for="visibility-state-${key}" style="min-width: 80px; font-size: 12px;">${localize('editor.section_visibility_state')}</label>
+                    <input type="text" id="visibility-state-${key}" style="flex: 1;"
+                      placeholder="on"
+                      .value=${rule?.state || ''}
+                      @change=${(e: Event) => this._sectionVisibilityChanged(key, 'state', (e.target as HTMLInputElement).value)} />
+                  </div>
+                </div>
+              `;
+            })}
+          </div>
+        </details>
       </div>
     `;
+  }
+
+  private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
+    const updated: Simon42StrategyConfig = { ...this._config };
+    const current = { ...(updated.section_visibility || {}) };
+    const rule = { ...(current[sectionKey] || { entity: '', state: '' }) };
+    rule[field] = value.trim();
+    if (!rule.entity && !rule.state) {
+      delete current[sectionKey];
+    } else {
+      current[sectionKey] = rule;
+    }
+    if (Object.keys(current).length === 0) {
+      delete updated.section_visibility;
+    } else {
+      updated.section_visibility = current;
+    }
+    this._fireConfigChanged(updated);
   }
 
   // -- Section order drag & drop -----------------------------------------
