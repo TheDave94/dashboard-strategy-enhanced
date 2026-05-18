@@ -226,7 +226,20 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       .filter((b) => b.parsed_config)
       .map((b) => b.parsed_config as LovelaceBadgeConfig);
 
-    return createOverviewView(overviewSections, [...personBadges, ...customBadges]);
+    // Optional live power badge — auto-hide when entity missing
+    const powerBadges: LovelaceBadgeConfig[] = [];
+    const powerEntity = dashboardConfig.power_badge_entity;
+    // eslint-disable-next-line security/detect-object-injection -- entity ID is user-picked from the editor sensor dropdown
+    if (powerEntity && hass.states[powerEntity]) {
+      powerBadges.push({
+        type: 'entity',
+        entity: powerEntity,
+        show_name: false,
+        color: 'orange',
+      });
+    }
+
+    return createOverviewView(overviewSections, [...personBadges, ...powerBadges, ...customBadges]);
   }
 }
 

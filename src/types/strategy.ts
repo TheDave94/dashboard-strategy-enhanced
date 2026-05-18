@@ -109,6 +109,7 @@ export interface Simon42StrategyConfig {
   show_todos_section?: boolean; // default: false (auto-hides when no todos)
   todos_entities?: string[]; // default: [] → all visible todo.* entities
   show_persons_section?: boolean; // default: false (auto-hides when no persons)
+  power_badge_entity?: string; // default: unset (no badge). Pick a sensor (e.g. main grid power in W).
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
