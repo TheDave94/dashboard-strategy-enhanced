@@ -23,9 +23,15 @@ export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
 export interface Simon42StrategyConfig {
   // Global toggles
   show_weather?: boolean; // default: true
-  show_weather_forecast_card?: boolean; // default: true — set false to keep the
-  // `weather` section + heading but omit the built-in weather-forecast card
-  // (lets custom_cards target=weather supply their own weather UI in this slot)
+  show_weather_forecast_card?: boolean; // (legacy) default: true — set false
+  // to keep the `weather` section + heading but omit the built-in card.
+  // Equivalent to `weather_presentation: 'none'`; superseded by it but still
+  // honoured for backwards-compatibility when no explicit weather_presentation
+  // is set.
+  weather_presentation?: WeatherPresentation; // default: 'forecast_daily'.
+  // Picks which built-in weather card the section renders. Use 'none' to omit
+  // the built-in card and supply your own via custom_cards target=weather
+  // (e.g. clock-weather-card, mini-weather, custom radar widget).
   weather_sensors?: WeatherSensorConfig[]; // optional inline icon+value row
   // rendered at the top of the weather section. Useful for displaying local
   // outdoor sensors (temperature, humidity, wind, pressure...) alongside or
@@ -110,6 +116,26 @@ export interface GroupOptions {
   names_hidden?: string[]; // Override show_name to false (used by badges group)
   [key: string]: unknown;
 }
+
+// -- Weather Presentation ---------------------------------------------
+
+/**
+ * Selects the built-in weather card variant rendered in the weather
+ * section. Setting 'none' suppresses the built-in card entirely so a
+ * custom_cards entry with target_section='weather' can stand alone.
+ *
+ * - `forecast_daily`       — `weather-forecast` with `forecast_type: daily`
+ * - `forecast_hourly`      — `weather-forecast` with `forecast_type: hourly`
+ * - `forecast_twice_daily` — `weather-forecast` with `forecast_type: twice_daily`
+ * - `tile`                 — HA core `tile` card bound to the weather entity
+ * - `none`                 — omit built-in card; section keeps heading + slot
+ */
+export type WeatherPresentation =
+  | 'forecast_daily'
+  | 'forecast_hourly'
+  | 'forecast_twice_daily'
+  | 'tile'
+  | 'none';
 
 // -- Weather Sensors --------------------------------------------------
 

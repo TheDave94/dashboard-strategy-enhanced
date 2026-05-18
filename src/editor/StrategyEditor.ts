@@ -17,6 +17,7 @@ import type {
   CustomBadge,
   RoomEntities,
   SectionKey,
+  WeatherPresentation,
 } from '../types/strategy';
 import { DEFAULT_SECTIONS_ORDER } from '../types/strategy';
 import type { AreaRegistryEntry, EntityRegistryEntry } from '../types/registries';
@@ -1084,13 +1085,35 @@ class Simon42DashboardStrategyEditor extends LitElement {
     }
   }
 
+  /**
+   * Persist a weather_presentation pick. Migrates off the legacy boolean:
+   * sets weather_presentation explicitly and deletes the deprecated
+   * `show_weather_forecast_card` field so the YAML reflects user intent.
+   */
+  private _setWeatherPresentation(presentation: WeatherPresentation): void {
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      weather_presentation: presentation,
+    };
+    delete newConfig.show_weather_forecast_card;
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
   private _renderSectionOrderPanel(): TemplateResult {
     const order = this._getSectionsOrder();
     const energyLinkDashboard = this._config.energy_link_dashboard !== false;
     const showEnergy = this._config.show_energy !== false;
     const showWeather = this._config.show_weather !== false;
-    const showWeatherForecastCard = this._config.show_weather_forecast_card !== false;
     const showEnergyDistributionCard = this._config.show_energy_distribution_card !== false;
+    // weather_presentation supersedes the legacy show_weather_forecast_card
+    // boolean. Resolution mirrors createWeatherSection:
+    //   explicit weather_presentation → use it
+    //   else show_weather_forecast_card === false → 'none'
+    //   else 'forecast_daily'
+    const weatherPresentation: WeatherPresentation =
+      this._config.weather_presentation ??
+      (this._config.show_weather_forecast_card === false ? 'none' : 'forecast_daily');
 
     return html`
       <div class="section">
@@ -1127,11 +1150,17 @@ class Simon42DashboardStrategyEditor extends LitElement {
                 ` : nothing}
               </div>
               ${key === 'weather' && showWeather ? html`
-                <div class="section-order-sub">
-                  <input type="checkbox" id="show-weather-forecast-card"
-                    ?checked=${showWeatherForecastCard}
-                    @change=${(e: Event) => { this._toggleChanged('show_weather_forecast_card', (e.target as HTMLInputElement).checked, true); }} />
-                  <label for="show-weather-forecast-card">${localize('editor.show_weather_forecast_card')}</label>
+                <div class="section-order-sub" style="flex-wrap: wrap;">
+                  <label for="weather-presentation">${localize('editor.weather_presentation')}</label>
+                  <select id="weather-presentation"
+                    .value=${weatherPresentation}
+                    @change=${(e: Event) => this._setWeatherPresentation((e.target as HTMLSelectElement).value as WeatherPresentation)}>
+                    <option value="forecast_daily" ?selected=${weatherPresentation === 'forecast_daily'}>${localize('editor.weather_presentation_forecast_daily')}</option>
+                    <option value="forecast_hourly" ?selected=${weatherPresentation === 'forecast_hourly'}>${localize('editor.weather_presentation_forecast_hourly')}</option>
+                    <option value="forecast_twice_daily" ?selected=${weatherPresentation === 'forecast_twice_daily'}>${localize('editor.weather_presentation_forecast_twice_daily')}</option>
+                    <option value="tile" ?selected=${weatherPresentation === 'tile'}>${localize('editor.weather_presentation_tile')}</option>
+                    <option value="none" ?selected=${weatherPresentation === 'none'}>${localize('editor.weather_presentation_none')}</option>
+                  </select>
                 </div>
               ` : nothing}
               ${key === 'energy' && showEnergy ? html`

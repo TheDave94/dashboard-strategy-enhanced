@@ -115,7 +115,8 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           weatherEntity ?? null,
           showWeather,
           dashboardConfig.show_weather_forecast_card !== false,
-          dashboardConfig.weather_sensors || []
+          dashboardConfig.weather_sensors || [],
+          dashboardConfig.weather_presentation
         ),
       ],
       [

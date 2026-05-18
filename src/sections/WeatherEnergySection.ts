@@ -6,7 +6,7 @@
 // ====================================================================
 
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
-import type { WeatherSensorConfig } from '../types/strategy';
+import type { WeatherPresentation, WeatherSensorConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
 
 // Entity ids follow `domain.object_id` where each part is lowercase
@@ -91,20 +91,56 @@ function buildWeatherSensorRow(sensors: WeatherSensorConfig[]): LovelaceCardConf
 }
 
 /**
- * Creates the weather forecast section.
+ * Map a WeatherPresentation enum value to the corresponding built-in card.
+ * Returns null for `none` — caller emits no built-in card and the section
+ * relies entirely on appended custom_cards.
+ */
+function buildPresentationCard(
+  weatherEntity: string,
+  presentation: WeatherPresentation
+): LovelaceCardConfig | null {
+  switch (presentation) {
+    case 'forecast_daily':
+      return { type: 'weather-forecast', entity: weatherEntity, forecast_type: 'daily' };
+    case 'forecast_hourly':
+      return { type: 'weather-forecast', entity: weatherEntity, forecast_type: 'hourly' };
+    case 'forecast_twice_daily':
+      return { type: 'weather-forecast', entity: weatherEntity, forecast_type: 'twice_daily' };
+    case 'tile':
+      return { type: 'tile', entity: weatherEntity };
+    case 'none':
+    default:
+      return null;
+  }
+}
+
+/**
+ * Creates the weather section.
  * Returns null if weather is disabled or no entity available.
  *
- * When `showForecastCard` is false, the built-in weather-forecast card is
- * omitted but the section (with heading) is still returned so custom_cards
- * targeted at `weather` can still be appended.
+ * Card rendered in the section is chosen via `presentation`:
+ *   - `forecast_daily` (default) — built-in weather-forecast (daily)
+ *   - `forecast_hourly`          — built-in weather-forecast (hourly)
+ *   - `forecast_twice_daily`     — built-in weather-forecast (twice-daily)
+ *   - `tile`                     — HA core tile card
+ *   - `none`                     — no built-in card; section keeps heading
+ *                                  and any custom_cards targeted at `weather`
+ *                                  appended by the caller.
+ *
+ * Legacy `showForecastCard=false` is honoured when `presentation` is left
+ * undefined — it maps to `none`. Any explicit presentation overrides.
  */
 export function createWeatherSection(
   weatherEntity: string | null,
   showWeather: boolean,
   showForecastCard: boolean = true,
-  weatherSensors: WeatherSensorConfig[] = []
+  weatherSensors: WeatherSensorConfig[] = [],
+  presentation?: WeatherPresentation
 ): LovelaceSectionConfig | null {
   if (!weatherEntity || !showWeather) return null;
+
+  const resolvedPresentation: WeatherPresentation =
+    presentation ?? (showForecastCard ? 'forecast_daily' : 'none');
 
   const cards: LovelaceCardConfig[] = [
     {
@@ -118,13 +154,8 @@ export function createWeatherSection(
   const sensorRow = buildWeatherSensorRow(weatherSensors);
   if (sensorRow) cards.push(sensorRow);
 
-  if (showForecastCard) {
-    cards.push({
-      type: 'weather-forecast',
-      entity: weatherEntity,
-      forecast_type: 'daily',
-    });
-  }
+  const card = buildPresentationCard(weatherEntity, resolvedPresentation);
+  if (card) cards.push(card);
 
   return { type: 'grid', cards };
 }
