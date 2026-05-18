@@ -70,7 +70,8 @@
     "windows_open": "Door & Window Sensors - Open",
     "windows_closed": "Door & Window Sensors - Closed",
     "smoke_gas_active": "Smoke & Gas Detectors - Alarm",
-    "smoke_gas_inactive": "Smoke & Gas Detectors - No Alarm"
+    "smoke_gas_inactive": "Smoke & Gas Detectors - No Alarm",
+    "extra_entities": "Smart Appliances & Other"
   },
   "batteries": {
     "critical": "Critical",
@@ -130,6 +131,8 @@
     "show_partially_open_covers": "Show partially open covers separately",
     "show_partially_open_covers_desc": "Shows partially open covers (neither fully open nor closed) in a separate group.",
     "show_security_summary": "Show security summary",
+    "security_extra_entities": "Extra entities in Security view",
+    "security_extra_entities_desc": "Pick any extra entities (smart appliances, custom sensors, etc.) to show as tiles at the bottom of the Security view. Useful for ovens, cooktops, irons — anything you want a glance at before leaving the house.",
     "show_climate_summary": "Show climate summary",
     "show_climate_summary_desc": "Shows the climate summary card on the overview. Counts active thermostats and climate devices.",
     "show_battery_summary": "Show battery summary",
