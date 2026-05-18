@@ -17,6 +17,7 @@ import { createPersonBadges } from '../utils/badge-builder';
 import { createOverviewSection, createCustomCardsSection } from '../sections/OverviewSection';
 import { createAreasSection } from '../sections/AreasSection';
 import { createWeatherSection, createEnergySection } from '../sections/WeatherEnergySection';
+import { createPlantsSection } from '../sections/PlantsSection';
 import { createOverviewView } from '../utils/view-builder';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 
@@ -25,7 +26,7 @@ import { timeStart, timeEnd, debugLog } from '../utils/debug';
  * appends any missing keys at the end (forward compatibility).
  */
 function normalizeSectionsOrder(order: SectionKey[]): SectionKey[] {
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy']);
+  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'plants']);
   const seen = new Set<SectionKey>();
   const result: SectionKey[] = [];
   for (const key of order) {
@@ -111,6 +112,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       ['areas', areasSections],
       ['weather', createWeatherSection(weatherEntity ?? null, showWeather)],
       ['energy', createEnergySection(showEnergy, dashboardConfig.energy_link_dashboard !== false)],
+      ['plants', createPlantsSection(hass, dashboardConfig.show_plants_section === true)],
     ]);
 
     // Assemble in configured order, appending assigned custom cards to each section
