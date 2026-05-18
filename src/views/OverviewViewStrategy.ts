@@ -149,7 +149,33 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       .filter((b) => b.parsed_config)
       .map((b) => b.parsed_config as LovelaceBadgeConfig);
 
-    return createOverviewView(overviewSections, [...personBadges, ...customBadges]);
+    // Optional "unavailable entities" alert badge — count entities whose
+    // state is "unavailable", skipping ones the user hid (no_dboard label,
+    // hidden_by, or hidden via Registry config). Auto-hide at zero.
+    const alertBadges: LovelaceBadgeConfig[] = [];
+    if (dashboardConfig.show_unavailable_alert_badge === true) {
+      let count = 0;
+      for (const [entityId, state] of Object.entries(hass.states)) {
+        if (state.state !== 'unavailable') continue;
+        if (Registry.isExcludedByLabel(entityId)) continue;
+        if (Registry.isHiddenByConfig(entityId)) continue;
+        const entry = Registry.getEntity(entityId);
+        if (entry?.hidden) continue;
+        count++;
+      }
+      if (count > 0 && someSensorId) {
+        alertBadges.push({
+          type: 'entity',
+          entity: someSensorId,
+          name: String(count),
+          icon: 'mdi:alert-circle-outline',
+          color: 'red',
+          show_state: false,
+        });
+      }
+    }
+
+    return createOverviewView(overviewSections, [...personBadges, ...alertBadges, ...customBadges]);
   }
 }
 

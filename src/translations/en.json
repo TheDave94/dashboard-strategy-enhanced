@@ -107,6 +107,8 @@
     "section_order_desc": "Drag sections to reorder them on the overview page. Empty sections are hidden automatically.",
     "section_hidden": "hidden",
     "energy_link_dashboard": "Link to energy dashboard",
+    "show_unavailable_alert_badge": "Show \"unavailable entities\" alert badge",
+    "show_unavailable_alert_badge_desc": "Adds a small red badge to the overview header showing the count of entities whose state is \"unavailable\" (broken integration, dead battery, offline device). Auto-hidden when the count is zero. Respects the no_dboard label and per-entity hidden flags.",
     "target_section": "Show in",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",

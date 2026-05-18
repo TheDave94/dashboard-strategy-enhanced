@@ -107,6 +107,8 @@
     "section_order_desc": "Ziehe die Abschnitte per Drag & Drop in die gewünschte Reihenfolge. Leere Abschnitte werden automatisch ausgeblendet.",
     "section_hidden": "ausgeblendet",
     "energy_link_dashboard": "Energie-Dashboard verlinken",
+    "show_unavailable_alert_badge": "Badge „Nicht verfügbare Entitäten“ anzeigen",
+    "show_unavailable_alert_badge_desc": "Fügt ein kleines rotes Badge in den Übersichts-Header ein, das die Anzahl der Entitäten mit Status „unavailable“ zeigt (kaputte Integration, leere Batterie, Offline-Gerät). Wird bei Null automatisch ausgeblendet. Respektiert das `no_dboard`-Label und pro-Entität Sichtbarkeits-Flags.",
     "target_section": "Zeige in",
     "section_overview": "Übersicht",
     "show_clock_card": "Uhrzeit-Karte anzeigen",

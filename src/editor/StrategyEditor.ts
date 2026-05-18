@@ -1134,6 +1134,13 @@ class Simon42DashboardStrategyEditor extends LitElement {
             `;
           })}
         </div>
+
+        <div style="margin-top: 12px;">
+          ${this._renderCheckbox('show-unavailable-alert-badge', localize('editor.show_unavailable_alert_badge'),
+            this._config.show_unavailable_alert_badge === true,
+            (checked) => this._toggleChanged('show_unavailable_alert_badge', checked, false))}
+          <div class="description">${localize('editor.show_unavailable_alert_badge_desc')}</div>
+        </div>
       </div>
     `;
   }

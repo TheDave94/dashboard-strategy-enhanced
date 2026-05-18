@@ -48,6 +48,7 @@ export interface Simon42StrategyConfig {
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
   energy_link_dashboard?: boolean; // default: true
+  show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
