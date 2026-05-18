@@ -1461,47 +1461,38 @@ class Simon42DashboardStrategyEditor extends LitElement {
         <div id="weather-sensors-list" style="margin-bottom: 12px;">
           ${sensors.length === 0
             ? html`<div class="empty-state">${localize('editor.no_weather_sensors')}</div>`
-            : html`
-              <div class="entity-list-container">
-                ${sensors.map((sensor, index) => {
-                  const name = entityMap.get(sensor.entity) || sensor.entity;
-                  return html`
-                    <div class="entity-list-item" data-sensor-index=${index}
-                      style="flex-wrap: wrap; gap: 6px;">
-                      <span class="item-info" style="flex: 1 1 200px; min-width: 0;">
-                        <span class="item-name">${name}</span>
-                        <span class="item-entity-id">${sensor.entity}</span>
-                      </span>
-                      <input type="text"
-                        class="weather-sensor-input"
-                        style="width: 110px; padding: 4px;"
-                        placeholder=${localize('editor.weather_sensors_icon')}
-                        .value=${sensor.icon || ''}
-                        @change=${(e: Event) => this._updateWeatherSensor(index, 'icon', (e.target as HTMLInputElement).value)}
-                      />
-                      <input type="text"
-                        class="weather-sensor-input"
-                        style="width: 60px; padding: 4px;"
-                        placeholder=${localize('editor.weather_sensors_unit')}
-                        .value=${sensor.unit || ''}
-                        @change=${(e: Event) => this._updateWeatherSensor(index, 'unit', (e.target as HTMLInputElement).value)}
-                      />
-                      <input type="number"
-                        class="weather-sensor-input"
-                        style="width: 60px; padding: 4px;"
-                        min="0"
-                        max="6"
-                        step="1"
-                        placeholder=${localize('editor.weather_sensors_round')}
-                        .value=${sensor.round !== undefined ? String(sensor.round) : ''}
-                        @change=${(e: Event) => this._updateWeatherSensor(index, 'round', (e.target as HTMLInputElement).value)}
-                      />
+            : sensors.map((sensor, index) => {
+                const name = entityMap.get(sensor.entity) || sensor.entity;
+                return html`
+                  <div class="custom-item" data-sensor-index=${index}>
+                    <div class="custom-item-header">
+                      <strong>
+                        ${name}
+                        <span class="item-entity-id" style="font-weight: normal; margin-left: 8px;">
+                          ${sensor.entity}
+                        </span>
+                      </strong>
                       <button class="btn-remove" @click=${() => this._removeWeatherSensor(index)}>&#x2715;</button>
                     </div>
-                  `;
-                })}
-              </div>
-            `}
+                    <div class="custom-item-fields">
+                      <div class="custom-item-row">
+                        <input type="text" style="flex: 2;"
+                          placeholder=${localize('editor.weather_sensors_icon')}
+                          .value=${sensor.icon || ''}
+                          @change=${(e: Event) => this._updateWeatherSensor(index, 'icon', (e.target as HTMLInputElement).value)} />
+                        <input type="text" style="flex: 1;"
+                          placeholder=${localize('editor.weather_sensors_unit')}
+                          .value=${sensor.unit || ''}
+                          @change=${(e: Event) => this._updateWeatherSensor(index, 'unit', (e.target as HTMLInputElement).value)} />
+                        <input type="number" style="flex: 1;" min="0" max="6" step="1"
+                          placeholder=${localize('editor.weather_sensors_round')}
+                          .value=${sensor.round !== undefined ? String(sensor.round) : ''}
+                          @change=${(e: Event) => this._updateWeatherSensor(index, 'round', (e.target as HTMLInputElement).value)} />
+                      </div>
+                    </div>
+                  </div>
+                `;
+              })}
         </div>
 
         <div class="entity-search-picker">
