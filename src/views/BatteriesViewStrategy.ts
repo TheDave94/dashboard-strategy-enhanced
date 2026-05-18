@@ -75,12 +75,14 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
     const lowThreshold = strategyConfig.battery_low_threshold ?? 50;
     const showArea = strategyConfig.show_area_in_battery_view === true;
     // Where to bucket sensors whose state can't be evaluated (unavailable,
-    // unknown, restarting, non-numeric). 'critical' alerts the user that
-    // monitoring is broken; 'good' hides them — both are defensible defaults,
-    // so we let the user decide. Default 'critical' preserves current behaviour
-    // for sensor.* (the only path that previously surfaced unavailable as critical).
+    // unknown, restarting, non-numeric). Default 'good': in a survey of
+    // typical HA installs, the Critical bucket otherwise gets flooded with
+    // offline / never-pressed entities that aren't actionable as low
+    // batteries. Users who want to surface broken sensors as critical can
+    // flip the radio in the editor. Both buckets are defensible defaults;
+    // 'good' keeps the count meaningful for at-a-glance scanning.
     const unavailableBucket: 'critical' | 'good' =
-      strategyConfig.unavailable_batteries_bucket === 'good' ? 'good' : 'critical';
+      strategyConfig.unavailable_batteries_bucket === 'critical' ? 'critical' : 'good';
     const critical: string[] = [];
     const low: string[] = [];
     const good: string[] = [];
