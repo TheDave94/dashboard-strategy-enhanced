@@ -65,6 +65,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     const sensorEntities: SensorEntities = {
       temperature: [],
       humidity: [],
+      pm1: [],
       pm25: [],
       pm10: [],
       co2: [],
@@ -161,6 +162,10 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         if (deviceClass === 'humidity' || unit === '%') continue;
         if (unit === 'g/m³') {
           sensorEntities.absolute_humidity.push(entityId);
+          continue;
+        }
+        if (deviceClass === 'pm1' || entityId.includes('pm_1') || /(^|_)pm1($|_)/.test(entityId)) {
+          sensorEntities.pm1.push(entityId);
           continue;
         }
         if (deviceClass === 'pm25' || entityId.includes('pm_2_5') || entityId.includes('pm25')) {
@@ -278,6 +283,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
 
     // Single-match sensor types
     const singleTypes: Array<[string[], string]> = [
+      [sensorEntities.pm1, 'pm1'],
       [sensorEntities.pm25, 'pm25'],
       [sensorEntities.pm10, 'pm10'],
       [sensorEntities.co2, 'carbon_dioxide'],
