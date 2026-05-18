@@ -95,7 +95,14 @@ export function getBatteryEntities(hass: HomeAssistant, config: Simon42StrategyC
       if (entry?.platform === 'battery_notes') return false;
     }
 
-    if (entityId.startsWith('binary_sensor.') && entityId.includes('battery')) return true;
+    // For binary_sensor.*, require device_class === 'battery'. The previous
+    // looser id-substring match also caught unrelated entities like
+    // binary_sensor.foo_battery_charging (which means "currently charging",
+    // not "battery low") and surfaced them as critical when 'on'.
+    if (
+      entityId.startsWith('binary_sensor.') &&
+      state.attributes?.device_class === 'battery'
+    ) return true;
     if (state.attributes?.device_class === 'battery' && state.attributes?.unit_of_measurement === '%') return true;
     return false;
   });

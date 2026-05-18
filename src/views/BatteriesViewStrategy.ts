@@ -74,13 +74,29 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
     const criticalThreshold = strategyConfig.battery_critical_threshold ?? 20;
     const lowThreshold = strategyConfig.battery_low_threshold ?? 50;
     const showArea = strategyConfig.show_area_in_battery_view === true;
+    // Where to bucket sensors whose state can't be evaluated (unavailable,
+    // unknown, restarting, non-numeric). 'critical' alerts the user that
+    // monitoring is broken; 'good' hides them — both are defensible defaults,
+    // so we let the user decide. Default 'critical' preserves current behaviour
+    // for sensor.* (the only path that previously surfaced unavailable as critical).
+    const unavailableBucket: 'critical' | 'good' =
+      strategyConfig.unavailable_batteries_bucket === 'good' ? 'good' : 'critical';
     const critical: string[] = [];
     const low: string[] = [];
     const good: string[] = [];
 
+    const UNAVAILABLE_STATES = new Set(['unavailable', 'unknown', 'none', 'restarting']);
+
     for (const entityId of batteryEntities) {
       const state = hass.states[entityId];
       if (entityId.startsWith('binary_sensor.')) {
+        // Unavailable binary battery sensors aren't reporting; mirror the
+        // sensor.* path and respect the user's chosen bucket.
+        if (UNAVAILABLE_STATES.has(state.state)) {
+          (unavailableBucket === 'critical' ? critical : good).push(entityId);
+          continue;
+        }
+        // For device_class === 'battery' binary sensors, state 'on' === low.
         (state.state === 'on' ? critical : good).push(entityId);
         continue;
       }
@@ -91,8 +107,11 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
       // meaningfully compared against percentage thresholds (e.g. 3V would
       // be "critical" at < 20 which is wrong). Skip them entirely.
       if (unit && unit !== '%') continue;
-      if (isNaN(value)) critical.push(entityId);
-      else if (value < criticalThreshold) critical.push(entityId);
+      if (isNaN(value)) {
+        (unavailableBucket === 'critical' ? critical : good).push(entityId);
+        continue;
+      }
+      if (value < criticalThreshold) critical.push(entityId);
       else if (value <= lowThreshold) low.push(entityId);
       else good.push(entityId);
     }
