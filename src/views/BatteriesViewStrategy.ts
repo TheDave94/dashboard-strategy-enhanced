@@ -8,10 +8,23 @@ import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 import { getBatteryEntities } from '../utils/entity-filter';
 
+function getAreaNameForEntity(entityId: string, hass: HomeAssistant): string | null {
+  const entity = Registry.getEntity(entityId);
+  let areaId: string | null = entity?.area_id ?? null;
+  if (!areaId && entity?.device_id) {
+    const device = Registry.getDevice(entity.device_id);
+    areaId = device?.area_id ?? null;
+  }
+  if (!areaId) return null;
+  return hass.areas?.[areaId]?.name ?? null;
+}
+
 function createBatterySection(
   entities: string[],
   status: 'critical' | 'low' | 'good',
   rangeText: string,
+  hass: HomeAssistant,
+  showArea: boolean,
 ): LovelaceSectionConfig | null {
   if (entities.length === 0) return null;
 
@@ -28,13 +41,23 @@ function createBatterySection(
         }`,
         heading_style: 'title',
       },
-      ...entities.map((e) => ({
-        type: 'tile',
-        entity: e,
-        vertical: false,
-        state_content: ['state', 'last_changed'],
-        color,
-      })),
+      ...entities.map((e) => {
+        const tile: { type: string; [key: string]: unknown } = {
+          type: 'tile',
+          entity: e,
+          vertical: false,
+          state_content: ['state', 'last_changed'],
+          color,
+        };
+        if (showArea) {
+          const areaName = getAreaNameForEntity(e, hass);
+          if (areaName) {
+            const friendly = hass.states[e]?.attributes?.friendly_name as string | undefined;
+            tile.name = friendly ? `${areaName} • ${friendly}` : areaName;
+          }
+        }
+        return tile;
+      }),
     ],
   };
 }
@@ -50,6 +73,7 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
     const strategyConfig = config.config || {};
     const criticalThreshold = strategyConfig.battery_critical_threshold ?? 20;
     const lowThreshold = strategyConfig.battery_low_threshold ?? 50;
+    const showArea = strategyConfig.show_area_in_battery_view === true;
     const critical: string[] = [];
     const low: string[] = [];
     const good: string[] = [];
@@ -87,13 +111,13 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
 
     const sections: LovelaceSectionConfig[] = [];
 
-    const criticalSection = createBatterySection(critical, 'critical', `< ${criticalThreshold}%`);
+    const criticalSection = createBatterySection(critical, 'critical', `< ${criticalThreshold}%`, hass, showArea);
     if (criticalSection) sections.push(criticalSection);
 
-    const lowSection = createBatterySection(low, 'low', `${criticalThreshold}% - ${lowThreshold}%`);
+    const lowSection = createBatterySection(low, 'low', `${criticalThreshold}% - ${lowThreshold}%`, hass, showArea);
     if (lowSection) sections.push(lowSection);
 
-    const goodSection = createBatterySection(good, 'good', `> ${lowThreshold}%`);
+    const goodSection = createBatterySection(good, 'good', `> ${lowThreshold}%`, hass, showArea);
     if (goodSection) sections.push(goodSection);
 
     return { type: 'sections', sections };
