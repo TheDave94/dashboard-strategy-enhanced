@@ -628,7 +628,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     });
 
     if (pinsForArea.length > 0) {
-      sections.push({
+      const pinsSection: LovelaceSectionConfig = {
         type: 'grid',
         cards: [
           { type: 'heading', heading: localize('room.room_pins'), heading_style: 'title', icon: 'mdi:pin' },
@@ -645,7 +645,17 @@ class Simon42ViewRoomStrategy extends HTMLElement {
             };
           }),
         ],
-      });
+      };
+      // Pin position: 'top' matches the documentation ("Spezielle Entitäten,
+      // die ... ganz oben erscheinen") and the maintainer's video. Existing
+      // dashboards rendered them at the bottom, so the explicit 'bottom'
+      // setting is provided as an opt-in for users who relied on that.
+      const pinsPosition = dashboardConfig.room_pins_position === 'bottom' ? 'bottom' : 'top';
+      if (pinsPosition === 'top') {
+        sections.unshift(pinsSection);
+      } else {
+        sections.push(pinsSection);
+      }
     }
 
     debugLog(
