@@ -5,7 +5,7 @@
 // distribution. Each returns a single section or null.
 // ====================================================================
 
-import type { LovelaceSectionConfig } from '../types/lovelace';
+import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import type { WeatherSensorConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
 
@@ -17,8 +17,8 @@ import { localize } from '../utils/localize';
  * separated by non-breaking spaces. Uses text_only so the markdown blends
  * into the section without extra card chrome.
  */
-function buildWeatherSensorRow(sensors: WeatherSensorConfig[]): any | null {
-  if (!sensors || sensors.length === 0) return null;
+function buildWeatherSensorRow(sensors: WeatherSensorConfig[]): LovelaceCardConfig | null {
+  if (sensors.length === 0) return null;
 
   const parts = sensors.map((s) => {
     const icon = s.icon || 'mdi:gauge';
@@ -53,7 +53,7 @@ export function createWeatherSection(
 ): LovelaceSectionConfig | null {
   if (!weatherEntity || !showWeather) return null;
 
-  const cards: any[] = [
+  const cards: LovelaceCardConfig[] = [
     {
       type: 'heading',
       heading: localize('sections.weather'),
@@ -91,7 +91,7 @@ export function createEnergySection(
 ): LovelaceSectionConfig | null {
   if (!showEnergy) return null;
 
-  const cards: any[] = [
+  const cards: LovelaceCardConfig[] = [
     {
       type: 'heading',
       heading: localize('sections.energy'),
