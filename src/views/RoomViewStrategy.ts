@@ -74,6 +74,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       occupancy: [],
       illuminance: [],
       absolute_humidity: [],
+      soil_moisture: [],
       battery: [],
       window: [],
       door: [],
@@ -159,6 +160,13 @@ class Simon42ViewRoomStrategy extends HTMLElement {
         // assigned in HA area settings (area.temperature_entity_id / humidity_entity_id).
         // No auto-detection — avoids wrong sensors (e.g. heater temperature).
         if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') continue;
+        // Soil/plant moisture sensors are auto-detected (device_class === 'moisture'
+        // on sensor.* — distinct from binary_sensor.moisture which means a leak).
+        // Check before the '%' fallthrough so we don't lose them.
+        if (deviceClass === 'moisture') {
+          sensorEntities.soil_moisture.push(entityId);
+          continue;
+        }
         if (deviceClass === 'humidity' || unit === '%') continue;
         if (unit === 'g/m³') {
           sensorEntities.absolute_humidity.push(entityId);
@@ -293,6 +301,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       [sensorEntities.motion, 'motion'],
       [sensorEntities.occupancy, 'occupancy'],
       [sensorEntities.absolute_humidity, 'moisture'],
+      [sensorEntities.soil_moisture, 'moisture'],
       [sensorEntities.smoke, 'smoke'],
       [sensorEntities.gas, 'gas'],
     ];

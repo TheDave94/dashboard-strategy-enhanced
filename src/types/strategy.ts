@@ -267,6 +267,7 @@ export interface SensorEntities {
   occupancy: string[];
   illuminance: string[];
   absolute_humidity: string[];
+  soil_moisture: string[];
   battery: string[];
   window: string[];
   door: string[];
