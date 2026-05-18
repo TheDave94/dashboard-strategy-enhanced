@@ -18,7 +18,8 @@
     "areas": "Bereiche",
     "areas_other": "Weitere Bereiche",
     "weather": "Wetter",
-    "energy": "Energie"
+    "energy": "Energie",
+    "plants": "Pflanzen"
   },
   "summary": {
     "lights_on_one": "Licht an",
