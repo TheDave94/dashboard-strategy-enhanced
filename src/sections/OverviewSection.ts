@@ -169,7 +169,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   // Light favorites — quick toggle row using HA's native glance card
   const lightFavs = (config.light_favorite_entities || []).filter(
-    (id) => id.startsWith('light.') && hass.states[id] !== undefined
+    (id) => id.startsWith('light.') && Reflect.get(hass.states as Record<string, unknown>, id) !== undefined
   );
   if (lightFavs.length > 0) {
     cards.push({
