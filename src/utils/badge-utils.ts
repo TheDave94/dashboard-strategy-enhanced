@@ -72,6 +72,10 @@ export function isBadgeCandidate(
     // Light / humidity
     if (deviceClass === 'illuminance' || unit === 'lx') return true;
     if (unit === 'g/m³') return true; // absolute humidity
+    // Power: instantaneous load (W, kW). Energy meter totals (Wh, kWh)
+    // are intentionally omitted — they're cumulative counters that don't
+    // make sense as a single live badge value.
+    if (deviceClass === 'power' || unit === 'W' || unit === 'kW') return true;
     return false;
   }
   if (domain === 'binary_sensor') {
