@@ -86,12 +86,18 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     // (no hidden, no_dboard, config/diagnostic, config-hidden)
     const visibleEntities = Registry.getVisibleEntitiesForArea(area.area_id);
 
+    // Filter unavailable entities from per-room domain lists / sensor badges.
+    // Default true: unavailable items are noise in a room view (offline devices,
+    // dead batteries surface elsewhere via the batteries view + alert badge).
+    const hideUnavailable = dashboardConfig.hide_unavailable_in_rooms !== false;
+
     for (const entity of visibleEntities) {
       const entityId = entity.entity_id;
 
       // State check
       const state = hass.states[entityId];
       if (!state) continue;
+      if (hideUnavailable && state.state === 'unavailable') continue;
 
       // Domain categorization
       const domain = entityId.split('.')[0];

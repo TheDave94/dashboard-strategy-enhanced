@@ -119,6 +119,7 @@ export interface Simon42StrategyConfig {
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
   show_sun_badge?: boolean; // default: false (requires HA sun integration / sun.sun entity)
   show_maintenance_section?: boolean; // default: false (auto-hides when nothing pending)
+  hide_unavailable_in_rooms?: boolean; // default: true (skip unavailable in room views)
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
