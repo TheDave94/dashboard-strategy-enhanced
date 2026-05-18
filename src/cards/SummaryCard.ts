@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-type SummaryType = 'lights' | 'covers' | 'security' | 'batteries' | 'climate';
+type SummaryType = 'lights' | 'covers' | 'security' | 'batteries' | 'valves' | 'climate';
 
 interface SummaryCardConfig {
   summary_type: SummaryType;
@@ -44,6 +44,7 @@ const COLOR_MAP: Record<string, string> = {
   purple: 'var(--purple-color, #9c27b0)',
   yellow: 'var(--yellow-color, #ffc107)',
   red: 'var(--red-color, #f44336)',
+  blue: 'var(--blue-color, #03a9f4)',
   grey: 'var(--disabled-color, #bdbdbd)',
   white: 'var(--white-color, #eeeeee)',
 };
@@ -198,6 +199,12 @@ class Simon42SummaryCard extends LitElement {
         break;
       }
 
+      case 'valves':
+        result = Registry.getVisibleEntityIdsForDomain('valve').filter(
+          (id) => hass.states[id] && this._isEntityRelevant(id, hass.states[id])
+        );
+        break;
+
       case 'climate':
         result = Registry.getVisibleEntityIdsForDomain('climate').filter(
           (id) => hass.states[id] && this._isEntityRelevant(id, hass.states[id])
@@ -248,6 +255,13 @@ class Simon42SummaryCard extends LitElement {
       case 'batteries': {
         return this._relevantEntityIds.size;
       }
+
+      case 'valves':
+        for (const id of this._relevantEntityIds) {
+          const s = hass.states[id]?.state;
+          if (s === 'open' || s === 'opening') count++;
+        }
+        return count;
 
       case 'climate':
         for (const id of this._relevantEntityIds) {
@@ -309,6 +323,16 @@ class Simon42SummaryCard extends LitElement {
         };
       }
 
+      case 'valves':
+        return {
+          icon: 'mdi:valve',
+          name: hasItems
+            ? `${count} ${count === 1 ? localize('summary.valves_open_one') : localize('summary.valves_open_many')}`
+            : localize('summary.valves_closed'),
+          color: hasItems ? 'blue' : 'grey',
+          path: 'valves',
+        };
+
       case 'climate':
         return {
           icon: 'mdi:thermostat',
@@ -350,7 +374,6 @@ class Simon42SummaryCard extends LitElement {
   }
 
   protected render() {
-
     const display = this._getDisplayConfig();
     const colorCss = COLOR_MAP[display.color] || COLOR_MAP.grey;
 

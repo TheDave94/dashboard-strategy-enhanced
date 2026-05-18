@@ -10,7 +10,7 @@ import type {
   LovelaceBadgeConfig,
 } from '../types/lovelace';
 import type { AreaRegistryEntry } from '../types/registries';
-import type { RoomEntities, SensorEntities } from '../types/strategy';
+import type { RoomEntities, SensorEntities, Simon42StrategyConfig } from '../types/strategy';
 import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
@@ -22,6 +22,27 @@ const FAN_SET_SPEED = 1;
 const MEDIA_PAUSE = 1;
 const MEDIA_PLAY = 16384;
 const MEDIA_STOP = 4096;
+const VACUUM_PAUSE = 2;
+const VACUUM_STOP = 4;
+const VACUUM_RETURN_HOME = 8;
+
+type RoomGenerateConfig = {
+  area: AreaRegistryEntry;
+  dashboardConfig?: Simon42StrategyConfig;
+  groups_options?: Record<string, unknown>;
+};
+
+function isRoomGenerateConfig(value: unknown): value is RoomGenerateConfig {
+  if (typeof value !== 'object' || value === null) return false;
+  return 'area' in value;
+}
+
+function getStateByEntityId(hass: HomeAssistant, entityId: string): HassEntity | undefined {
+  if (!/^[a-z0-9_]+\.[a-z0-9_]+$/i.test(entityId)) return undefined;
+  const state = Reflect.get(hass.states, entityId);
+  if (!state || typeof state !== 'object') return undefined;
+  return state as HassEntity;
+}
 
 /** Check if a fan supports speed control */
 function fanSupportsSpeed(state: HassEntity): boolean {
@@ -36,21 +57,155 @@ function mediaPlayerSupportsPlayback(state: HassEntity): boolean {
 
 /** Filter all configured room pins for the ones in the given area */
 function getAreasRoomPins(config: any, area: AreaRegistryEntry): string[] {
-    const roomPinEntities: string[] = config.room_pin_entities || [];
-    return roomPinEntities.filter((entityId) => {
-      const entity = Registry.getEntity(entityId);
-      if (!entity) return false;
-      if (entity.area_id === area.area_id) return true;
-      if (entity.device_id) {
-        const device = Registry.getDevice(entity.device_id);
-        if (device?.area_id === area.area_id) return true;
-      }
-      return false;
+  const roomPinEntities: string[] = config.room_pin_entities || [];
+  return roomPinEntities.filter((entityId) => {
+    const entity = Registry.getEntity(entityId);
+    if (!entity) return false;
+    if (entity.area_id === area.area_id) return true;
+    if (entity.device_id) {
+      const device = Registry.getDevice(entity.device_id);
+      if (device?.area_id === area.area_id) return true;
+    }
+    return false;
+  });
+}
+
+// -- Vacuum helpers (from #199) ----------------------------------------
+
+function vacuumSupportsFeature(state: HassEntity, feature: number): boolean {
+  const supported = (state.attributes?.supported_features as number) || 0;
+  return (supported & feature) !== 0;
+}
+
+function getNextVacuumFanSpeed(state: HassEntity): string | number | undefined {
+  const fanSpeedList = state.attributes?.fan_speed_list;
+  if (!Array.isArray(fanSpeedList) || fanSpeedList.length === 0) return undefined;
+
+  const current = state.attributes?.fan_speed;
+  const currentIndex = fanSpeedList.findIndex((value) => String(value) === String(current));
+  if (currentIndex === -1) return fanSpeedList[0] as string | number;
+
+  const nextIndex = (currentIndex + 1) % fanSpeedList.length;
+  const nextSpeed = fanSpeedList.slice(nextIndex, nextIndex + 1)[0];
+  return nextSpeed as string | number;
+}
+
+function buildRoomCleaningBadges(
+  areaId: string,
+  vacuumEntityId: string,
+  vacuumState: HassEntity
+): LovelaceBadgeConfig[] {
+  const nextFanSpeed = getNextVacuumFanSpeed(vacuumState);
+  const vacuumStatus = vacuumState.state;
+  const isVacuumActive =
+    vacuumStatus !== 'docked' &&
+    vacuumStatus !== 'idle' &&
+    vacuumStatus !== 'off' &&
+    vacuumStatus !== 'unavailable' &&
+    vacuumStatus !== 'unknown';
+  const badgeColor = isVacuumActive ? 'light-blue' : 'primary';
+
+  const badges: LovelaceBadgeConfig[] = [
+    {
+      type: 'entity',
+      entity: vacuumEntityId,
+      name: `${localize('room.cleaning')}: ${localize('room.clean_area')}`,
+      title: `${localize('room.cleaning')}: ${localize('room.clean_area')}`,
+      icon: 'mdi:robot-vacuum',
+      color: badgeColor,
+      show_name: false,
+      show_state: false,
+      tap_action: {
+        action: 'perform-action',
+        perform_action: 'vacuum.clean_area',
+        target: { entity_id: vacuumEntityId },
+        data: { cleaning_area_id: [areaId] },
+      },
+    },
+  ];
+
+  if (vacuumSupportsFeature(vacuumState, VACUUM_PAUSE)) {
+    badges.push({
+      type: 'entity',
+      entity: vacuumEntityId,
+      name: localize('room.pause'),
+      title: localize('room.pause'),
+      icon: 'mdi:pause',
+      color: badgeColor,
+      show_name: false,
+      show_state: false,
+      tap_action: {
+        action: 'perform-action',
+        perform_action: 'vacuum.pause',
+        target: { entity_id: vacuumEntityId },
+      },
     });
+  }
+
+  if (vacuumSupportsFeature(vacuumState, VACUUM_STOP)) {
+    badges.push({
+      type: 'entity',
+      entity: vacuumEntityId,
+      name: localize('room.stop'),
+      title: localize('room.stop'),
+      icon: 'mdi:stop',
+      color: badgeColor,
+      show_name: false,
+      show_state: false,
+      tap_action: {
+        action: 'perform-action',
+        perform_action: 'vacuum.stop',
+        target: { entity_id: vacuumEntityId },
+      },
+    });
+  }
+
+  if (vacuumSupportsFeature(vacuumState, VACUUM_RETURN_HOME)) {
+    badges.push({
+      type: 'entity',
+      entity: vacuumEntityId,
+      name: localize('room.return_to_base'),
+      title: localize('room.return_to_base'),
+      icon: 'mdi:home-map-marker',
+      color: badgeColor,
+      show_name: false,
+      show_state: false,
+      tap_action: {
+        action: 'perform-action',
+        perform_action: 'vacuum.return_to_base',
+        target: { entity_id: vacuumEntityId },
+      },
+    });
+  }
+
+  if (nextFanSpeed !== undefined) {
+    badges.push({
+      type: 'entity',
+      entity: vacuumEntityId,
+      name: localize('room.fan_speed_next'),
+      title: localize('room.fan_speed_next'),
+      icon: 'mdi:fan-plus',
+      color: badgeColor,
+      show_name: false,
+      show_state: false,
+      tap_action: {
+        action: 'perform-action',
+        perform_action: 'vacuum.set_fan_speed',
+        target: { entity_id: vacuumEntityId },
+        data: { fan_speed: nextFanSpeed },
+      },
+    });
+  }
+
+  return badges;
 }
 
 class Simon42ViewRoomStrategy extends HTMLElement {
-  static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
+  static async generate(config: unknown, hass: HomeAssistant): Promise<LovelaceViewConfig> {
+    if (!isRoomGenerateConfig(config)) {
+      throw new Error('Invalid room strategy config');
+    }
+
     const area: AreaRegistryEntry = config.area;
     debugLog(`room-generate-${area.area_id}: called at ${performance.now().toFixed(1)}ms after page load`);
     timeStart(`room-generate-${area.area_id}`);
@@ -70,6 +225,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       media_player: [],
       vacuum: [],
       fan: [],
+      valves: [],
+      soil_moisture: [],
       switches: [],
       locks: [],
       automations: [],
@@ -103,7 +260,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       const entityId = entity.entity_id;
 
       // State check
-      const state = hass.states[entityId];
+      const state = getStateByEntityId(hass, entityId);
       if (!state) continue;
 
       // Domain categorization
@@ -117,7 +274,13 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
       if (domain === 'cover') {
         if (deviceClass === 'curtain') roomEntities.covers_curtain.push(entityId);
-        else if (deviceClass === 'window' || deviceClass === 'door' || deviceClass === 'gate' || deviceClass === 'garage') roomEntities.covers_window.push(entityId);
+        else if (
+          deviceClass === 'window' ||
+          deviceClass === 'door' ||
+          deviceClass === 'gate' ||
+          deviceClass === 'garage'
+        )
+          roomEntities.covers_window.push(entityId);
         else roomEntities.covers.push(entityId);
         continue;
       }
@@ -139,6 +302,14 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
       if (domain === 'fan') {
         roomEntities.fan.push(entityId);
+        continue;
+      }
+      if (domain === 'valve') {
+        roomEntities.valves.push(entityId);
+        continue;
+      }
+      if (domain === 'sensor' && deviceClass === 'moisture') {
+        roomEntities.soil_moisture.push(entityId);
         continue;
       }
       if (domain === 'switch') {
@@ -227,6 +398,14 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
     }
 
+    const soilMoistureAdditional = groupsOptions.soil_moisture?.additional || [];
+    for (const entityId of soilMoistureAdditional) {
+      if (!getStateByEntityId(hass, entityId)) continue;
+      if (!roomEntities.soil_moisture.includes(entityId)) {
+        roomEntities.soil_moisture.push(entityId);
+      }
+    }
+
     // Apply groups_options filters
     const applyGroupFilter = (groupKey: keyof RoomEntities): string[] => {
       const groupOpts = groupsOptions[groupKey];
@@ -255,14 +434,14 @@ class Simon42ViewRoomStrategy extends HTMLElement {
 
     if (
       area.temperature_entity_id &&
-      hass.states[area.temperature_entity_id] &&
+      getStateByEntityId(hass, area.temperature_entity_id) &&
       !Registry.isEntityExcluded(area.temperature_entity_id)
     ) {
       primaryTemp = area.temperature_entity_id;
     }
     if (
       area.humidity_entity_id &&
-      hass.states[area.humidity_entity_id] &&
+      getStateByEntityId(hass, area.humidity_entity_id) &&
       !Registry.isEntityExcluded(area.humidity_entity_id)
     ) {
       primaryHumidity = area.humidity_entity_id;
@@ -283,7 +462,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     // Auto-detected sensors (first match per type, except window/door which show all)
     // Colors from shared BADGE_COLOR_MAP, show_name from shared isDefaultShowName()
     const addCandidate = (entityId: string, colorKey: string, dcOverride?: string) => {
-      const dc = dcOverride || (hass.states[entityId]?.attributes?.device_class as string | undefined);
+      const dc = dcOverride || (getStateByEntityId(hass, entityId)?.attributes?.device_class as string | undefined);
       candidates.push({
         entity: entityId,
         color: BADGE_COLOR_MAP[colorKey] || 'grey',
@@ -322,7 +501,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
       if (badgeOpts.additional?.length) {
         for (const entityId of badgeOpts.additional) {
-          if (hass.states[entityId] && !filteredCandidates.some((b) => b.entity === entityId)) {
+          if (getStateByEntityId(hass, entityId) && !filteredCandidates.some((b) => b.entity === entityId)) {
             filteredCandidates.push({ entity: entityId, color: getColorForEntity(entityId, hass) });
           }
         }
@@ -335,8 +514,10 @@ class Simon42ViewRoomStrategy extends HTMLElement {
 
     // Convert to LovelaceBadgeConfig
     const badges: LovelaceBadgeConfig[] = [];
-    if (primaryTemp) badges.push({ type: 'entity', entity: primaryTemp, color: 'red', tap_action: { action: 'more-info' } });
-    if (primaryHumidity) badges.push({ type: 'entity', entity: primaryHumidity, color: 'indigo', tap_action: { action: 'more-info' } });
+    if (primaryTemp)
+      badges.push({ type: 'entity', entity: primaryTemp, color: 'red', tap_action: { action: 'more-info' } });
+    if (primaryHumidity)
+      badges.push({ type: 'entity', entity: primaryHumidity, color: 'indigo', tap_action: { action: 'more-info' } });
     for (const b of filteredCandidates) {
       const showName = resolveShowName(b.entity, !!b.showName, namesVisible, namesHidden);
       badges.push({
@@ -348,6 +529,14 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       });
     }
 
+    const cleaningVacuumEntity = dashboardConfig.areas_options?.[area.area_id]?.cleaning_vacuum_entity as
+      | string
+      | undefined;
+    const cleaningVacuumState = cleaningVacuumEntity ? getStateByEntityId(hass, cleaningVacuumEntity) : undefined;
+    if (cleaningVacuumEntity && cleaningVacuumState) {
+      badges.push(...buildRoomCleaningBadges(area.area_id, cleaningVacuumEntity, cleaningVacuumState));
+    }
+
     // === SECTIONS ===
     const sections: LovelaceSectionConfig[] = [];
 
@@ -355,7 +544,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     if (roomEntities.cameras.length > 0) {
       const cameraCards: LovelaceCardConfig[] = [];
       for (const cameraId of roomEntities.cameras) {
-        if (!hass.states[cameraId]) continue;
+        if (!getStateByEntityId(hass, cameraId)) continue;
         const camEntity = Registry.getEntity(cameraId);
         const deviceId = camEntity?.device_id;
 
@@ -376,29 +565,29 @@ class Simon42ViewRoomStrategy extends HTMLElement {
 
           // Reolink-specific entities
           const spotlight = devEntities.find(
-            (id) => id.startsWith('light.') && hass.states[id] && !Registry.isEntityExcluded(id)
+            (id) => id.startsWith('light.') && getStateByEntityId(hass, id) && !Registry.isEntityExcluded(id)
           );
           const motion = devEntities.find(
             (id) =>
               id.startsWith('binary_sensor.') &&
-              hass.states[id]?.attributes?.device_class === 'motion' &&
+              getStateByEntityId(hass, id)?.attributes?.device_class === 'motion' &&
               !Registry.isEntityExcluded(id)
           );
           const siren = devEntities.find(
-            (id) => id.startsWith('siren.') && hass.states[id] && !Registry.isEntityExcluded(id)
+            (id) => id.startsWith('siren.') && getStateByEntityId(hass, id) && !Registry.isEntityExcluded(id)
           );
 
           // Aqara-specific entities
           const battery = devEntities.find(
             (id) =>
               id.startsWith('sensor.') &&
-              hass.states[id]?.attributes?.device_class === 'battery' &&
+              getStateByEntityId(hass, id)?.attributes?.device_class === 'battery' &&
               !Registry.isEntityExcluded(id)
           );
           const doorbell = devEntities.find(
             (id) =>
               id.startsWith('event.') &&
-              hass.states[id]?.attributes?.device_class === 'doorbell' &&
+              getStateByEntityId(hass, id)?.attributes?.device_class === 'doorbell' &&
               !Registry.isEntityExcluded(id)
           );
 
@@ -436,7 +625,10 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       if (cameraCards.length > 0) {
         sections.push({
           type: 'grid',
-          cards: [{ type: 'heading', heading: localize('room.cameras'), heading_style: 'title', icon: 'mdi:cctv' }, ...cameraCards],
+          cards: [
+            { type: 'heading', heading: localize('room.cameras'), heading_style: 'title', icon: 'mdi:cctv' },
+            ...cameraCards,
+          ],
         });
       }
     }
@@ -532,6 +724,22 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       sections.push({ type: 'grid', cards: climateCards });
     }
 
+    domainSection(roomEntities.valves, localize('room.valves'), 'mdi:valve', (e) => ({
+      type: 'tile',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+      features: [{ type: 'valve-open-close' }],
+      vertical: false,
+      features_position: 'inline',
+      state_content: 'last_changed',
+    }));
+
+    domainSection(roomEntities.soil_moisture, localize('room.soil_moisture'), 'mdi:sprout', (e) => ({
+      type: 'sensor',
+      entity: e,
+      name: stripAreaName(e, area, hass),
+    }));
+
     domainSection(roomEntities.covers, localize('room.covers'), 'mdi:window-shutter', (e) => ({
       type: 'tile',
       entity: e,
@@ -563,7 +771,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     }));
 
     domainSection(roomEntities.media_player, localize('room.media'), 'mdi:speaker', (e) => {
-      const state = hass.states[e];
+      const state = getStateByEntityId(hass, e);
       const hasPlayback = state && mediaPlayerSupportsPlayback(state);
       return {
         type: 'tile',
@@ -605,8 +813,8 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       });
 
     miscCards.sort((a, b) => {
-      const sA = hass.states[a.entity];
-      const sB = hass.states[b.entity];
+      const sA = getStateByEntityId(hass, a.entity);
+      const sB = getStateByEntityId(hass, b.entity);
       if (!sA || !sB) return 0;
       return new Date(sB.last_changed).getTime() - new Date(sA.last_changed).getTime();
     });
@@ -640,7 +848,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       `Room ${area.area_id}: ${visibleEntities.length} visible entities, ${sections.length} sections, ${badges.length} badges`
     );
     timeEnd(`room-generate-${area.area_id}`);
-    return { type: 'sections', header: { badges_position: 'bottom' }, sections, badges };
+    return { type: 'sections', header: { badges_position: 'bottom', badges_wrap: 'wrap' }, sections, badges };
   }
 }
 

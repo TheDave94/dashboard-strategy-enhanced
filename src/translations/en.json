@@ -6,6 +6,7 @@
     "overview": "Overview",
     "lights": "Lights",
     "covers": "Blinds & Covers",
+    "valves": "Valves",
     "security": "Security",
     "batteries": "Batteries",
     "climate": "Climate"
@@ -34,6 +35,9 @@
     "batteries_unknown_one": "battery unknown",
     "batteries_unknown_many": "batteries unknown",
     "batteries_ok": "All batteries OK",
+    "valves_open_one": "valve open",
+    "valves_open_many": "valves open",
+    "valves_closed": "All valves closed",
     "climate_active_one": "thermostat active",
     "climate_active_many": "thermostats active",
     "climate_off": "All thermostats off"
@@ -61,6 +65,12 @@
     "windows_partial": "Partially Open Windows",
     "windows_open_all": "Open all",
     "windows_close_all": "Close all"
+  },
+  "valves": {
+    "open": "Open Valves",
+    "closed": "Closed Valves",
+    "open_all": "Open all",
+    "close_all": "Close all"
   },
   "security": {
     "locks_unlocked": "Locks - Unlocked",
@@ -95,6 +105,8 @@
     "all_off": "All off",
     "locks": "Locks",
     "climate": "Climate",
+    "soil_moisture": "Bodenfeuchte",
+    "valves": "Valves",
     "covers": "Blinds & Covers",
     "curtains": "Curtains",
     "windows": "Windows, Doors & Gates",
@@ -103,7 +115,13 @@
     "misc": "Miscellaneous",
     "automations": "Automations",
     "scripts": "Scripts",
-    "room_pins": "Room Pins"
+    "room_pins": "Room Pins",
+    "cleaning": "Cleaning",
+    "clean_area": "Clean area",
+    "pause": "Pause",
+    "stop": "Stop",
+    "return_to_base": "Return to base",
+    "fan_speed_next": "Fan+"
   },
   "editor": {
     "section_order": "Section Order",
@@ -148,6 +166,7 @@
     "show_partially_open_covers": "Show partially open covers separately",
     "show_partially_open_covers_desc": "Shows partially open covers (neither fully open nor closed) in a separate group.",
     "show_security_summary": "Show security summary",
+    "show_valves_summary": "Show valve summary",
     "show_climate_summary": "Show climate summary",
     "show_climate_summary_desc": "Shows the climate summary card on the overview. Counts active thermostats and climate devices.",
     "show_battery_summary": "Show battery summary",
@@ -191,11 +210,14 @@
     "use_default_area_sort": "Use Home Assistant sorting",
     "use_default_area_sort_desc": "Uses the area sorting from Home Assistant instead of the order configured here.",
     "areas_manage_desc": "Choose which areas should be shown on the dashboard and in what order. Expand areas to manage individual entities.",
+    "area_cleaning_vacuum": "Cleaning robot",
+    "area_cleaning_vacuum_none": "None",
+    "area_cleaning_vacuum_desc": "Select which vacuum should clean this area. Note: vacuum.clean_area only works when your vacuum segments are mapped to Home Assistant areas.",
     "section_room_pins": "Room Pins",
     "room_pins_desc": "Select entities to be shown first in their assigned rooms. Ideal for entities that are not automatically detected (e.g. weather stations, special sensors). <strong>Only entities with room assignment can be selected.</strong> These pins only appear in their respective room, not on the overview.",
     "section_views": "Views",
     "show_summary_views": "Show summary views",
-    "show_summary_views_desc": "Shows the summary views (Lights, Covers, Security, Batteries) in the top navigation.",
+    "show_summary_views_desc": "Shows the summary views (Lights, Covers, Security, Batteries, Valves) in the top navigation.",
     "show_room_views": "Show room views",
     "show_room_views_desc": "Shows individual room views in the top navigation.",
     "section_advanced": "Advanced Features",
@@ -237,6 +259,8 @@
     "domain_scenes": "Scenes",
     "domain_vacuum": "Vacuums",
     "domain_fan": "Fans",
+    "domain_valves": "Valves",
+    "domain_soil_moisture": "Bodenfeuchte",
     "domain_switches": "Switches",
     "domain_locks": "Locks",
     "domain_badges": "Room Badges",

@@ -6,6 +6,7 @@
     "overview": "Übersicht",
     "lights": "Lichter",
     "covers": "Rollos & Abdeckungen",
+    "valves": "Ventile",
     "security": "Sicherheit",
     "batteries": "Batterien",
     "climate": "Klima"
@@ -34,6 +35,9 @@
     "batteries_unknown_one": "Batterie unbekannt",
     "batteries_unknown_many": "Batterien unbekannt",
     "batteries_ok": "Alle Batterien OK",
+    "valves_open_one": "Ventil offen",
+    "valves_open_many": "Ventile offen",
+    "valves_closed": "Alle Ventile geschlossen",
     "climate_active_one": "Thermostat aktiv",
     "climate_active_many": "Thermostate aktiv",
     "climate_off": "Alle Thermostate aus"
@@ -61,6 +65,12 @@
     "windows_partial": "Teiloffene Fenster",
     "windows_open_all": "Alle öffnen",
     "windows_close_all": "Alle schließen"
+  },
+  "valves": {
+    "open": "Offene Ventile",
+    "closed": "Geschlossene Ventile",
+    "open_all": "Alle öffnen",
+    "close_all": "Alle schließen"
   },
   "security": {
     "locks_unlocked": "Schlösser - Entriegelt",
@@ -95,6 +105,8 @@
     "all_off": "Alle aus",
     "locks": "Schlösser",
     "climate": "Klima",
+    "soil_moisture": "Bodenfeuchte",
+    "valves": "Ventile",
     "covers": "Rollos & Abdeckungen",
     "curtains": "Vorhänge",
     "windows": "Fenster, Türen & Tore",
@@ -103,7 +115,13 @@
     "misc": "Sonstiges",
     "automations": "Automationen",
     "scripts": "Skripte",
-    "room_pins": "Raum-Pins"
+    "room_pins": "Raum-Pins",
+    "cleaning": "Reinigung",
+    "clean_area": "Bereich reinigen",
+    "pause": "Pause",
+    "stop": "Stop",
+    "return_to_base": "Zur Station",
+    "fan_speed_next": "Fan+"
   },
   "editor": {
     "section_order": "Abschnitts-Reihenfolge",
@@ -148,6 +166,7 @@
     "show_partially_open_covers": "Teiloffene Rollos separat anzeigen",
     "show_partially_open_covers_desc": "Zeigt teiloffene Rollos (weder ganz offen noch geschlossen) in einer eigenen Gruppe an.",
     "show_security_summary": "Sicherheits-Zusammenfassung anzeigen",
+    "show_valves_summary": "Ventil-Zusammenfassung anzeigen",
     "show_climate_summary": "Klima-Zusammenfassung anzeigen",
     "show_climate_summary_desc": "Zeigt die Klima-Zusammenfassungskarte in der Übersicht an. Zählt aktive Thermostate und Klimageräte.",
     "show_battery_summary": "Batterie-Zusammenfassung anzeigen",
@@ -191,11 +210,14 @@
     "use_default_area_sort": "Home Assistant Sortierung verwenden",
     "use_default_area_sort_desc": "Verwendet die Sortierung der Bereiche aus Home Assistant anstelle der hier konfigurierten Reihenfolge.",
     "areas_manage_desc": "Wähle aus, welche Bereiche im Dashboard angezeigt werden sollen und in welcher Reihenfolge. Klappe Bereiche auf, um einzelne Entitäten zu verwalten.",
+    "area_cleaning_vacuum": "Reinigungsroboter",
+    "area_cleaning_vacuum_none": "Keiner",
+    "area_cleaning_vacuum_desc": "Wähle aus, welcher Staubsauger diesen Bereich reinigen soll. Hinweis: vacuum.clean_area funktioniert nur, wenn die Segmente des Roboters den Home-Assistant-Bereichen zugeordnet sind.",
     "section_room_pins": "Raum-Pins",
     "room_pins_desc": "Wähle Entitäten aus, die in ihren zugeordneten Räumen als erstes angezeigt werden sollen. Ideal für Entitäten die normalerweise nicht automatisch erfasst werden (z.B. Wetterstationen, spezielle Sensoren). <strong>Nur Entitäten mit Raum-Zuordnung können ausgewählt werden.</strong> Diese Pins erscheinen nur im jeweiligen Raum, nicht in der Übersicht.",
     "section_views": "Ansichten",
     "show_summary_views": "Zusammenfassungs-Views anzeigen",
-    "show_summary_views_desc": "Zeigt die Zusammenfassungs-Views (Lichter, Rollos, Sicherheit, Batterien) in der oberen Navigation an.",
+    "show_summary_views_desc": "Zeigt die Zusammenfassungs-Views (Lichter, Rollos, Sicherheit, Batterien, Ventile) in der oberen Navigation an.",
     "show_room_views": "Raum-Views anzeigen",
     "show_room_views_desc": "Zeigt die einzelnen Raum-Views in der oberen Navigation an.",
     "section_advanced": "Erweiterte Funktionen",
@@ -237,6 +259,8 @@
     "domain_scenes": "Szenen",
     "domain_vacuum": "Staubsauger",
     "domain_fan": "Ventilatoren",
+    "domain_valves": "Ventile",
+    "domain_soil_moisture": "Bodenfeuchte",
     "domain_switches": "Schalter",
     "domain_locks": "Schlösser",
     "domain_badges": "Raum-Badges",

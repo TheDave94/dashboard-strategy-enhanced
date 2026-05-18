@@ -10,7 +10,7 @@ import type { HomeAssistant } from './types/homeassistant';
 import type { Simon42StrategyConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 
-const STRATEGY_VERSION = '1.3.4-beta.10';
+const STRATEGY_VERSION = '1.3.5-beta.7';
 
 const DEBUG = new URLSearchParams(window.location.search).has('s42_debug');
 const T0 = performance.now();
@@ -29,11 +29,14 @@ const modulesPromise = Promise.all([
   import('./views/CoversViewStrategy'),
   import('./views/SecurityViewStrategy'),
   import('./views/BatteriesViewStrategy'),
+  import('./views/ValvesViewStrategy'),
   import('./views/ClimateViewStrategy'),
   import('./views/RoomViewStrategy'),
 ]);
 
-void modulesPromise.then(() => { t('all chunks loaded'); });
+void modulesPromise.then(() => {
+  t('all chunks loaded');
+});
 
 class Simon42DashboardStrategy extends HTMLElement {
   static async generate(config: Simon42StrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
@@ -61,6 +64,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     const showCovers = config.show_covers_summary !== false;
     const showSecurity = config.show_security_summary !== false;
     const showBatteries = config.show_battery_summary !== false;
+    const showValves = config.show_valves_summary === true;
     const showClimate = config.show_climate_summary === true;
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
@@ -72,17 +76,52 @@ class Simon42DashboardStrategy extends HTMLElement {
 
     // Only resolve utility views for enabled summaries
     const utilityViewDefs = [
-      { enabled: showLights, title: localize('views.lights'), path: 'lights', icon: 'mdi:lamps',
-        resolve: () => getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass) },
-      { enabled: showCovers, title: localize('views.covers'), path: 'covers', icon: 'mdi:blinds-horizontal',
-        resolve: () => getStrategy('ll-strategy-simon42-view-covers').generate(
-          { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
-      { enabled: showSecurity, title: localize('views.security'), path: 'security', icon: 'mdi:security',
-        resolve: () => getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass) },
-      { enabled: showBatteries, title: localize('views.batteries'), path: 'batteries', icon: 'mdi:battery-alert',
-        resolve: () => getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass) },
-      { enabled: showClimate, title: localize('views.climate'), path: 'climate', icon: 'mdi:thermostat',
-        resolve: () => getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass) },
+      {
+        enabled: showLights,
+        title: localize('views.lights'),
+        path: 'lights',
+        icon: 'mdi:lamps',
+        resolve: () => getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass),
+      },
+      {
+        enabled: showCovers,
+        title: localize('views.covers'),
+        path: 'covers',
+        icon: 'mdi:blinds-horizontal',
+        resolve: () =>
+          getStrategy('ll-strategy-simon42-view-covers').generate(
+            { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config },
+            hass
+          ),
+      },
+      {
+        enabled: showSecurity,
+        title: localize('views.security'),
+        path: 'security',
+        icon: 'mdi:security',
+        resolve: () => getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass),
+      },
+      {
+        enabled: showBatteries,
+        title: localize('views.batteries'),
+        path: 'batteries',
+        icon: 'mdi:battery-alert',
+        resolve: () => getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass),
+      },
+      {
+        enabled: showValves,
+        title: localize('views.valves'),
+        path: 'valves',
+        icon: 'mdi:valve',
+        resolve: () => getStrategy('ll-strategy-simon42-view-valves').generate({ config }, hass),
+      },
+      {
+        enabled: showClimate,
+        title: localize('views.climate'),
+        path: 'climate',
+        icon: 'mdi:thermostat',
+        resolve: () => getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass),
+      },
     ];
 
     const enabledDefs = utilityViewDefs.filter((d) => d.enabled);
