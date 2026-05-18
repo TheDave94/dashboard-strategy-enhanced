@@ -24,7 +24,8 @@
     "todos": "To-do",
     "persons": "People",
     "vacuums": "Vacuums & Mowers",
-    "maintenance": "Pending Updates"
+    "maintenance": "Pending Updates",
+    "light_favorites": "Quick lights"
   },
   "summary": {
     "lights_on_one": "light on",
@@ -227,6 +228,8 @@
     "show_energy": "Show energy dashboard",
     "show_energy_desc": "Shows the energy distribution card on the overview when energy data is available.",
     "section_favorites": "Favorites",
+    "section_light_favorites": "Quick lights",
+    "light_favorites_desc": "Pick lights you want as a compact toggle row on the overview (above the regular favorites). Each light renders as a glance icon: tap to toggle on/off, long-press to open more-info. Auto-hidden when no light is selected. Only light.* entities can be added.",
     "select_entity": "Select entity...",
     "add": "+ Add",
     "favorites_desc": "Select entities to be shown as favorites below the summaries. Entities are displayed as tiles.",
