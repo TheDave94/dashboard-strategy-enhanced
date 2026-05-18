@@ -70,7 +70,8 @@
     "windows_open": "Tür- & Fenstersensoren - Offen",
     "windows_closed": "Tür- & Fenstersensoren - Geschlossen",
     "smoke_gas_active": "Rauch- & Gasmelder - Alarm",
-    "smoke_gas_inactive": "Rauch- & Gasmelder - Kein Alarm"
+    "smoke_gas_inactive": "Rauch- & Gasmelder - Kein Alarm",
+    "extra_entities": "Smart-Geräte & Sonstiges"
   },
   "batteries": {
     "critical": "Kritisch",
@@ -130,6 +131,8 @@
     "show_partially_open_covers": "Teiloffene Rollos separat anzeigen",
     "show_partially_open_covers_desc": "Zeigt teiloffene Rollos (weder ganz offen noch geschlossen) in einer eigenen Gruppe an.",
     "show_security_summary": "Sicherheits-Zusammenfassung anzeigen",
+    "security_extra_entities": "Zusätzliche Entitäten in Sicherheits-Ansicht",
+    "security_extra_entities_desc": "Beliebige Entitäten (Smart-Geräte, eigene Sensoren etc.) auswählen, die unten in der Sicherheits-Ansicht als Kacheln erscheinen. Praktisch für Backofen, Herd, Bügeleisen — alles, was du vor dem Verlassen noch einmal prüfen möchtest.",
     "show_climate_summary": "Klima-Zusammenfassung anzeigen",
     "show_climate_summary_desc": "Zeigt die Klima-Zusammenfassungskarte in der Übersicht an. Zählt aktive Thermostate und Klimageräte.",
     "show_battery_summary": "Batterie-Zusammenfassung anzeigen",

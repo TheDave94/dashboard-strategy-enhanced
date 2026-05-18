@@ -72,6 +72,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   // Entity search state (NOT @state — we call requestUpdate manually)
   private _favoriteSearch = '';
   private _roomPinSearch = '';
+  private _securityExtraSearch = '';
 
   // Cache for loaded area entities (avoid re-fetching on every render)
   private _areaEntitiesCache = new Map<string, {
@@ -1306,6 +1307,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-security-summary', localize('editor.show_security_summary'), showSecuritySummary,
           (checked) => this._toggleChanged('show_security_summary', checked, true))}
 
+        <div style="margin-left: 26px; margin-bottom: 8px;">
+          ${this._renderSecurityExtraEntitiesPicker()}
+        </div>
+
         ${this._renderCheckbox('show-climate-summary', localize('editor.show_climate_summary'), showClimateSummary,
           (checked) => this._toggleChanged('show_climate_summary', checked, false))}
         <div class="description">${localize('editor.show_climate_summary_desc')}</div>
@@ -1339,6 +1344,77 @@ class Simon42DashboardStrategyEditor extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  private _renderSecurityExtraEntitiesPicker(): TemplateResult {
+    const extras = this._config.security_extra_entities || [];
+    const allEntities = this._getAllEntitiesForSelect();
+    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
+    const filtered = this._getFilteredEntities(this._securityExtraSearch);
+    return html`
+      <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 4px; margin-bottom: 4px;">
+        ${localize('editor.security_extra_entities')}
+      </div>
+      <div class="description" style="margin-left: 0; margin-bottom: 8px;">
+        ${localize('editor.security_extra_entities_desc')}
+      </div>
+      ${extras.length > 0 ? html`
+        <div class="entity-list-container" style="margin-bottom: 8px;">
+          ${extras.map((entityId) => {
+            const name = entityMap.get(entityId) || entityId;
+            return html`
+              <div class="entity-list-item" data-entity-id=${entityId}>
+                <span class="item-info">
+                  <span class="item-name">${name}</span>
+                  <span class="item-entity-id">${entityId}</span>
+                </span>
+                <button class="btn-remove" @click=${() => this._removeSecurityExtraEntity(entityId)}>&#x2715;</button>
+              </div>
+            `;
+          })}
+        </div>
+      ` : nothing}
+      <div class="entity-search-picker">
+        <input type="text" class="entity-search-input"
+          placeholder=${localize('editor.select_entity') + '...'}
+          .value=${this._securityExtraSearch}
+          @input=${(e: Event) => { this._securityExtraSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
+          @blur=${() => { setTimeout(() => { this._securityExtraSearch = ''; this.requestUpdate(); }, 200); }}
+        />
+        ${this._securityExtraSearch.length >= 2 ? html`
+          <div class="entity-search-results">
+            ${filtered.length > 0
+              ? filtered.map((entity) => html`
+                <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addSecurityExtraEntity(entity.entity_id); this._securityExtraSearch = ''; this.requestUpdate(); }}>
+                  <span class="entity-search-name">${entity.name}</span>
+                  <span class="entity-search-id">${entity.entity_id}</span>
+                </div>
+              `)
+              : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
+            }
+          </div>
+        ` : nothing}
+      </div>
+    `;
+  }
+
+  private _addSecurityExtraEntity(entityId: string): void {
+    const current = this._config.security_extra_entities || [];
+    if (current.includes(entityId)) return;
+    const updated: Simon42StrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
+    this._fireConfigChanged(updated);
+  }
+
+  private _removeSecurityExtraEntity(entityId: string): void {
+    const current = this._config.security_extra_entities || [];
+    const next = current.filter((e) => e !== entityId);
+    const updated: Simon42StrategyConfig = { ...this._config };
+    if (next.length === 0) {
+      delete updated.security_extra_entities;
+    } else {
+      updated.security_extra_entities = next;
+    }
+    this._fireConfigChanged(updated);
   }
 
   private _renderFavoritesSection(): TemplateResult {

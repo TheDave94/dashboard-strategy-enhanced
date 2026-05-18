@@ -63,6 +63,7 @@ export interface Simon42StrategyConfig {
   alarm_entity?: string;
   favorite_entities?: string[];
   room_pin_entities?: string[];
+  security_extra_entities?: string[];
 
   // Area management
   use_default_area_sort?: boolean; // default: false
