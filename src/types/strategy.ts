@@ -50,6 +50,16 @@ export interface Simon42StrategyConfig {
   show_alerts_on_areas?: boolean; // default: false
   energy_link_dashboard?: boolean; // default: true
   hide_unavailable_in_rooms?: boolean; // default: true (skip unavailable in room views)
+  /**
+   * Per-room conditional visibility. Keyed by area_id. When set, the room
+   * view (and its corresponding nav tab) is only rendered when
+   * hass.states[entity].state === state. Useful for guest-mode rooms,
+   * seasonal rooms (garden in winter), etc.
+   *
+   * The overview's area cards section is NOT affected — only the per-area
+   * room views and nav tabs.
+   */
+  room_visibility?: Record<string, { entity: string; state: string }>;
 
   // Layout
   sections_order?: SectionKey[]; // default: DEFAULT_SECTIONS_ORDER
