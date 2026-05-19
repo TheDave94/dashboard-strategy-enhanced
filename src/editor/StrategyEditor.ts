@@ -1531,6 +1531,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const groupByFloors = this._config.group_by_floors === true;
     const showSwitchesOnAreas = this._config.show_switches_on_areas === true;
     const showAlertsOnAreas = this._config.show_alerts_on_areas === true;
+    const showWindowAlertsOnAreas = this._config.show_window_alerts_on_areas === true;
     const showLocksInRooms = this._config.show_locks_in_rooms === true;
     const showAutomationsInRooms = this._config.show_automations_in_rooms === true;
     const showScriptsInRooms = this._config.show_scripts_in_rooms === true;
@@ -1555,6 +1556,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-alerts-on-areas', localize('editor.show_alerts_on_areas'), showAlertsOnAreas,
           (checked) => this._toggleChanged('show_alerts_on_areas', checked, false))}
         <div class="description">${localize('editor.show_alerts_on_areas_desc')}</div>
+
+        ${this._renderCheckbox('show-window-alerts-on-areas', localize('editor.show_window_alerts_on_areas'), showWindowAlertsOnAreas,
+          (checked) => this._toggleChanged('show_window_alerts_on_areas', checked, false))}
+        <div class="description">${localize('editor.show_window_alerts_on_areas_desc')}</div>
 
         ${this._renderCheckbox('show-locks-in-rooms', localize('editor.show_locks_in_rooms'), showLocksInRooms,
           (checked) => this._toggleChanged('show_locks_in_rooms', checked, false))}

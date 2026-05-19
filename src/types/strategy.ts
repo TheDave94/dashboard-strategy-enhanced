@@ -69,6 +69,7 @@ export interface Simon42StrategyConfig {
   show_door_contacts_in_rooms?: boolean; // default: false
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
+  show_window_alerts_on_areas?: boolean; // default: false
   energy_link_dashboard?: boolean; // default: true
 
   // Layout
