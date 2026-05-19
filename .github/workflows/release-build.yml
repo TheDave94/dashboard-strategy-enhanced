@@ -1,0 +1,66 @@
+name: Release Build
+
+# Triggered when release-please publishes a new GitHub Release.
+# Builds dist/ from source at the tagged commit, zips it, and attaches
+# the zip as a release asset. HACS picks up the zip via hacs.json's
+# `zip_release: true` flag.
+#
+# Separates concerns from release-please: that workflow owns versioning
+# + changelog + tagging; this one owns producing the artifact users
+# install. Either can be retried independently.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g. v1.4.0). Defaults to the latest release.'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build + attach dist zip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine ref
+        id: ref
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            echo "ref=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Package dist into a zip
+        run: |
+          cd dist
+          zip -r ../simon42-dashboard-strategy.zip .
+          cd ..
+          ls -la simon42-dashboard-strategy.zip
+
+      - name: Attach zip to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ steps.ref.outputs.ref }}" \
+            simon42-dashboard-strategy.zip \
+            --clobber
