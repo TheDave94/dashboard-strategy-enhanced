@@ -110,6 +110,8 @@
     "power_badge_entity": "Live power badge",
     "power_badge_none": "None (no live power badge)",
     "power_badge_entity_desc": "Optional. Adds a small live power badge to the overview header (next to person chips) showing the current value of the selected sensor. Pick the entity that represents your current consumption (e.g. grid power, plug power). Requires a sensor with device_class \"power\" or unit W/kW; otherwise this picker shows no options.",
+    "show_unavailable_alert_badge": "Show \"unavailable entities\" alert badge",
+    "show_unavailable_alert_badge_desc": "Adds a small red badge to the overview header showing the count of entities whose state is \"unavailable\" (broken integration, dead battery, offline device). Auto-hidden when the count is zero. Respects the no_dboard label and per-entity hidden flags.",
     "target_section": "Show in",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",

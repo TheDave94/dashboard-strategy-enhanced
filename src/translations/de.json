@@ -110,6 +110,8 @@
     "power_badge_entity": "Live-Strom-Badge",
     "power_badge_none": "Kein Live-Badge",
     "power_badge_entity_desc": "Optional. Fügt ein kleines Live-Badge in den Übersichts-Header (neben den Personen-Chips) ein, das den aktuellen Wert des gewählten Sensors anzeigt. Wähle die Entität, die deinen aktuellen Verbrauch repräsentiert (z.B. Netzbezug, Steckdose). Benötigt einen Sensor mit `device_class: power` oder Einheit W/kW; ansonsten erscheinen keine Optionen.",
+    "show_unavailable_alert_badge": "Badge „Nicht verfügbare Entitäten“ anzeigen",
+    "show_unavailable_alert_badge_desc": "Fügt ein kleines rotes Badge in den Übersichts-Header ein, das die Anzahl der Entitäten mit Status „unavailable“ zeigt (kaputte Integration, leere Batterie, Offline-Gerät). Wird bei Null automatisch ausgeblendet. Respektiert das `no_dboard`-Label und pro-Entität Sichtbarkeits-Flags.",
     "target_section": "Zeige in",
     "section_overview": "Übersicht",
     "show_clock_card": "Uhrzeit-Karte anzeigen",
