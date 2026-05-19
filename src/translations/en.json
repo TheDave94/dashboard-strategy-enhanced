@@ -70,7 +70,9 @@
     "windows_open": "Door & Window Sensors - Open",
     "windows_closed": "Door & Window Sensors - Closed",
     "smoke_gas_active": "Smoke & Gas Detectors - Alarm",
-    "smoke_gas_inactive": "Smoke & Gas Detectors - No Alarm"
+    "smoke_gas_inactive": "Smoke & Gas Detectors - No Alarm",
+    "water_leak_active": "Water Leak Sensors - Alarm",
+    "water_leak_inactive": "Water Leak Sensors - Dry"
   },
   "batteries": {
     "critical": "Critical",

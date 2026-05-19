@@ -70,7 +70,9 @@
     "windows_open": "Tür- & Fenstersensoren - Offen",
     "windows_closed": "Tür- & Fenstersensoren - Geschlossen",
     "smoke_gas_active": "Rauch- & Gasmelder - Alarm",
-    "smoke_gas_inactive": "Rauch- & Gasmelder - Kein Alarm"
+    "smoke_gas_inactive": "Rauch- & Gasmelder - Kein Alarm",
+    "water_leak_active": "Wassersensoren - Alarm",
+    "water_leak_inactive": "Wassersensoren - Trocken"
   },
   "batteries": {
     "critical": "Kritisch",

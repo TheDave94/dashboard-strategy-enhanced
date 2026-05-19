@@ -23,6 +23,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
     const garages: string[] = [];
     const windows: string[] = [];
     const smokeGas: string[] = [];
+    const waterLeak: string[] = [];
 
     for (const id of [
       ...allVisibleByDomain('lock'),
@@ -44,6 +45,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
         if (entry?.platform && SECURITY_EXCLUDED_PLATFORMS.has(entry.platform)) continue;
         if (deviceClass && ['door', 'window', 'garage_door', 'opening'].includes(deviceClass)) windows.push(id);
         else if (deviceClass && ['smoke', 'gas'].includes(deviceClass)) smokeGas.push(id);
+        else if (deviceClass === 'moisture') waterLeak.push(id);
       }
     }
 
@@ -228,6 +230,25 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
       }
       if (inactive.length > 0) {
         cards.push({ type: 'heading', heading: localize('security.smoke_gas_inactive'), heading_style: 'subtitle', icon: 'mdi:smoke-detector' });
+        cards.push(...inactive.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
+      }
+      if (cards.length > 0) sections.push({ type: 'grid', cards });
+    }
+
+    // Water leak / moisture sensors
+    if (waterLeak.length > 0) {
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
+      const active = waterLeak.filter((e) => hass.states[e]?.state === 'on');
+      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
+      const inactive = waterLeak.filter((e) => hass.states[e]?.state === 'off');
+      const cards: LovelaceCardConfig[] = [];
+
+      if (active.length > 0) {
+        cards.push({ type: 'heading', heading: localize('security.water_leak_active'), heading_style: 'subtitle', icon: 'mdi:water-alert' });
+        cards.push(...active.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
+      }
+      if (inactive.length > 0) {
+        cards.push({ type: 'heading', heading: localize('security.water_leak_inactive'), heading_style: 'subtitle', icon: 'mdi:water-check' });
         cards.push(...inactive.map((e) => ({ type: 'tile', entity: e, state_content: 'last_changed' })));
       }
       if (cards.length > 0) sections.push({ type: 'grid', cards });
