@@ -1459,6 +1459,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-cameras-in-rooms', localize('editor.show_cameras_in_rooms'), showCamerasInRooms,
           (checked) => this._toggleChanged('show_cameras_in_rooms', checked, true))}
         <div class="description">${localize('editor.show_cameras_in_rooms_desc')}</div>
+        ${this._renderCheckbox('hide-unavailable-in-rooms', localize('editor.hide_unavailable_in_rooms'),
+          this._config.hide_unavailable_in_rooms !== false,
+          (checked) => this._toggleChanged('hide_unavailable_in_rooms', checked, true))}
+        <div class="description">${localize('editor.hide_unavailable_in_rooms_desc')}</div>
 
         ${this._renderCheckbox('use-default-area-sort', localize('editor.use_default_area_sort'), useDefaultAreaSort,
           (checked) => this._toggleChanged('use_default_area_sort', checked, false))}
