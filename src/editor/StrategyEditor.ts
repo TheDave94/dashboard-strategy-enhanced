@@ -1202,6 +1202,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
       delete updated.hidden_section_headings;
     } else {
       updated.hidden_section_headings = next;
+    }
+    this._fireConfigChanged(updated);
+  }
+
   private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
     const updated: Simon42StrategyConfig = { ...this._config };
     const current = { ...(updated.section_visibility || {}) };
