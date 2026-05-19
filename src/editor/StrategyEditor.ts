@@ -1594,6 +1594,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const allAreas = Object.values(this._hass!.areas).sort((a, b) => a.name.localeCompare(b.name));
     const roomPinsShowState = this._config.room_pins_show_state === true;
     const roomPinsHideLastChanged = this._config.room_pins_hide_last_changed === true;
+    const roomPinsPosition = this._config.room_pins_position === 'bottom' ? 'bottom' : 'top';
 
     const entityMap = new Map(allEntities.map((e) => [e.entity_id, e]));
     const areaMap = new Map(allAreas.map((a) => [a.area_id, a.name]));
@@ -1664,8 +1665,36 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
         ${this._renderCheckbox('room-pins-hide-last-changed', localize('editor.hide_last_changed'), roomPinsHideLastChanged,
           (checked) => this._toggleChanged('room_pins_hide_last_changed', checked, false))}
+
+        <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">
+          ${localize('editor.room_pins_position')}
+        </div>
+        <div class="form-row">
+          <input type="radio" id="room-pins-top" name="room-pins-position" value="top"
+            ?checked=${roomPinsPosition === 'top'}
+            @change=${() => this._roomPinsPositionChanged('top')} />
+          <label for="room-pins-top">${localize('editor.room_pins_position_top')}</label>
+        </div>
+        <div class="form-row">
+          <input type="radio" id="room-pins-bottom" name="room-pins-position" value="bottom"
+            ?checked=${roomPinsPosition === 'bottom'}
+            @change=${() => this._roomPinsPositionChanged('bottom')} />
+          <label for="room-pins-bottom">${localize('editor.room_pins_position_bottom')}</label>
+        </div>
+        <div class="description">${localize('editor.room_pins_position_desc')}</div>
       </div>
     `;
+  }
+
+  private _roomPinsPositionChanged(position: 'top' | 'bottom'): void {
+    const updated: Simon42StrategyConfig = { ...this._config };
+    // 'top' is the default — omit the key when it matches default to keep YAML clean
+    if (position === 'top') {
+      delete updated.room_pins_position;
+    } else {
+      updated.room_pins_position = position;
+    }
+    this._fireConfigChanged(updated);
   }
 
   private _renderViewsSection(): TemplateResult {
