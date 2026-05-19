@@ -169,6 +169,7 @@ export interface RoomEntities {
 export interface SensorEntities {
   temperature: string[];
   humidity: string[];
+  pm1: string[];
   pm25: string[];
   pm10: string[];
   co2: string[];
