@@ -1266,7 +1266,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const batteryCriticalThreshold = this._config.battery_critical_threshold ?? 20;
     const batteryLowThreshold = this._config.battery_low_threshold ?? 50;
     const showAreaInBatteryView = this._config.show_area_in_battery_view === true;
-    const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'good' ? 'good' : 'critical';
     const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'critical' ? 'critical' : 'good';
 
     return html`
