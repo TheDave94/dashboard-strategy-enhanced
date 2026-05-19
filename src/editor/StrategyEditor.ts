@@ -1179,6 +1179,9 @@ class Simon42DashboardStrategyEditor extends LitElement {
                     <option value="forecast_twice_daily" ?selected=${weatherPresentation === 'forecast_twice_daily'}>${localize('editor.weather_presentation_forecast_twice_daily')}</option>
                     <option value="tile" ?selected=${weatherPresentation === 'tile'}>${localize('editor.weather_presentation_tile')}</option>
                     <option value="none" ?selected=${weatherPresentation === 'none'}>${localize('editor.weather_presentation_none')}</option>
+                  </select>
+                </div>
+              ` : nothing}
               ${key === 'weather' && showWeather && weatherEntities.length > 1 ? html`
                 <div class="section-order-sub" style="flex-wrap: wrap;">
                   <label for="weather-entity">${localize('editor.weather_entity')}</label>

@@ -286,8 +286,7 @@ class Simon42CoversGroupCard extends LitElement {
       return {
         type: 'heading',
         heading: `${headingLabel} (${covers.length})`,
-        icon: this._config.icon_partial || 'mdi:blinds-horizontal',
-        icon: floorIcon || 'mdi:blinds-horizontal',
+        icon: floorIcon || this._config.icon_partial || 'mdi:blinds-horizontal',
         badges: [
           {
             type: 'button',
@@ -316,20 +315,14 @@ class Simon42CoversGroupCard extends LitElement {
     const isOpen = groupType === 'open';
     const headingLabel = floorLabel || (isOpen
       ? (this._config.heading_open || localize('covers.open'))
-      : (this._config.heading_closed || localize('covers.closed'));
+      : (this._config.heading_closed || localize('covers.closed')));
     const defaultIcon = isOpen ? 'mdi:blinds-horizontal' : 'mdi:blinds';
-    const headingIcon = isOpen
-      ? (this._config.icon_open || defaultIcon)
-      : (this._config.icon_closed || defaultIcon);
+    const headingIcon = floorIcon
+      || (isOpen ? (this._config.icon_open || defaultIcon) : (this._config.icon_closed || defaultIcon));
     return {
       type: 'heading',
       heading: `${headingLabel} (${covers.length})`,
       icon: headingIcon,
-      : (this._config.heading_closed || localize('covers.closed')));
-    return {
-      type: 'heading',
-      heading: `${headingLabel} (${covers.length})`,
-      icon: floorIcon || (isOpen ? 'mdi:blinds-horizontal' : 'mdi:blinds'),
       badges: [
         {
           type: 'button',
