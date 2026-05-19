@@ -1259,7 +1259,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
         <div class="description">${localize('editor.alarm_desc')}</div>
 
         ${this._renderCheckbox('show-search-card', localize('editor.show_search_card'), showSearchCard,
-          (checked) => this._toggleChanged('show_search_card', checked, false))}
+          (checked) => { this._toggleChanged('show_search_card', checked, false); })}
         <div class="description">
           ${hasSearchCardDeps
             ? localize('editor.show_search_card_desc')
