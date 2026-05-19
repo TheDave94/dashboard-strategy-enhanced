@@ -175,6 +175,8 @@
     "show_switches_on_areas_desc": "Shows switches as controls on the area cards in the overview. Home Assistant hides these by default.",
     "show_alerts_on_areas": "Show alert icons on area cards",
     "show_alerts_on_areas_desc": "Shows alert icons (e.g. motion, moisture, heat) on area cards when a binary sensor in the area is active.",
+    "show_window_alerts_on_areas": "Show open window/door icons on area cards",
+    "show_window_alerts_on_areas_desc": "Shows an alert icon on the area card whenever a window, door, opening, or garage-door contact sensor in that area is open. Independent of the regular alert toggle above.",
     "show_locks_in_rooms": "Show locks in room views",
     "show_locks_in_rooms_desc": "Shows locks (e.g. Nuki) in the respective room views. Locks always appear in the security overview regardless.",
     "show_automations_in_rooms": "Show automations in room views",

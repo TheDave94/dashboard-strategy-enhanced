@@ -69,12 +69,22 @@ const ALERT_DEVICE_CLASSES = new Set([
   'smoke', 'gas', 'heat', 'cold', 'safety', 'tamper', 'vibration',
 ]);
 
+// Window/door alerts are gated by a separate toggle (show_window_alerts_on_areas)
+// because they're less universally desired — many users have permanent contact
+// sensors on doors that they don't want as constant "alerts" on the overview.
+const WINDOW_ALERT_DEVICE_CLASSES = new Set(['window', 'door', 'opening', 'garage_door']);
+
 /**
  * Pre-computes which binary sensor alert classes exist in this area.
  * Only returns device classes from the allowlist that have at least one
  * binary_sensor entity, so the area card doesn't scan all entities at render time.
  */
-function getAreaAlertClasses(areaId: string, hass: HomeAssistant): string[] {
+function getAreaAlertClasses(
+  areaId: string,
+  hass: HomeAssistant,
+  includeStandardAlerts: boolean,
+  includeWindowAlerts: boolean
+): string[] {
   const areaEntities = Registry.getVisibleEntitiesForArea(areaId);
   if (areaEntities.length === 0) return [];
 
@@ -86,7 +96,9 @@ function getAreaAlertClasses(areaId: string, hass: HomeAssistant): string[] {
 
     const state = hass.states[entity.entity_id];
     const deviceClass = state?.attributes?.device_class as string | undefined;
-    if (deviceClass && ALERT_DEVICE_CLASSES.has(deviceClass)) found.add(deviceClass);
+    if (!deviceClass) continue;
+    if (includeStandardAlerts && ALERT_DEVICE_CLASSES.has(deviceClass)) found.add(deviceClass);
+    else if (includeWindowAlerts && WINDOW_ALERT_DEVICE_CLASSES.has(deviceClass)) found.add(deviceClass);
   }
 
   return [...found];
@@ -109,9 +121,12 @@ function buildAreaCard(area: AreaRegistryEntry, hass: HomeAssistant): LovelaceCa
     sensorClasses.push('humidity');
   }
 
-  // Pre-filter alert classes if enabled
-  const alertClasses = Registry.config.show_alerts_on_areas
-    ? getAreaAlertClasses(area.area_id, hass)
+  // Pre-filter alert classes if enabled. Window/door classes are gated by a
+  // separate toggle so users can opt into open-window badges independently.
+  const showAlerts = Registry.config.show_alerts_on_areas === true;
+  const showWindowAlerts = Registry.config.show_window_alerts_on_areas === true;
+  const alertClasses = showAlerts || showWindowAlerts
+    ? getAreaAlertClasses(area.area_id, hass, showAlerts, showWindowAlerts)
     : undefined;
 
   return {
