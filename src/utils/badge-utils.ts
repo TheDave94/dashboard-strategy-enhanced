@@ -62,6 +62,10 @@ export function isBadgeCandidate(
   if (domain === 'sensor') {
     // Battery (caller must check threshold)
     if (deviceClass === 'battery' || entityId.includes('battery')) return true;
+    // Soil/plant moisture sensors (e.g. plant.*, soil moisture %). Check before
+    // the generic '%'-unit reject below — soil moisture also uses '%' but is
+    // semantically distinct from air humidity.
+    if (deviceClass === 'moisture') return true;
     // Skip temperature/humidity (handled by HA area config, not auto-detected)
     if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') return false;
     if (deviceClass === 'humidity' || unit === '%') return false;
