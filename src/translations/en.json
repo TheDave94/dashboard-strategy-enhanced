@@ -122,6 +122,8 @@
     "weather_sensors_round": "Decimals",
     "weather_sensors_add": "+ Add sensor",
     "no_weather_sensors": "No sensors configured. Use the picker below to add one.",
+    "weather_entity": "Weather entity:",
+    "weather_entity_auto": "Auto-detect (first available)",
     "target_section": "Show in",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",

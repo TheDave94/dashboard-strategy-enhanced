@@ -165,6 +165,20 @@ class Simon42DashboardStrategyEditor extends LitElement {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
+  private _getWeatherEntities(): AlarmEntityOption[] {
+    if (!this._hass) return [];
+    return Object.keys(this._hass.states)
+      .filter((entityId) => entityId.startsWith('weather.'))
+      .map((entityId) => {
+        const stateObj = this._hass!.states[entityId];
+        return {
+          entity_id: entityId,
+          name: stateObj.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' '),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   private _getFilteredEntities(query: string, filterWithArea = false): EntitySelectOption[] {
     if (!this._hass || query.length < 2) return [];
     const q = query.toLowerCase();
@@ -1117,6 +1131,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const weatherPresentation: WeatherPresentation =
       this._config.weather_presentation ??
       (this._config.show_weather_forecast_card === false ? 'none' : 'forecast_daily');
+    const weatherEntity = this._config.weather_entity || '';
+    const weatherEntities = this._getWeatherEntities();
 
     return html`
       <div class="section">
@@ -1163,6 +1179,18 @@ class Simon42DashboardStrategyEditor extends LitElement {
                     <option value="forecast_twice_daily" ?selected=${weatherPresentation === 'forecast_twice_daily'}>${localize('editor.weather_presentation_forecast_twice_daily')}</option>
                     <option value="tile" ?selected=${weatherPresentation === 'tile'}>${localize('editor.weather_presentation_tile')}</option>
                     <option value="none" ?selected=${weatherPresentation === 'none'}>${localize('editor.weather_presentation_none')}</option>
+              ${key === 'weather' && showWeather && weatherEntities.length > 1 ? html`
+                <div class="section-order-sub" style="flex-wrap: wrap;">
+                  <label for="weather-entity">${localize('editor.weather_entity')}</label>
+                  <select id="weather-entity"
+                    .value=${weatherEntity}
+                    @change=${this._weatherEntityChanged}>
+                    <option value="" ?selected=${!weatherEntity}>${localize('editor.weather_entity_auto')}</option>
+                    ${weatherEntities.map((entity) => html`
+                      <option value=${entity.entity_id} ?selected=${entity.entity_id === weatherEntity}>
+                        ${entity.name}
+                      </option>
+                    `)}
                   </select>
                 </div>
               ` : nothing}
@@ -2476,6 +2504,23 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     if (!entityId || entityId === '') {
       delete newConfig.alarm_entity;
+    }
+
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  private _weatherEntityChanged(e: Event): void {
+    if (!this._hass) return;
+
+    const entityId = (e.target as HTMLSelectElement).value;
+    const newConfig: Simon42StrategyConfig = {
+      ...this._config,
+      weather_entity: entityId,
+    };
+
+    if (!entityId || entityId === '') {
+      delete newConfig.weather_entity;
     }
 
     this._config = newConfig;

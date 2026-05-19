@@ -122,6 +122,8 @@
     "weather_sensors_round": "Dezimalstellen",
     "weather_sensors_add": "+ Sensor hinzufügen",
     "no_weather_sensors": "Keine Sensoren konfiguriert. Suche unten, um einen hinzuzufügen.",
+    "weather_entity": "Wetter-Entität:",
+    "weather_entity_auto": "Automatisch (erste verfügbare)",
     "target_section": "Zeige in",
     "section_overview": "Übersicht",
     "show_clock_card": "Uhrzeit-Karte anzeigen",

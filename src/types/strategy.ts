@@ -77,6 +77,9 @@ export interface Simon42StrategyConfig {
 
   // Special entities
   alarm_entity?: string;
+  weather_entity?: string; // explicit weather entity for the weather section;
+  // defaults to the first visible weather.* entity when omitted. Falls back
+  // to auto-discovery if the configured entity is unavailable at render time.
   favorite_entities?: string[];
   room_pin_entities?: string[];
 
