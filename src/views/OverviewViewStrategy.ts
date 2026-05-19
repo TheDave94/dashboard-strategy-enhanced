@@ -31,12 +31,10 @@ import { timeStart, timeEnd, debugLog } from '../utils/debug';
  * appends any missing keys at the end (forward compatibility).
  */
 function normalizeSectionsOrder(order: SectionKey[]): SectionKey[] {
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'plants']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'agenda']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'todos']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'persons']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'vacuums']);
-  const validKeys = new Set<SectionKey>(['overview', 'custom_cards', 'areas', 'weather', 'energy', 'maintenance']);
+  const validKeys = new Set<SectionKey>([
+    'overview', 'custom_cards', 'areas', 'weather', 'energy',
+    'plants', 'agenda', 'todos', 'persons', 'vacuums', 'maintenance',
+  ]);
   const seen = new Set<SectionKey>();
   const result: SectionKey[] = [];
   for (const key of order) {
