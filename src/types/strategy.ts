@@ -8,12 +8,18 @@
 
 // -- Section Ordering -------------------------------------------------
 
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'plants';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'agenda';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'todos';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'persons';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'vacuums';
-export type SectionKey = 'overview' | 'custom_cards' | 'areas' | 'weather' | 'energy' | 'maintenance';
+export type SectionKey =
+  | 'overview'
+  | 'custom_cards'
+  | 'areas'
+  | 'weather'
+  | 'energy'
+  | 'plants'
+  | 'agenda'
+  | 'todos'
+  | 'persons'
+  | 'vacuums'
+  | 'maintenance';
 
 export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'overview',

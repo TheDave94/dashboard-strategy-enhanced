@@ -1083,35 +1083,24 @@ class Simon42DashboardStrategyEditor extends LitElement {
     ['weather', { icon: 'mdi:weather-partly-cloudy', labelKey: 'sections.weather' }],
     ['energy', { icon: 'mdi:lightning-bolt', labelKey: 'sections.energy' }],
     ['plants', { icon: 'mdi:flower-tulip', labelKey: 'sections.plants' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'plants';
     ['agenda', { icon: 'mdi:calendar', labelKey: 'sections.agenda' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'agenda';
     ['todos', { icon: 'mdi:format-list-checks', labelKey: 'sections.todos' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'todos';
     ['persons', { icon: 'mdi:account-group', labelKey: 'sections.persons' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'persons';
     ['vacuums', { icon: 'mdi:robot-vacuum', labelKey: 'sections.vacuums' }],
-  ]);
-
-  private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'vacuums';
     ['maintenance', { icon: 'mdi:update', labelKey: 'sections.maintenance' }],
   ]);
 
   private _isSectionToggleable(key: SectionKey): boolean {
-    return key === 'weather' || key === 'energy' || key === 'maintenance';
+    return (
+      key === 'weather' ||
+      key === 'energy' ||
+      key === 'plants' ||
+      key === 'agenda' ||
+      key === 'todos' ||
+      key === 'persons' ||
+      key === 'vacuums' ||
+      key === 'maintenance'
+    );
   }
 
   private _toggleSectionVisibility(key: SectionKey, visible: boolean): void {
