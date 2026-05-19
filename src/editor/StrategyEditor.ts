@@ -1257,8 +1257,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
         <div class="description">${localize('editor.alarm_desc')}</div>
 
         ${this._renderCheckbox('show-search-card', localize('editor.show_search_card'), showSearchCard,
-          (checked) => this._toggleChanged('show_search_card', checked, false),
-          !hasSearchCardDeps)}
+          (checked) => this._toggleChanged('show_search_card', checked, false))}
         <div class="description">
           ${hasSearchCardDeps
             ? localize('editor.show_search_card_desc')
@@ -1268,8 +1267,36 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-person-badges', localize('editor.show_person_badges'), showPersonBadges,
           (checked) => this._toggleChanged('show_person_badges', checked, true))}
         <div class="description">${localize('editor.show_person_badges_desc')}</div>
+        ${showSearchCard ? html`
+          <div style="margin-left: 26px; margin-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 4px; margin-bottom: 4px;">
+              ${localize('editor.search_card_variant')}
+            </div>
+            ${(['custom', 'tip'] as const).map((opt) => {
+              const current = this._config.search_card_variant === 'tip' ? 'tip' : 'custom';
+              return html`
+                <div class="form-row">
+                  <input type="radio" id="search-variant-${opt}" name="search-card-variant" value=${opt}
+                    ?checked=${current === opt}
+                    @change=${() => this._searchCardVariantChanged(opt)} />
+                  <label for="search-variant-${opt}">${localize('editor.search_card_variant_' + opt)}</label>
+                </div>
+              `;
+            })}
+          </div>
+        ` : nothing}
       </div>
     `;
+  }
+
+  private _searchCardVariantChanged(variant: 'custom' | 'tip'): void {
+    const updated: Simon42StrategyConfig = { ...this._config };
+    if (variant === 'custom') {
+      delete updated.search_card_variant;
+    } else {
+      updated.search_card_variant = variant;
+    }
+    this._fireConfigChanged(updated);
   }
 
   private _renderSummariesSection(): TemplateResult {
