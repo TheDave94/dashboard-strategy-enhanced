@@ -11,6 +11,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 export const BADGE_COLOR_MAP: Record<string, string> = {
   temperature: 'red',
   humidity: 'indigo',
+  pm1: 'orange',
   pm25: 'orange',
   pm10: 'orange',
   carbon_dioxide: 'green',
@@ -65,6 +66,7 @@ export function isBadgeCandidate(
     if (deviceClass === 'temperature' || unit === '°C' || unit === '°F') return false;
     if (deviceClass === 'humidity' || unit === '%') return false;
     // Air quality
+    if (deviceClass === 'pm1' || entityId.includes('pm_1') || /(^|_)pm1($|_)/.test(entityId)) return true;
     if (deviceClass === 'pm25' || entityId.includes('pm_2_5') || entityId.includes('pm25')) return true;
     if (deviceClass === 'pm10' || entityId.includes('pm_10') || entityId.includes('pm10')) return true;
     if (deviceClass === 'carbon_dioxide' || entityId.includes('co2')) return true;
