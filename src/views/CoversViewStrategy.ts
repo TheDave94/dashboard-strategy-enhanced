@@ -57,6 +57,9 @@ class Simon42ViewCoversStrategy extends HTMLElement {
         heading_partial: localize('covers.awnings_partial'),
         batch_open_text: localize('covers.awnings_open_all'),
         batch_close_text: localize('covers.awnings_close_all'),
+        icon_open: strategyConfig.awning_icon_open || 'mdi:storefront-outline',
+        icon_closed: strategyConfig.awning_icon_closed || 'mdi:storefront',
+        icon_partial: strategyConfig.awning_icon_partial || 'mdi:storefront-outline',
       };
 
       cards.push({
