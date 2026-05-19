@@ -162,10 +162,8 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       });
     }
 
-    return createOverviewView(overviewSections, [...personBadges, ...powerBadges, ...customBadges]);
     // Optional "unavailable entities" alert badge — count entities whose
-    // state is "unavailable", skipping ones the user hid (no_dboard label,
-    // hidden_by, or hidden via Registry config). Auto-hide at zero.
+    // state is "unavailable", skipping ones the user hid. Auto-hide at zero.
     const alertBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_unavailable_alert_badge === true) {
       let count = 0;
@@ -185,12 +183,16 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           icon: 'mdi:alert-circle-outline',
           color: 'red',
           show_state: false,
-    // Optional "now playing" badge — first media_player in 'playing' state
+        });
+      }
+    }
+
+    // Optional "now playing" badge — first media_player in 'playing' state.
     const nowPlayingBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_now_playing_badge === true) {
       const playing = Registry.getVisibleEntityIdsForDomain('media_player').find((id) => {
-        // eslint-disable-next-line security/detect-object-injection -- entity IDs from Registry
-        return hass.states[id]?.state === 'playing';
+        const st = Reflect.get(hass.states as Record<string, unknown>, id) as { state?: string } | undefined;
+        return st?.state === 'playing';
       });
       if (playing) {
         nowPlayingBadges.push({
@@ -200,6 +202,26 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           color: 'green',
           show_state: false,
           tap_action: { action: 'more-info' },
+        });
+      }
+    }
+
+    // Optional sun badge — sun.sun + auto next-sunrise/sunset state content.
+    // Auto-hide when no sun.sun entity present.
+    const sunBadges: LovelaceBadgeConfig[] = [];
+    const sunState = Reflect.get(hass.states as Record<string, unknown>, 'sun.sun') as { state?: string } | undefined;
+    if (dashboardConfig.show_sun_badge === true && sunState) {
+      const isAbove = sunState.state === 'above_horizon';
+      sunBadges.push({
+        type: 'entity',
+        entity: 'sun.sun',
+        name: '',
+        icon: isAbove ? 'mdi:weather-sunset-down' : 'mdi:weather-sunset-up',
+        color: isAbove ? 'amber' : 'indigo',
+        tap_action: { action: 'more-info' },
+      });
+    }
+
     // Optional "pending updates count" badge — Registry-filtered update.* in state 'on'.
     const updatesBadges: LovelaceBadgeConfig[] = [];
     if (dashboardConfig.show_updates_badge === true) {
@@ -225,26 +247,15 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
-    return createOverviewView(overviewSections, [...personBadges, ...alertBadges, ...customBadges]);
-    return createOverviewView(overviewSections, [...personBadges, ...nowPlayingBadges, ...customBadges]);
-    // Optional sun badge — shows sun.sun with next sunrise/sunset
-    // (state_content auto-picks next_dawn/next_dusk from HA's sun integration).
-    // Auto-hide when no sun.sun entity present.
-    const sunBadges: LovelaceBadgeConfig[] = [];
-    if (dashboardConfig.show_sun_badge === true && hass.states['sun.sun']) {
-      const isAbove = hass.states['sun.sun'].state === 'above_horizon';
-      sunBadges.push({
-        type: 'entity',
-        entity: 'sun.sun',
-        name: '',
-        icon: isAbove ? 'mdi:weather-sunset-down' : 'mdi:weather-sunset-up',
-        color: isAbove ? 'amber' : 'indigo',
-        tap_action: { action: 'more-info' },
-      });
-    }
-
-    return createOverviewView(overviewSections, [...personBadges, ...sunBadges, ...customBadges]);
-    return createOverviewView(overviewSections, [...personBadges, ...updatesBadges, ...customBadges]);
+    return createOverviewView(overviewSections, [
+      ...personBadges,
+      ...powerBadges,
+      ...alertBadges,
+      ...nowPlayingBadges,
+      ...sunBadges,
+      ...updatesBadges,
+      ...customBadges,
+    ]);
   }
 }
 
