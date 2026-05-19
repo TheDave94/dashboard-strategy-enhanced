@@ -20,7 +20,8 @@
     "weather": "Weather",
     "energy": "Energy",
     "plants": "Plants",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "todos": "To-do"
   },
   "summary": {
     "lights_on_one": "light on",
