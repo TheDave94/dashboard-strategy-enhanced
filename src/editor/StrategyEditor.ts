@@ -1267,6 +1267,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const batteryLowThreshold = this._config.battery_low_threshold ?? 50;
     const showAreaInBatteryView = this._config.show_area_in_battery_view === true;
     const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'good' ? 'good' : 'critical';
+    const unavailableBatteriesBucket = this._config.unavailable_batteries_bucket === 'critical' ? 'critical' : 'good';
 
     return html`
       <div class="section">
@@ -1370,7 +1371,8 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
     const updated: Simon42StrategyConfig = { ...this._config };
-    if (bucket === 'critical') {
+    // 'good' is now the default → omit the key when matching default
+    if (bucket === 'good') {
       delete updated.unavailable_batteries_bucket;
     } else {
       updated.unavailable_batteries_bucket = bucket;
