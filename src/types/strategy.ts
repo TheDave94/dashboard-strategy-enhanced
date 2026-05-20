@@ -171,23 +171,12 @@ export interface Simon42StrategyConfig {
    * stacked icon + label layout. 'compact' switches to a horizontal
    * single-row layout for ~½ the vertical footprint.
    */
-  summary_card_density?: 'compact' | 'comfortable';
   /**
-   * Strategy-wide density toggle. When set to 'compact', every
-   * custom card emitted by the strategy (summary tiles, lights
-   * group, covers group, zone-presence) receives `density: compact`
-   * in its config, which rebinds the card's `--s42-*` CSS tokens to
-   * tighter values — smaller padding, smaller icon wraps, condensed
-   * grids. HA built-in cards (tile, area, weather-forecast) are
-   * unaffected: the strategy emits the same configs and they keep
-   * HA's standard sizing.
-   *
-   * Default 'comfortable' (HA's standard sizing).
-   *
-   * `summary_card_density` remains a per-section override for
-   * backward compatibility — when set, it wins for the summary
-   * tiles specifically. New configurations should prefer
-   * `dashboard_density`.
+   * Manual density override. By default, every custom card scales
+   * dynamically to its actual rendered width via CSS container
+   * queries — no flag needed. Set this to force `compact` or
+   * `comfortable` sizing regardless of the container width. HA
+   * built-in cards (tile, area, weather-forecast) are unaffected.
    */
   dashboard_density?: 'compact' | 'comfortable';
   /**
@@ -369,12 +358,6 @@ export interface AreaOptions {
    * {occupancy, motion, presence}.
    */
   presence_entities?: Array<string | PresenceZoneEntry>;
-  /**
-   * @deprecated Use `presence_entities` instead. Beta.15+ honours
-   * `presence_entities` for both the room view and favorites pin; if
-   * unset, this field is read for backwards compat.
-   */
-  pin_zone_presence_to_favorites_entities?: Array<string | PresenceZoneEntry>;
 }
 
 export interface GroupOptions {

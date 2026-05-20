@@ -145,4 +145,4 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-simon42-view-batteries', Simon42ViewBatteriesStrategy);
+customElements.define('ll-strategy-view-simon42-view-batteries', Simon42ViewBatteriesStrategy);

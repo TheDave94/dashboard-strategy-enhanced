@@ -117,7 +117,15 @@
     "sticky_lock": "Sticky"
   },
   "zone_presence": {
-    "title": "Anwesenheit"
+    "title": "Anwesenheit",
+    "aria_active": "aktiv",
+    "aria_idle": "inaktiv"
+  },
+  "sticky_lock": {
+    "aria_locked": "Modus gesperrt — tippen zum Entsperren",
+    "aria_unlocked": "Modus entsperrt — tippen zum Sperren",
+    "title_on": "Sticky-Sperre an",
+    "title_off": "Sticky-Sperre aus"
   },
   "editor": {
     "section_order": "Abschnitts-Reihenfolge",

@@ -565,7 +565,9 @@ class Simon42ZonePresenceCard extends LitElement {
                 tabindex=${unavailable ? '-1' : '0'}
                 aria-pressed=${active ? 'true' : 'false'}
                 aria-disabled=${unavailable ? 'true' : 'false'}
-                aria-label=${`${this._nameFor(z)} ${active ? 'active' : 'idle'}`}
+                aria-label=${`${this._nameFor(z)} ${
+                  active ? localize('zone_presence.aria_active') : localize('zone_presence.aria_idle')
+                }`}
                 title=${this._nameFor(z)}
                 @action=${this._handleAction}
               >

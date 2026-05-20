@@ -19,3 +19,43 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: chore(deps)
+
+  # npm dependency watching — Lit security advisories, TypeScript patch
+  # releases, webpack updates, etc. Grouped to keep PR churn manageable.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      lit:
+        patterns:
+          - 'lit'
+          - '@lit/*'
+          - 'lit-html'
+          - 'lit-element'
+      typescript:
+        patterns:
+          - 'typescript'
+          - '@typescript-eslint/*'
+          - 'ts-loader'
+          - 'ts-node'
+      typings:
+        patterns:
+          - '@types/*'
+      eslint:
+        patterns:
+          - 'eslint'
+          - 'eslint-*'
+      build:
+        patterns:
+          - 'webpack'
+          - 'webpack-*'
+          - 'compression-webpack-plugin'
+          - 'tsx'
+      tests:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'

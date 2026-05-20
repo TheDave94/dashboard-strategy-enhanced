@@ -77,4 +77,4 @@ class Simon42ViewClimateStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-simon42-view-climate', Simon42ViewClimateStrategy);
+customElements.define('ll-strategy-view-simon42-view-climate', Simon42ViewClimateStrategy);

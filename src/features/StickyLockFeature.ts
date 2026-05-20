@@ -29,6 +29,7 @@
 
 import { LitElement, html, css, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
+import { setupLocalize, localize } from '../utils/localize';
 
 // HA's frontend registers a few global hooks for plugin extensions. The
 // Window typing in other card files is intentionally narrow; we extend
@@ -117,14 +118,19 @@ class Simon42StickyLockFeature extends LitElement {
     // than a confusing dead button).
     if (!this.hass.states[this._config.sticky_entity]) return nothing;
 
+    setupLocalize(this.hass);
     const locked = this._locked;
     return html`
       <button
         class=${locked ? 'btn locked' : 'btn'}
         role="switch"
         aria-checked=${locked ? 'true' : 'false'}
-        aria-label=${locked ? 'Unlock mode' : 'Lock mode'}
-        title=${locked ? 'Sticky lock on' : 'Sticky lock off'}
+        aria-label=${locked
+          ? localize('sticky_lock.aria_locked')
+          : localize('sticky_lock.aria_unlocked')}
+        title=${locked
+          ? localize('sticky_lock.title_on')
+          : localize('sticky_lock.title_off')}
         @click=${this._onClick}
       >
         <ha-icon icon=${locked ? MDI_LOCK : MDI_LOCK_OPEN}></ha-icon>

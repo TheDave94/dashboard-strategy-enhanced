@@ -138,4 +138,4 @@ class Simon42ViewCoversStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-simon42-view-covers', Simon42ViewCoversStrategy);
+customElements.define('ll-strategy-view-simon42-view-covers', Simon42ViewCoversStrategy);

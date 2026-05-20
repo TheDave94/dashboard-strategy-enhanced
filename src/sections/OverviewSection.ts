@@ -98,9 +98,8 @@ function buildZonePresenceCard(
 ): LovelaceCardConfig | null {
   const areaOpts = (config.areas_options || {})[areaId] || {};
   // Single source of truth — same field consulted by the Room view's
-  // auto-render. Legacy field kept for one release for backwards compat.
-  const curated =
-    areaOpts.presence_entities ?? areaOpts.pin_zone_presence_to_favorites_entities;
+  // auto-render in RoomViewStrategy.
+  const curated = areaOpts.presence_entities;
 
   let entities: unknown[];
   if (Array.isArray(curated) && curated.length > 0) {
@@ -232,17 +231,15 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   // Build summary cards based on config
   const summaryCards: LovelaceCardConfig[] = [];
-  // Density resolution: per-section override (summary_card_density) wins
-  // when set, otherwise inherit the strategy-wide `dashboard_density`.
-  // Both default to 'comfortable' (HA's standard sizing).
-  const density: 'comfortable' | 'compact' =
-    config.summary_card_density === 'compact'
+  // Density: container queries scale cards to their actual cell size
+  // by default. `dashboard_density` is the manual override (forces
+  // compact / comfortable regardless of container width).
+  const density: 'comfortable' | 'compact' | undefined =
+    config.dashboard_density === 'compact'
       ? 'compact'
-      : config.summary_card_density === 'comfortable'
+      : config.dashboard_density === 'comfortable'
         ? 'comfortable'
-        : config.dashboard_density === 'compact'
-          ? 'compact'
-          : 'comfortable';
+        : undefined;
 
   if (showLightSummary) {
     summaryCards.push({

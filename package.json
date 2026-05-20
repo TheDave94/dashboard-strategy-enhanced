@@ -1,8 +1,12 @@
 {
   "name": "simon42-dashboard-strategy",
-  "version": "1.5.0-thedave-beta.15",
+  "version": "1.5.0-thedave-beta.16",
   "private": true,
   "type": "module",
+  "license": "CC-BY-NC-SA-4.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "webpack",
     "build-dev": "webpack --config webpack.dev.config.ts",

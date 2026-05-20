@@ -805,9 +805,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       dashboardConfig.show_zone_presence_in_rooms !== false;
 
     if (showZonePresence) {
-      const curatedPresence =
-        areaOpts.presence_entities ??
-        areaOpts.pin_zone_presence_to_favorites_entities;
+      const curatedPresence = areaOpts.presence_entities;
       let zoneEntities: unknown[];
       if (Array.isArray(curatedPresence) && curatedPresence.length > 0) {
         zoneEntities = curatedPresence.filter((e) => {
@@ -847,4 +845,4 @@ class Simon42ViewRoomStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-simon42-view-room', Simon42ViewRoomStrategy);
+customElements.define('ll-strategy-view-simon42-view-room', Simon42ViewRoomStrategy);

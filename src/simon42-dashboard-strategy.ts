@@ -10,7 +10,14 @@ import type { HomeAssistant } from './types/homeassistant';
 import type { Simon42StrategyConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 
-const STRATEGY_VERSION = '1.3.4-beta.9';
+// Injected at build time by webpack DefinePlugin from package.json#version.
+// `as unknown as string` keeps TS happy since the value isn't declared
+// in any .d.ts (an alternative is a global.d.ts; this is cheaper).
+declare const __SIMON42_VERSION__: string;
+const STRATEGY_VERSION =
+  typeof __SIMON42_VERSION__ !== 'undefined'
+    ? __SIMON42_VERSION__
+    : 'dev';
 
 const DEBUG = new URLSearchParams(window.location.search).has('s42_debug');
 const T0 = performance.now();
@@ -78,7 +85,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     const showClimate = config.show_climate_summary === true;
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
-    const overviewConfig = await getStrategy('ll-strategy-simon42-view-overview').generate(
+    const overviewConfig = await getStrategy('ll-strategy-view-simon42-view-overview').generate(
       { dashboardConfig: config },
       hass
     );
@@ -87,23 +94,23 @@ class Simon42DashboardStrategy extends HTMLElement {
     // Only resolve utility views for enabled summaries
     const utilityViewDefs = [
       { enabled: showLights, title: localize('views.lights'), path: 'lights', icon: 'mdi:lamps',
-        resolve: () => getStrategy('ll-strategy-simon42-view-lights').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-simon42-view-lights').generate({ config }, hass) },
       { enabled: showCovers, title: localize('views.covers'), path: 'covers', icon: 'mdi:blinds-horizontal',
-        resolve: () => getStrategy('ll-strategy-simon42-view-covers').generate(
+        resolve: () => getStrategy('ll-strategy-view-simon42-view-covers').generate(
           { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
       { enabled: showSecurity, title: localize('views.security'), path: 'security', icon: 'mdi:security',
-        resolve: () => getStrategy('ll-strategy-simon42-view-security').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-simon42-view-security').generate({ config }, hass) },
       { enabled: showBatteries, title: localize('views.batteries'), path: 'batteries', icon: 'mdi:battery-alert',
-        resolve: () => getStrategy('ll-strategy-simon42-view-batteries').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-simon42-view-batteries').generate({ config }, hass) },
       { enabled: showClimate, title: localize('views.climate'), path: 'climate', icon: 'mdi:thermostat',
-        resolve: () => getStrategy('ll-strategy-simon42-view-climate').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-simon42-view-climate').generate({ config }, hass) },
     ];
 
     const enabledDefs = utilityViewDefs.filter((d) => d.enabled);
     const utilityConfigs = await Promise.all(enabledDefs.map((d) => d.resolve()));
     t('utility views resolved');
 
-    const roomStrategy = getStrategy('ll-strategy-simon42-view-room');
+    const roomStrategy = getStrategy('ll-strategy-view-simon42-view-room');
     const roomConfigs = await Promise.all(
       visibleAreas.map((area) => {
         const areaOptions = config.areas_options?.[area.area_id];
@@ -169,22 +176,9 @@ class Simon42DashboardStrategy extends HTMLElement {
   }
 }
 
-// Register strategy custom element IMMEDIATELY — no heavy imports needed.
-// This ensures HA's 5-second timeout is satisfied even on slow networks.
-//
-// Register under BOTH naming conventions:
-//   - `ll-strategy-simon42-dashboard` (legacy, pre-2025 HA)
-//   - `ll-strategy-dashboard-simon42-dashboard` (current convention:
-//     `ll-strategy-<type>-<name>`, enforced by recent HA versions which
-//     drop the legacy fallback and surface as "Timeout waiting for
-//     strategy element ll-strategy-dashboard-simon42-dashboard to be
-//     registered" until both are present).
-// customElements.define() refuses to register the same class twice, so
-// the second registration uses an empty subclass.
-customElements.define('ll-strategy-simon42-dashboard', Simon42DashboardStrategy);
-customElements.define(
-  'll-strategy-dashboard-simon42-dashboard',
-  class extends Simon42DashboardStrategy {}
-);
+// Register the strategy custom element under HA's current naming
+// convention (`ll-strategy-<type>-<name>`). HA 2026.5+ enforces this
+// strictly and the fork no longer carries a pre-2025 fallback.
+customElements.define('ll-strategy-dashboard-simon42-dashboard', Simon42DashboardStrategy);
 
 console.log(`Simon42 Dashboard Strategy v${STRATEGY_VERSION} loaded`);

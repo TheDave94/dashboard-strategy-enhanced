@@ -117,7 +117,15 @@
     "sticky_lock": "Sticky"
   },
   "zone_presence": {
-    "title": "Presence"
+    "title": "Presence",
+    "aria_active": "active",
+    "aria_idle": "idle"
+  },
+  "sticky_lock": {
+    "aria_locked": "Mode locked — tap to unlock",
+    "aria_unlocked": "Mode unlocked — tap to lock",
+    "title_on": "Sticky lock on",
+    "title_off": "Sticky lock off"
   },
   "editor": {
     "section_order": "Section Order",

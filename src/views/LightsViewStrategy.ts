@@ -42,4 +42,4 @@ class Simon42ViewLightsStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-simon42-view-lights', Simon42ViewLightsStrategy);
+customElements.define('ll-strategy-view-simon42-view-lights', Simon42ViewLightsStrategy);

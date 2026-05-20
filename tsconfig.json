@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*", "webpack.config.ts", "webpack.dev.config.ts"],
+  "include": ["src/**/*", "webpack.dev.config.ts"],
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
@@ -16,7 +16,14 @@
     "noImplicitReturns": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // Pin legacy class-field semantics regardless of target.
+    // Lit installs `hass`/`_config` accessors on the prototype; with
+    // useDefineForClassFields:true (TS default at target >= ES2022)
+    // an instance-field declaration would shadow them via [[Define]]
+    // and break reactivity in every card. Locked off until cards
+    // migrate to the stage-3 decorator API (@property accessor).
+    "useDefineForClassFields": false
   },
   "ts-node": {
     "compilerOptions": {
