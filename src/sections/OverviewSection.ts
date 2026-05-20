@@ -110,12 +110,16 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   // Build summary cards based on config
   const summaryCards: LovelaceCardConfig[] = [];
+  // 'comfortable' default keeps the original layout; 'compact' switches each
+  // summary tile to a horizontal single-row layout (~½ the vertical space).
+  const density = config.summary_card_density === 'compact' ? 'compact' : 'comfortable';
 
   if (showLightSummary) {
     summaryCards.push({
       type: 'custom:simon42-summary-card',
       summary_type: 'lights',
       areas_options: config.areas_options || {},
+      density,
     });
   }
 
@@ -124,6 +128,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       type: 'custom:simon42-summary-card',
       summary_type: 'covers',
       areas_options: config.areas_options || {},
+      density,
     });
   }
 
@@ -132,6 +137,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       type: 'custom:simon42-summary-card',
       summary_type: 'security',
       areas_options: config.areas_options || {},
+      density,
     });
   }
 
@@ -143,6 +149,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       hide_mobile_app_batteries: config.hide_mobile_app_batteries,
       hide_battery_notes_entities: config.hide_battery_notes_entities,
       battery_critical_threshold: config.battery_critical_threshold,
+      density,
     });
   }
 
@@ -151,6 +158,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       type: 'custom:simon42-summary-card',
       summary_type: 'climate',
       areas_options: config.areas_options || {},
+      density,
     });
   }
 

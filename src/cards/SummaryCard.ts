@@ -22,6 +22,13 @@ interface SummaryCardConfig {
   hide_mobile_app_batteries?: boolean;
   hide_battery_notes_entities?: boolean;
   battery_critical_threshold?: number;
+  /**
+   * Density of the tile. 'comfortable' (default) is the original layout —
+   * stacked icon + label, generous padding. 'compact' is a horizontal
+   * single-row layout that halves the tile's vertical footprint, useful
+   * when the user wants the summary row to take less of the overview.
+   */
+  density?: 'compact' | 'comfortable';
 }
 
 interface DisplayConfig {
@@ -88,11 +95,36 @@ class Simon42SummaryCard extends LitElement {
       line-height: 1.2;
       color: var(--primary-text-color);
     }
+    /* Compact density: single-row layout, smaller padding, ~½ the
+       vertical footprint of the comfortable variant. */
+    :host([density="compact"]) ha-card {
+      padding: 8px 12px;
+      flex-direction: row;
+      gap: 12px;
+      text-align: left;
+      justify-content: flex-start;
+    }
+    :host([density="compact"]) .icon {
+      --mdc-icon-size: 22px;
+      flex: 0 0 auto;
+    }
+    :host([density="compact"]) .name {
+      font-size: 13px;
+      flex: 1 1 auto;
+    }
   `;
 
   setConfig(config: SummaryCardConfig): void {
     this._config = config;
     this._relevantEntityIds = null;
+    // Reflect density onto a host attribute so the static CSS selector
+    // (:host([density="compact"])) can pick it up without rebuilding
+    // styles per instance.
+    if (config.density === 'compact') {
+      this.setAttribute('density', 'compact');
+    } else {
+      this.removeAttribute('density');
+    }
   }
 
   protected willUpdate(changedProps: PropertyValues): void {

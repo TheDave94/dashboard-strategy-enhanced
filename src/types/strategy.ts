@@ -133,6 +133,38 @@ export interface Simon42StrategyConfig {
   todos_entities?: string[]; // default: [] → all visible todo.* entities
   show_persons_section?: boolean; // default: false (auto-hides when no persons)
   power_badge_entity?: string; // default: unset (no badge). Pick a sensor (e.g. main grid power in W).
+  /**
+   * Optional house-mode badge in the overview header. Typically an
+   * `input_select.house_mode` (At Home / Away / Holiday) so users can
+   * see and change it without opening a submenu. Auto-hides when the
+   * entity does not exist. Set `house_mode_icon` to override the
+   * default icon (`mdi:home-account`).
+   */
+  house_mode_entity?: string;
+  house_mode_icon?: string;
+  /**
+   * Optional per-room mode picker rendered at the top of each Room view.
+   * Typically an `input_select.room_mode` (Work / Relax / Sleep / …).
+   * Single-area users set this top-level; multi-area users can override
+   * per-area via `areas_options.<area_id>.room_mode_entity`.
+   * Auto-hides when the entity does not exist.
+   */
+  room_mode_entity?: string;
+  room_mode_icon?: string;
+  /**
+   * Optional sticky-lock toggle rendered next to the room-mode tile.
+   * Typically an `input_boolean.room_mode_sticky` — when on, the room
+   * automation suppresses auto-mode-changes. Same override semantics
+   * as `room_mode_entity` (per-area beats dashboard-wide).
+   */
+  room_mode_sticky_entity?: string;
+  /**
+   * Density of the summary tiles (lights / covers / security / batteries /
+   * climate) on the overview. 'comfortable' (default) keeps the original
+   * stacked icon + label layout. 'compact' switches to a horizontal
+   * single-row layout for ~½ the vertical footprint.
+   */
+  summary_card_density?: 'compact' | 'comfortable';
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)

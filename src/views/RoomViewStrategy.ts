@@ -716,6 +716,60 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
     }
 
+    // Room mode + sticky lock tile (opt-in). Renders at the very top of
+    // the room view so the mode is the first thing the user sees /
+    // changes. Both entities are resolved with per-area override winning
+    // over the dashboard-wide default, so single-area users can configure
+    // it once and multi-room users can have per-room mode pickers.
+    const areaOpts: Record<string, unknown> =
+      (dashboardConfig.areas_options || {})[area.area_id] || {};
+    const roomModeEntity =
+      (areaOpts.room_mode_entity as string | undefined) ||
+      dashboardConfig.room_mode_entity;
+    const roomModeStickyEntity =
+      (areaOpts.room_mode_sticky_entity as string | undefined) ||
+      dashboardConfig.room_mode_sticky_entity;
+
+    const modeCards: LovelaceCardConfig[] = [];
+    if (
+      roomModeEntity &&
+      Reflect.get(hass.states as Record<string, unknown>, roomModeEntity)
+    ) {
+      modeCards.push({
+        type: 'tile',
+        entity: roomModeEntity,
+        name: localize('room.room_mode'),
+        icon: dashboardConfig.room_mode_icon || 'mdi:home-account',
+        color: 'accent',
+        features: [{ type: 'select-options' }],
+        features_position: 'bottom',
+      });
+    }
+    if (
+      roomModeStickyEntity &&
+      Reflect.get(hass.states as Record<string, unknown>, roomModeStickyEntity)
+    ) {
+      modeCards.push({
+        type: 'tile',
+        entity: roomModeStickyEntity,
+        name: localize('room.sticky_lock'),
+        icon: 'mdi:lock',
+        color: 'red',
+        tap_action: { action: 'toggle' },
+      });
+    }
+    if (modeCards.length > 0) {
+      sections.unshift({
+        type: 'grid',
+        cards: [
+          {
+            type: 'horizontal-stack',
+            cards: modeCards,
+          } as LovelaceCardConfig,
+        ],
+      });
+    }
+
     debugLog(
       `Room ${area.area_id}: ${visibleEntities.length} visible entities, ${sections.length} sections, ${badges.length} badges`
     );

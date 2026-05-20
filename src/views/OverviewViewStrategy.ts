@@ -379,6 +379,27 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
+    // Optional house-mode badge — typically an input_select.house_mode
+    // (At Home / Away / Holiday). Renders the current state right in the
+    // header so the user can see — and tap to change — without opening
+    // any submenu. Auto-hide when the configured entity is missing.
+    const houseModeBadges: LovelaceBadgeConfig[] = [];
+    const houseModeEntity = dashboardConfig.house_mode_entity;
+    if (
+      houseModeEntity &&
+      Reflect.get(hass.states as Record<string, unknown>, houseModeEntity)
+    ) {
+      houseModeBadges.push({
+        type: 'entity',
+        entity: houseModeEntity,
+        show_name: false,
+        show_state: true,
+        icon: dashboardConfig.house_mode_icon || 'mdi:home-account',
+        color: 'accent',
+        tap_action: { action: 'more-info' },
+      });
+    }
+
     // Optional sun badge — shows sun.sun with next sunrise/sunset
     // (state_content auto-picks next_dawn/next_dusk from HA's sun integration).
     // Auto-hide when no sun.sun entity present.
@@ -398,6 +419,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
 
     return createOverviewView(overviewSections, [
       ...personBadges,
+      ...houseModeBadges,
       ...powerBadges,
       ...alertBadges,
       ...nowPlayingBadges,

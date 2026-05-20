@@ -112,7 +112,9 @@
     "misc": "Miscellaneous",
     "automations": "Automations",
     "scripts": "Scripts",
-    "room_pins": "Room Pins"
+    "room_pins": "Room Pins",
+    "room_mode": "Room Mode",
+    "sticky_lock": "Sticky Lock"
   },
   "editor": {
     "section_order": "Section Order",
