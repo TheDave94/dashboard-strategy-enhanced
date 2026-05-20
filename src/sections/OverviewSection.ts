@@ -26,21 +26,14 @@ import { localize } from '../utils/localize';
 const ZONE_DEVICE_CLASSES = new Set(['occupancy', 'motion', 'presence']);
 
 /**
- * Build the compact room-mode tile pinned into the favorites grid.
+ * Build the room-mode tile pinned into the favorites grid.
  *
- * Compared to RoomViewStrategy's room-mode emit (full-row, with the
- * inline select-options chip picker), this is intentionally smaller:
- *
- *   - No `select-options` feature. With 6+ modes the chips wrap 2-3
- *     rows, tripling the tile's height — too tall for a glance-tile
- *     in the favorites grid. The full picker is reachable by tapping
- *     the tile (default tile tap_action = more-info, which opens
- *     HA's input_select picker dialog).
- *   - The sticky-lock custom tile feature is preserved when
- *     configured — it's a single icon button, doesn't bloat height.
- *   - `columns: 6` so a sibling pinned card (zone-presence, etc.)
- *     sits beside it on the same row. `rows: 'auto'` so the lock
- *     feature row is reserved properly.
+ * Same shape as RoomViewStrategy's emit — select-options inline picker
+ * plus the sticky-lock custom tile feature — but narrower
+ * (columns:6) so a sibling pinned card sits beside it. The mode tile
+ * tends to be the taller of the two when many input_select options
+ * wrap the chip row; the favorites grid keeps row alignment via
+ * rows:'auto'.
  *
  * Returns null when neither explicit areas_options config nor the
  * auto-detect heuristic resolves an entity.
@@ -60,7 +53,7 @@ function buildRoomModeCard(
   }
   if (!roomModeEntity || !hass.states[roomModeEntity]) return null;
 
-  const features: Array<Record<string, unknown>> = [];
+  const features: Array<Record<string, unknown>> = [{ type: 'select-options' }];
   const stickyEntity = areaOpts.room_mode_sticky_entity;
   if (stickyEntity && hass.states[stickyEntity]) {
     features.push({
@@ -75,34 +68,63 @@ function buildRoomModeCard(
     name: localize('room.room_mode'),
     icon: config.room_mode_icon || 'mdi:home-account',
     color: 'accent',
-    ...(features.length > 0 ? { features, features_position: 'bottom' } : {}),
+    features,
+    features_position: 'bottom',
     grid_options: { columns: 6, rows: 'auto' },
   };
 }
 
 /**
- * Build a zone-presence card for the given area, using the same
- * occupancy/motion/presence device_class auto-detection used by the
- * room view's bottom-of-room auto-render. Returns null when fewer
- * than 2 zone-class binary_sensors are tagged to the area.
+ * Build a zone-presence card for the given area.
+ *
+ * Entity source priority:
+ *   1. Explicit `areas_options.<area>.pin_zone_presence_to_favorites_entities`
+ *      — a curated subset of entity IDs (each forwarded verbatim to
+ *      the card, so users can supply objects with name/icon/color
+ *      overrides too). Useful when the area has many occupancy
+ *      sensors but only a few are interesting at a glance.
+ *   2. Auto-detect by device_class — same rule used by the room view
+ *      (≥2 `binary_sensor.*` with device_class ∈
+ *      {occupancy, motion, presence} tagged to the area).
+ *
+ * Returns null when neither path produces ≥1 entity. (The auto-detect
+ * path still requires ≥2 — a single sensor reads fine as a regular
+ * tile.)
  */
 function buildZonePresenceCard(
   areaId: string,
+  config: Simon42StrategyConfig,
   hass: HomeAssistant,
 ): LovelaceCardConfig | null {
-  const zoneEntities = Registry.getVisibleEntitiesForArea(areaId)
-    .map((e) => e.entity_id)
-    .filter((id) => {
-      if (!id.startsWith('binary_sensor.')) return false;
-      const s = hass.states[id];
-      const dc = s?.attributes?.device_class as string | undefined;
-      return dc !== undefined && ZONE_DEVICE_CLASSES.has(dc);
+  const areaOpts = (config.areas_options || {})[areaId] || {};
+  const curated = areaOpts.pin_zone_presence_to_favorites_entities;
+
+  let entities: unknown[];
+  if (Array.isArray(curated) && curated.length > 0) {
+    // Trust the user's list — the card itself defends against
+    // malformed entries. Pass through verbatim so per-entry
+    // overrides (name/icon/color) work.
+    entities = curated.filter((e) => {
+      if (typeof e === 'string') return e.length > 0;
+      return typeof (e as { entity?: unknown }).entity === 'string';
     });
-  if (zoneEntities.length < 2) return null;
+    if (entities.length === 0) return null;
+  } else {
+    const zoneEntities = Registry.getVisibleEntitiesForArea(areaId)
+      .map((e) => e.entity_id)
+      .filter((id) => {
+        if (!id.startsWith('binary_sensor.')) return false;
+        const s = hass.states[id];
+        const dc = s?.attributes?.device_class as string | undefined;
+        return dc !== undefined && ZONE_DEVICE_CLASSES.has(dc);
+      });
+    if (zoneEntities.length < 2) return null;
+    entities = zoneEntities;
+  }
 
   return {
     type: 'custom:simon42-zone-presence-card',
-    entities: zoneEntities,
+    entities,
     grid_options: { columns: 6, rows: 'auto' },
   };
 }
@@ -327,7 +349,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
       if (card) pinnedCards.push(card);
     }
     if (areaOpts.pin_zone_presence_to_favorites === true) {
-      const card = buildZonePresenceCard(areaId, hass);
+      const card = buildZonePresenceCard(areaId, config, hass);
       if (card) pinnedCards.push(card);
     }
   }
