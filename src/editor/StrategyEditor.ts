@@ -35,6 +35,7 @@ import { renderLightFavoritesTab } from './tabs/LightFavoritesTab';
 import { renderFavoritesTab } from './tabs/FavoritesTab';
 import { renderWeatherSensorsTab } from './tabs/WeatherSensorsTab';
 import { renderCustomCardsTab } from './tabs/CustomCardsTab';
+import { renderCustomSectionsTab } from './tabs/CustomSectionsTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1845,58 +1846,15 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderCustomSectionsSection(): TemplateResult {
-    const customSections = this._config.custom_sections || [];
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_custom_sections')}</div>
-        <div class="description" style="margin-bottom: 8px;">${localize('editor.custom_sections_desc')}</div>
-
-        <div id="custom-sections-list">
-          ${customSections.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_sections')}</div>`
-            : customSections.map((s, index) => this._renderCustomSectionItem(s, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomSection}>
-          ${localize('editor.add_custom_section')}
-        </button>
-        <div class="description">${localize('editor.custom_sections_help')}</div>
-      </div>
-    `;
-  }
-
-  private _renderCustomSectionItem(section: CustomSection, index: number): TemplateResult {
-    const validationMsg = section._yaml_error
-      ? html`<span style="color: var(--error-color);">&#x274C; ${section._yaml_error}</span>`
-      : section.parsed_config
-        ? html`<span style="color: var(--success-color, green);">&#x2705; ${localize('editor.yaml_valid')}</span>`
-        : html``;
-
-    return html`
-      <div class="custom-item">
-        <div class="custom-item-header">
-          <span class="custom-item-index">#${index + 1}</span>
-          <button class="btn-icon" @click=${() => this._removeCustomSection(index)}
-            title=${localize('editor.remove')}>&#x274C;</button>
-        </div>
-        <div class="custom-item-fields">
-          <input type="text" .value=${section.key || ''}
-            placeholder=${localize('editor.custom_section_key_placeholder')}
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'key', (e.target as HTMLInputElement).value)} />
-          <input type="text" .value=${section.heading || ''}
-            placeholder=${localize('editor.custom_section_heading_placeholder')}
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'heading', (e.target as HTMLInputElement).value)} />
-          <input type="text" .value=${section.icon || ''}
-            placeholder="mdi:card-bulleted"
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'icon', (e.target as HTMLInputElement).value)} />
-          <textarea rows="6" placeholder=${localize('editor.custom_section_yaml_placeholder')}
-            .value=${section.yaml || ''}
-            style="width: 100%;"
-            @change=${(e: Event) => this._updateCustomSectionYaml(index, (e.target as HTMLTextAreaElement).value)}></textarea>
-          <div class="custom-item-validation">${validationMsg}</div>
-        </div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomSectionsTab({
+      config: this._config,
+      onAdd: () => this._addCustomSection(),
+      onRemove: (index) => this._removeCustomSection(index),
+      onUpdateField: (index, field, value) =>
+        this._updateCustomSectionField(index, field, value),
+      onUpdateYaml: (index, yamlString) => this._updateCustomSectionYaml(index, yamlString),
+    });
   }
 
   private _renderCustomBadgesSection(): TemplateResult {
