@@ -143,21 +143,15 @@ export interface Simon42StrategyConfig {
   house_mode_entity?: string;
   house_mode_icon?: string;
   /**
-   * Optional per-room mode picker rendered at the top of each Room view.
-   * Typically an `input_select.room_mode` (Work / Relax / Sleep / …).
-   * Single-area users set this top-level; multi-area users can override
-   * per-area via `areas_options.<area_id>.room_mode_entity`.
-   * Auto-hides when the entity does not exist.
+   * Icon used on the room-mode tile when it renders. The room-mode tile
+   * itself is opted into per-area via
+   * `areas_options.<area_id>.room_mode_entity`, or auto-detected when an
+   * area has exactly one `input_select.*` entity whose object_id
+   * contains "mode". There is intentionally no dashboard-wide
+   * `room_mode_entity` fallback: a global input_select shouldn't appear
+   * on every room view.
    */
-  room_mode_entity?: string;
   room_mode_icon?: string;
-  /**
-   * Optional sticky-lock toggle rendered next to the room-mode tile.
-   * Typically an `input_boolean.room_mode_sticky` — when on, the room
-   * automation suppresses auto-mode-changes. Same override semantics
-   * as `room_mode_entity` (per-area beats dashboard-wide).
-   */
-  room_mode_sticky_entity?: string;
   /**
    * Density of the summary tiles (lights / covers / security / batteries /
    * climate) on the overview. 'comfortable' (default) keeps the original
@@ -244,6 +238,13 @@ export interface AreasDisplay {
 
 export interface AreaOptions {
   groups_options?: Record<string, GroupOptions>;
+  /**
+   * Opt this area into the room-mode tile by picking the entity. When
+   * not set, the room view auto-detects: if the area has exactly one
+   * `input_select.*` entity whose object_id contains "mode", that one
+   * is used. The tile is omitted when neither path resolves an entity.
+   */
+  room_mode_entity?: string;
 }
 
 export interface GroupOptions {

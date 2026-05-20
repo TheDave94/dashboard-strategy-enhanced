@@ -716,56 +716,52 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       }
     }
 
-    // Room mode + sticky lock tile (opt-in). Renders at the very top of
-    // the room view so the mode is the first thing the user sees /
-    // changes. Both entities are resolved with per-area override winning
-    // over the dashboard-wide default, so single-area users can configure
-    // it once and multi-room users can have per-room mode pickers.
+    // Room mode tile (opt-in). Renders at the very top of the room view
+    // so the mode is the first thing the user sees / changes.
+    //
+    // Resolution order (no dashboard-wide fallback — that would bleed a
+    // global "room_mode" entity into every room view, which is what we
+    // explicitly don't want):
+    //   1. Explicit per-area config: areas_options.<area>.room_mode_entity
+    //   2. Auto-detect: a single `input_select.*` entity assigned to
+    //      this area whose object_id contains "mode" (case-insensitive).
+    //
+    // Auto-detect intentionally skips when the heuristic finds 0 or
+    // 2+ matches — silence is better than guessing wrong. Users who
+    // want a non-matching entity, or have multiple candidates, set it
+    // explicitly under areas_options.
     const areaOpts: Record<string, unknown> =
       (dashboardConfig.areas_options || {})[area.area_id] || {};
-    const roomModeEntity =
-      (areaOpts.room_mode_entity as string | undefined) ||
-      dashboardConfig.room_mode_entity;
-    const roomModeStickyEntity =
-      (areaOpts.room_mode_sticky_entity as string | undefined) ||
-      dashboardConfig.room_mode_sticky_entity;
+    let roomModeEntity = areaOpts.room_mode_entity as string | undefined;
 
-    const modeCards: LovelaceCardConfig[] = [];
+    if (!roomModeEntity) {
+      const candidates = Registry.getVisibleEntitiesForArea(area.area_id)
+        .map((e) => e.entity_id)
+        .filter(
+          (id) =>
+            id.startsWith('input_select.') &&
+            /mode/i.test(id.split('.')[1])
+        );
+      if (candidates.length === 1) roomModeEntity = candidates[0];
+    }
+
     if (
       roomModeEntity &&
       Reflect.get(hass.states as Record<string, unknown>, roomModeEntity)
     ) {
-      modeCards.push({
-        type: 'tile',
-        entity: roomModeEntity,
-        name: localize('room.room_mode'),
-        icon: dashboardConfig.room_mode_icon || 'mdi:home-account',
-        color: 'accent',
-        features: [{ type: 'select-options' }],
-        features_position: 'bottom',
-      });
-    }
-    if (
-      roomModeStickyEntity &&
-      Reflect.get(hass.states as Record<string, unknown>, roomModeStickyEntity)
-    ) {
-      modeCards.push({
-        type: 'tile',
-        entity: roomModeStickyEntity,
-        name: localize('room.sticky_lock'),
-        icon: 'mdi:lock',
-        color: 'red',
-        tap_action: { action: 'toggle' },
-      });
-    }
-    if (modeCards.length > 0) {
       sections.unshift({
         type: 'grid',
         cards: [
           {
-            type: 'horizontal-stack',
-            cards: modeCards,
-          } as LovelaceCardConfig,
+            type: 'tile',
+            entity: roomModeEntity,
+            name: localize('room.room_mode'),
+            icon: dashboardConfig.room_mode_icon || 'mdi:home-account',
+            color: 'accent',
+            features: [{ type: 'select-options' }],
+            features_position: 'bottom',
+            grid_options: { columns: 'full' },
+          },
         ],
       });
     }

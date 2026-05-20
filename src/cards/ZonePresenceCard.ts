@@ -11,37 +11,119 @@
 // Each dot:
 //   - reflects the zone's binary_sensor state (on = active, off = idle)
 //   - shows the zone's friendly name as label below
-//   - opens the more-info dialog on tap
+//   - is keyboard-focusable + supports HA's tap/hold/double-tap actions
+//     (default tap → more-info)
 //
 // Config (YAML for custom_cards / custom_views):
 //   type: custom:simon42-zone-presence-card
-//   name: Anwesenheit            # optional, hides heading when omitted
-//   icon: mdi:account-multiple   # optional
+//   name: Anwesenheit            # optional header label
+//   icon: mdi:account-multiple   # optional header icon
 //   entities:
 //     - binary_sensor.desk_occupied
 //     - { entity: binary_sensor.couch, name: Couch, color: light-blue }
 //     - binary_sensor.relax_area
 //     - binary_sensor.bed
+//   tap_action:                  # optional, applies to every dot;
+//     action: more-info          # per-entity override via the object form
 //
-// Each entity entry can be either a plain string or an object with
-// optional `name`, `icon`, `color` (active-state color).
+// Design notes
+// ------------
+// - Built per the HA custom-card playbook: extends LitElement directly,
+//   uses HA's `actionHandler` directive + `handleAction` helper instead
+//   of raw `@click`, exposes `getCardSize` + `getGridOptions`, gates
+//   re-renders to only the entities we actually watch.
+// - Colors come from HA CSS variables (`--state-active-color`,
+//   `--state-inactive-color`, etc.) so themes work out of the box. The
+//   per-entity `color:` is forwarded as an inline `--dot-color` so users
+//   keep their existing tile-card palette idioms.
+// - Accessibility: each dot is a `role="button"` with `tabindex="0"`,
+//   `aria-pressed`, `aria-label`, and a `:focus-visible` ring. The
+//   `actionHandler` directive wires Enter/Space keyboard activation.
 // ====================================================================
 
-import { LitElement, html, css, type PropertyValues } from 'lit';
+import { LitElement, html, css, nothing, type PropertyValues, type TemplateResult } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
-import { debugLog } from '../utils/debug';
 
-declare global {
-  interface Window {
-    customCards?: Array<{ type: string; name: string; description: string }>;
+// The Window.customCards interface is already declared in
+// SummaryCard.ts / LightsGroupCard.ts / CoversGroupCard.ts. We register
+// our card by pushing to that same array; the `preview` field below is
+// type-cast at the push site to stay compatible with the existing
+// shared declaration without forcing every card module to redeclare it.
+
+// --------------------------------------------------------------------
+// HA action-handler integration
+// --------------------------------------------------------------------
+// We use HA's official action-handler directive (registered globally
+// by the frontend as the custom element `action-handler`). The
+// directive fires a single `@action` event with `detail.action ∈
+// 'tap' | 'hold' | 'double_tap'`. We dispatch the actual action through
+// `hass-action` (HA's built-in handler) so navigation, more-info,
+// service calls, etc. all work the same way the tile-card does them.
+
+interface ActionConfig {
+  action: 'more-info' | 'toggle' | 'navigate' | 'call-service' | 'url' | 'none';
+  [key: string]: unknown;
+}
+
+interface ActionHandlerEventDetail {
+  action: 'tap' | 'hold' | 'double_tap';
+}
+type ActionHandlerEvent = CustomEvent<ActionHandlerEventDetail>;
+
+interface ActionHandlerOptions {
+  hasHold?: boolean;
+  hasDoubleClick?: boolean;
+  disabled?: boolean;
+}
+
+const hasAction = (a?: ActionConfig): boolean => a !== undefined && a.action !== 'none';
+
+// Mirrors HA's actionHandler() directive in the simplest correct form:
+// attach the global <action-handler> custom element to the bound node
+// once, and configure it for hold/double-tap. The element is lazily
+// created on first use.
+type ActionHandlerElement = HTMLElement & {
+  bind: (el: HTMLElement, opts: ActionHandlerOptions) => void;
+};
+let _actionHandlerEl: ActionHandlerElement | null = null;
+
+function getActionHandler(): ActionHandlerElement {
+  if (_actionHandlerEl) return _actionHandlerEl;
+  const existing = document.body.querySelector('action-handler') as ActionHandlerElement | null;
+  if (existing) {
+    _actionHandlerEl = existing;
+    return _actionHandlerEl;
+  }
+  // The element is shipped by the HA frontend; in the rare case it
+  // isn't loaded yet, we create it. It self-registers on first import
+  // anywhere in HA.
+  const el = document.createElement('action-handler') as ActionHandlerElement;
+  document.body.appendChild(el);
+  _actionHandlerEl = el;
+  return _actionHandlerEl;
+}
+
+function bindActionHandler(el: HTMLElement, opts: ActionHandlerOptions): void {
+  const handler = getActionHandler();
+  if (typeof handler.bind === 'function') {
+    handler.bind(el, opts);
   }
 }
+
+// --------------------------------------------------------------------
+// Config
+// --------------------------------------------------------------------
 
 interface ZoneEntry {
   entity: string;
   name?: string;
   icon?: string;
   color?: string;
+  tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
 interface ZonePresenceCardConfig {
@@ -49,31 +131,51 @@ interface ZonePresenceCardConfig {
   name?: string;
   icon?: string;
   entities: Array<string | ZoneEntry>;
+  tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
-const COLOR_MAP: Record<string, string> = {
-  red: 'var(--red-color, #f44336)',
-  orange: 'var(--orange-color, #ff9800)',
-  amber: 'var(--amber-color, #ffc107)',
-  yellow: 'var(--yellow-color, #ffeb3b)',
-  green: 'var(--green-color, #4caf50)',
-  'light-blue': 'var(--light-blue-color, #03a9f4)',
-  blue: 'var(--blue-color, #2196f3)',
-  indigo: 'var(--indigo-color, #3f51b5)',
-  purple: 'var(--purple-color, #9c27b0)',
-  pink: 'var(--pink-color, #e91e63)',
-  accent: 'var(--accent-color)',
-  primary: 'var(--primary-color)',
-};
+interface LovelaceGridOptions {
+  rows?: number | 'auto';
+  columns?: number | 'full';
+  min_rows?: number;
+  max_rows?: number;
+  min_columns?: number;
+  max_columns?: number;
+}
+
+// Map of the HA tile-card / Mushroom palette aliases to the official
+// HA `--<name>-color` variables. Falls back gracefully if a theme
+// doesn't define one.
+const PALETTE = new Set([
+  'red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue',
+  'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber',
+  'orange', 'deep-orange', 'brown', 'grey', 'blue-grey', 'black', 'white',
+  'disabled', 'primary', 'accent',
+]);
+
+function resolveColor(color: string | undefined): string {
+  if (!color) return 'var(--state-active-color, var(--primary-color))';
+  if (color === 'accent') return 'var(--accent-color)';
+  if (color === 'primary') return 'var(--primary-color)';
+  if (PALETTE.has(color)) return `var(--${color}-color)`;
+  // Allow raw CSS color values (hex, rgb(), etc.) to pass through.
+  return color;
+}
+
+// --------------------------------------------------------------------
+// Card
+// --------------------------------------------------------------------
 
 class Simon42ZonePresenceCard extends LitElement {
   static properties = {
     hass: { attribute: false },
+    _config: { state: true },
   };
 
   public hass?: HomeAssistant;
-  private _config!: ZonePresenceCardConfig;
-  private _zones: ZoneEntry[] = [];
+  private _config?: ZonePresenceCardConfig;
 
   static styles = css`
     :host {
@@ -81,18 +183,19 @@ class Simon42ZonePresenceCard extends LitElement {
     }
     ha-card {
       padding: 12px 16px;
-      background: var(--ha-card-background, var(--card-background-color, #fff));
+      background: var(--ha-card-background, var(--card-background-color));
       border-radius: var(--ha-card-border-radius, 12px);
-      --ha-card-border-width: 0;
+      box-sizing: border-box;
     }
     .header {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: var(--primary-text-color);
       font-weight: 500;
       font-size: 14px;
+      line-height: 1.2;
     }
     .header ha-icon {
       --mdc-icon-size: 18px;
@@ -101,46 +204,61 @@ class Simon42ZonePresenceCard extends LitElement {
     .zones {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      align-items: stretch;
+      gap: 6px 14px;
+      align-items: flex-start;
     }
     .zone {
-      flex: 1 1 auto;
-      min-width: 56px;
+      flex: 1 1 56px;
+      min-width: 48px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      cursor: pointer;
+      gap: 6px;
       padding: 6px 4px;
-      border-radius: 8px;
-      transition: background 0.15s;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 120ms ease;
+      outline: none;
     }
     .zone:hover {
       background: var(--secondary-background-color);
     }
-    .zone:active {
-      transform: scale(0.96);
-      transition: transform 0.08s;
+    .zone:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+    .zone.unavailable {
+      cursor: default;
+      opacity: 0.6;
     }
     .dot {
+      --dot-color: var(--state-active-color, var(--primary-color));
+      --dot-inactive: var(--state-inactive-color, var(--disabled-text-color));
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: var(--disabled-color, #bdbdbd);
-      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      background: var(--dot-inactive);
+      transition: background-color 200ms ease, box-shadow 200ms ease, transform 180ms ease;
     }
     .zone.active .dot {
-      transform: scale(1.2);
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--zone-color, var(--accent-color)) 25%, transparent);
-      background: var(--zone-color, var(--accent-color));
+      background: var(--dot-color);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot-color) 24%, transparent);
+      transform: scale(1.15);
+    }
+    .zone.unavailable .dot {
+      background: transparent;
+      border: 1.5px dashed var(--dot-inactive);
+      width: 11px;
+      height: 11px;
     }
     .label {
       font-size: 11px;
+      line-height: 1.15;
       color: var(--secondary-text-color);
       text-align: center;
-      line-height: 1.1;
-      max-width: 80px;
+      max-width: 88px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -151,80 +269,170 @@ class Simon42ZonePresenceCard extends LitElement {
     }
   `;
 
-  setConfig(config: ZonePresenceCardConfig): void {
+  // ---- LovelaceCard interface ----------------------------------------
+
+  public setConfig(config: ZonePresenceCardConfig): void {
     if (!config || !Array.isArray(config.entities) || config.entities.length === 0) {
       throw new Error('simon42-zone-presence-card: `entities` (non-empty array) is required');
     }
-    this._config = config;
-    this._zones = config.entities.map((e) =>
-      typeof e === 'string' ? { entity: e } : { ...e }
-    );
-    debugLog(`zone-presence-card: ${this._zones.length} zones configured`);
+    // Apply defaults first, user config second — mirrors HA tile-card.
+    this._config = {
+      tap_action: { action: 'more-info' },
+      hold_action: { action: 'more-info' },
+      ...config,
+    };
   }
 
-  getCardSize(): number {
+  public getCardSize(): number {
     return 1;
   }
 
-  shouldUpdate(changedProps: PropertyValues): boolean {
-    if (!this._config) return false;
-    if (changedProps.has('hass')) {
-      const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
-      if (!oldHass) return true;
-      // Only re-render when any tracked zone's state actually changed —
-      // saves work when global state updates land for unrelated entities.
-      for (const z of this._zones) {
-        const oldS = oldHass.states[z.entity] as HassEntity | undefined;
-        const newS = this.hass?.states[z.entity] as HassEntity | undefined;
-        if (oldS?.state !== newS?.state) return true;
-      }
-      return false;
+  public getGridOptions(): LovelaceGridOptions {
+    return { rows: 1, columns: 6, min_rows: 1, min_columns: 3, max_rows: 1 };
+  }
+
+  // Pick a representative binary_sensor for the picker preview.
+  public static getStubConfig(hass: HomeAssistant): ZonePresenceCardConfig {
+    const entityIds = Object.keys(hass.states)
+      .filter((id) => id.startsWith('binary_sensor.'))
+      .slice(0, 4);
+    return {
+      type: 'custom:simon42-zone-presence-card',
+      name: 'Zone Presence',
+      entities: entityIds.length > 0 ? entityIds : ['binary_sensor.example'],
+    };
+  }
+
+  // ---- Render gating -------------------------------------------------
+
+  protected shouldUpdate(changed: PropertyValues): boolean {
+    if (changed.has('_config')) return true;
+    const oldHass = changed.get('hass') as HomeAssistant | undefined;
+    if (!oldHass || !this._config) return true;
+    // Only re-render when one of our watched entities actually changed.
+    return this._entries().some((z) => oldHass.states[z.entity] !== this.hass?.states[z.entity]);
+  }
+
+  // ---- Helpers -------------------------------------------------------
+
+  private _entries(): ZoneEntry[] {
+    if (!this._config) return [];
+    return this._config.entities.map((e) => (typeof e === 'string' ? { entity: e } : { ...e }));
+  }
+
+  private _nameFor(z: ZoneEntry): string {
+    if (z.name) return z.name;
+    const s = this.hass?.states[z.entity] as HassEntity | undefined;
+    return s?.attributes?.friendly_name || z.entity.split('.').slice(1).join('.') || z.entity;
+  }
+
+  private _stateFor(z: ZoneEntry): { active: boolean; unavailable: boolean } {
+    const s = this.hass?.states[z.entity] as HassEntity | undefined;
+    const v = s?.state;
+    return {
+      active: v === 'on',
+      unavailable: v === undefined || v === 'unavailable' || v === 'unknown',
+    };
+  }
+
+  // Merges card-level defaults with per-entry overrides into the config
+  // shape HA's `hass-action` event expects.
+  private _resolveActions(z: ZoneEntry) {
+    return {
+      tap_action: z.tap_action || this._config?.tap_action || { action: 'more-info' },
+      hold_action: z.hold_action || this._config?.hold_action || { action: 'more-info' },
+      double_tap_action: z.double_tap_action || this._config?.double_tap_action,
+    };
+  }
+
+  private _handleAction(ev: ActionHandlerEvent): void {
+    if (!this.hass) return;
+    const target = ev.currentTarget as HTMLElement;
+    const idx = Number(target.dataset.index);
+    const entries = this._entries();
+    if (!Number.isFinite(idx) || idx < 0 || idx >= entries.length) return;
+    const entry = entries[idx];
+    const actions = this._resolveActions(entry);
+    // Build a config block hass-action recognises (same shape as a
+    // tile-card config). Pass the per-entry entity so more-info /
+    // toggle targets the dot the user tapped.
+    const cfg = {
+      entity: entry.entity,
+      ...actions,
+    };
+    this.dispatchEvent(
+      new CustomEvent('hass-action', {
+        bubbles: true,
+        composed: true,
+        detail: { config: cfg, action: ev.detail.action },
+      })
+    );
+  }
+
+  // Rebind the action-handler directive every render (cheap; matches
+  // HA's own usage from `actionHandler.bind`). We do it in `updated`
+  // so the element exists in the DOM.
+  protected updated(changed: PropertyValues): void {
+    if (!this._config) return;
+    if (!changed.has('_config') && !changed.has('hass')) return;
+    const entries = this._entries();
+    const nodes = this.shadowRoot?.querySelectorAll<HTMLElement>('.zone') || [];
+    nodes.forEach((node, i) => {
+      const entry = entries[i];
+      if (!entry) return;
+      const actions = this._resolveActions(entry);
+      bindActionHandler(node, {
+        hasHold: hasAction(actions.hold_action),
+        hasDoubleClick: hasAction(actions.double_tap_action),
+        disabled: this._stateFor(entry).unavailable,
+      });
+    });
+    // Reflect dark-mode for theme-aware ::shadow consumers (Mushroom pattern).
+    if (changed.has('hass') && this.hass) {
+      const dark = (this.hass.themes as { darkMode?: boolean } | undefined)?.darkMode === true;
+      this.toggleAttribute('dark-mode', dark);
     }
-    return true;
   }
 
-  private _onZoneTap(entity: string): void {
-    const event = new Event('hass-more-info', { bubbles: true, composed: true });
-    (event as Event & { detail: { entityId: string } }).detail = { entityId: entity };
-    this.dispatchEvent(event);
-  }
+  // ---- Render --------------------------------------------------------
 
-  private _resolveName(zone: ZoneEntry): string {
-    if (zone.name) return zone.name;
-    const s = this.hass?.states[zone.entity] as HassEntity | undefined;
-    return s?.attributes?.friendly_name || zone.entity.split('.')[1] || zone.entity;
-  }
-
-  render() {
+  protected render(): TemplateResult {
     if (!this._config || !this.hass) return html``;
 
-    const name = this._config.name;
-    const icon = this._config.icon || 'mdi:account-multiple';
+    const headerName = this._config.name;
+    const headerIcon = this._config.icon;
+    const showHeader = !!headerName || !!headerIcon;
+    const entries = this._entries();
 
     return html`
       <ha-card>
-        ${name
+        ${showHeader
           ? html`
               <div class="header">
-                <ha-icon icon=${icon}></ha-icon>
-                <span>${name}</span>
+                ${headerIcon ? html`<ha-icon icon=${headerIcon}></ha-icon>` : nothing}
+                ${headerName ? html`<span>${headerName}</span>` : nothing}
               </div>
             `
-          : ''}
+          : nothing}
         <div class="zones">
-          ${this._zones.map((z) => {
-            const state = this.hass!.states[z.entity] as HassEntity | undefined;
-            const active = state?.state === 'on';
-            const color = COLOR_MAP[z.color || 'accent'] || COLOR_MAP['accent'];
+          ${entries.map((z, i) => {
+            const { active, unavailable } = this._stateFor(z);
+            const color = resolveColor(z.color);
             return html`
               <div
-                class="zone ${active ? 'active' : ''}"
-                style="--zone-color: ${color}"
-                title=${this._resolveName(z)}
-                @click=${() => this._onZoneTap(z.entity)}
+                class=${classMap({ zone: true, active, unavailable })}
+                style=${styleMap({ '--dot-color': color })}
+                data-index=${i}
+                role="button"
+                tabindex=${unavailable ? '-1' : '0'}
+                aria-pressed=${active ? 'true' : 'false'}
+                aria-disabled=${unavailable ? 'true' : 'false'}
+                aria-label=${`${this._nameFor(z)} ${active ? 'active' : 'idle'}`}
+                title=${this._nameFor(z)}
+                @action=${this._handleAction}
               >
                 <div class="dot"></div>
-                <div class="label">${this._resolveName(z)}</div>
+                <div class="label">${this._nameFor(z)}</div>
               </div>
             `;
           })}
@@ -236,13 +444,17 @@ class Simon42ZonePresenceCard extends LitElement {
 
 customElements.define('simon42-zone-presence-card', Simon42ZonePresenceCard);
 
-// Register with the HA custom-cards picker so it shows up in the UI
-// "Add card" dialog with a description.
+// Register with HA's "Add card" picker so it surfaces in the editor UI.
+// The `preview: true` flag isn't part of the shared global interface
+// (other cards in this bundle declare a narrower shape), so we cast
+// the descriptor at push site rather than widen every card module.
 window.customCards = window.customCards || [];
 if (!window.customCards.some((c) => c.type === 'simon42-zone-presence-card')) {
   window.customCards.push({
     type: 'simon42-zone-presence-card',
     name: 'Simon42 Zone Presence',
-    description: 'Compact row of zone-presence indicators (one dot per zone). Use for multi-zone presence sensors like Aqara FP1/FP2.',
-  });
+    description:
+      'Compact row of zone-presence dots, one per zone — for multi-zone presence sensors (Aqara FP1/FP2, mmWave, etc.).',
+    preview: true,
+  } as { type: string; name: string; description: string });
 }
