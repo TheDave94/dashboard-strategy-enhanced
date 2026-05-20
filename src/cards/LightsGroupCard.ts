@@ -774,6 +774,20 @@ class Simon42LightsGroupCard extends LitElement {
     const lights = this._getRelevantLights();
     return Math.ceil(lights.length / 3) + 1;
   }
+
+  public static getStubConfig(): { group_type: 'on' | 'off' | 'all' } {
+    return { group_type: 'all' };
+  }
 }
 
 customElements.define('simon42-lights-group-card', Simon42LightsGroupCard);
+
+window.customCards = window.customCards || [];
+if (!window.customCards.some((c) => c.type === 'simon42-lights-group-card')) {
+  window.customCards.push({
+    type: 'simon42-lights-group-card',
+    name: 'Simon42 Lights Group',
+    description: 'Grouped on/off light tiles with nested-group support, floor grouping, and inline batch controls.',
+    preview: true,
+  } as { type: string; name: string; description: string });
+}

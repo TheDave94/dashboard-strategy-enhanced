@@ -53,69 +53,18 @@ import { setupLocalize, localize } from '../utils/localize';
 // type-cast at the push site to stay compatible with the existing
 // shared declaration without forcing every card module to redeclare it.
 
+import { bindActionHandler, type ActionHandlerEvent } from '../utils/action-handler';
+
 // --------------------------------------------------------------------
-// HA action-handler integration
+// Config
 // --------------------------------------------------------------------
-// We use HA's official action-handler directive (registered globally
-// by the frontend as the custom element `action-handler`). The
-// directive fires a single `@action` event with `detail.action ∈
-// 'tap' | 'hold' | 'double_tap'`. We dispatch the actual action through
-// `hass-action` (HA's built-in handler) so navigation, more-info,
-// service calls, etc. all work the same way the tile-card does them.
 
 interface ActionConfig {
   action: 'more-info' | 'toggle' | 'navigate' | 'call-service' | 'url' | 'none';
   [key: string]: unknown;
 }
 
-interface ActionHandlerEventDetail {
-  action: 'tap' | 'hold' | 'double_tap';
-}
-type ActionHandlerEvent = CustomEvent<ActionHandlerEventDetail>;
-
-interface ActionHandlerOptions {
-  hasHold?: boolean;
-  hasDoubleClick?: boolean;
-  disabled?: boolean;
-}
-
 const hasAction = (a?: ActionConfig): boolean => a !== undefined && a.action !== 'none';
-
-// Mirrors HA's actionHandler() directive in the simplest correct form:
-// attach the global <action-handler> custom element to the bound node
-// once, and configure it for hold/double-tap. The element is lazily
-// created on first use.
-type ActionHandlerElement = HTMLElement & {
-  bind: (el: HTMLElement, opts: ActionHandlerOptions) => void;
-};
-let _actionHandlerEl: ActionHandlerElement | null = null;
-
-function getActionHandler(): ActionHandlerElement {
-  if (_actionHandlerEl) return _actionHandlerEl;
-  const existing = document.body.querySelector('action-handler') as ActionHandlerElement | null;
-  if (existing) {
-    _actionHandlerEl = existing;
-    return _actionHandlerEl;
-  }
-  // The element is shipped by the HA frontend; in the rare case it
-  // isn't loaded yet, we create it. It self-registers on first import
-  // anywhere in HA.
-  const el = document.createElement('action-handler') as ActionHandlerElement;
-  document.body.appendChild(el);
-  _actionHandlerEl = el;
-  return _actionHandlerEl;
-}
-
-function bindActionHandler(el: HTMLElement, opts: ActionHandlerOptions): void {
-  const handler = getActionHandler();
-  if (typeof handler.bind === 'function') {
-    handler.bind(el, opts);
-  }
-}
-
-// --------------------------------------------------------------------
-// Config
-// --------------------------------------------------------------------
 
 interface ZoneEntry {
   entity: string;
