@@ -183,6 +183,16 @@ class Simon42ZonePresenceCard extends LitElement {
   static styles = css`
     :host {
       display: block;
+      /* Enable inline-size container queries on the host so the card
+         scales to its actual rendered width — narrow cells in a
+         section, wide cells in a single-card layout, anything between.
+         Token-driven design: the CSS below reads only --s42-* so the
+         container-query rules just rebind them per breakpoint. */
+      container-type: inline-size;
+      container-name: s42-zone;
+
+      /* Default / mid-size tokens (≈ comfortable). Used when no
+         container-query breakpoint matches. */
       --s42-pad-block: var(--ha-space-3, 12px);
       --s42-pad-inline: var(--ha-space-4, 16px);
       --s42-header-gap: var(--ha-space-2, 8px);
@@ -197,15 +207,44 @@ class Simon42ZonePresenceCard extends LitElement {
       --s42-label: var(--ha-font-size-xs, 11px);
       --s42-header-size: var(--ha-font-size-m, 14px);
     }
+    /* Narrow container (< 360px): cards on phones, half-section
+       favorites pins. Tighten chrome, keep icons legible. */
+    @container s42-zone (max-width: 360px) {
+      :host {
+        --s42-pad-block: var(--ha-space-2, 10px);
+        --s42-pad-inline: var(--ha-space-3, 14px);
+        --s42-header-mb: var(--ha-space-2, 8px);
+        --s42-zone-gap-col: var(--ha-space-2, 10px);
+        --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
+        --s42-icon-wrap: 32px;
+        --s42-icon-size: 20px;
+      }
+    }
+    /* Wide container (> 600px): card has room to breathe. */
+    @container s42-zone (min-width: 600px) {
+      :host {
+        --s42-pad-block: var(--ha-space-4, 16px);
+        --s42-pad-inline: var(--ha-space-5, 20px);
+        --s42-icon-wrap: 40px;
+        --s42-icon-size: 24px;
+      }
+    }
+    /* Manual override — overrides any container-query result, used
+       when the user explicitly forces a density regardless of size. */
     :host([density="compact"]) {
-      /* Gentle reduction — keeps icon legibility while trimming chrome. */
-      --s42-pad-block: var(--ha-space-2, 10px);
-      --s42-pad-inline: var(--ha-space-3, 14px);
-      --s42-header-mb: var(--ha-space-2, 8px);
-      --s42-zone-gap-col: var(--ha-space-2, 10px);
-      --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
-      --s42-icon-wrap: 32px;
-      --s42-icon-size: 20px;
+      --s42-pad-block: var(--ha-space-2, 10px) !important;
+      --s42-pad-inline: var(--ha-space-3, 14px) !important;
+      --s42-header-mb: var(--ha-space-2, 8px) !important;
+      --s42-zone-gap-col: var(--ha-space-2, 10px) !important;
+      --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px) !important;
+      --s42-icon-wrap: 32px !important;
+      --s42-icon-size: 20px !important;
+    }
+    :host([density="comfortable"]) {
+      --s42-pad-block: var(--ha-space-3, 12px) !important;
+      --s42-pad-inline: var(--ha-space-4, 16px) !important;
+      --s42-icon-wrap: 36px !important;
+      --s42-icon-size: 22px !important;
     }
     ha-card {
       padding: var(--s42-pad-block) var(--s42-pad-inline);

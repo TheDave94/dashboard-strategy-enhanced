@@ -353,17 +353,26 @@ export interface AreaOptions {
    */
   pin_zone_presence_to_favorites?: boolean;
   /**
-   * Curated entity subset for the favorites-pinned zone-presence card.
-   * When set (and `pin_zone_presence_to_favorites: true`), the
-   * favorites-pin uses this list verbatim instead of the room view's
-   * auto-detected device_class={occupancy,motion,presence} set.
+   * Single source of truth for the area's zone-presence card.
+   * When set, BOTH the Room view's auto-rendered presence card AND
+   * the favorites pin use this list verbatim instead of the
+   * device-class auto-detect.
+   *
    * Each entry can be a string (entity ID) or an object
-   * `{ entity, name?, icon?, color?, tap_action?, ... }` — same shape
-   * the zone-presence card itself accepts. Useful when an area has
-   * many occupancy sensors but only a few are interesting at a
-   * glance on the overview. The Room view's auto-render still shows
-   * the full auto-detected set; this only overrides the favorites
-   * pin.
+   * `{ entity, name?, icon?, color?, tap_action?, ... }` — the same
+   * shape the zone-presence card itself accepts. Useful when an
+   * area has many occupancy sensors but you want the strategy to
+   * surface only a few, with consistent icons/colors across every
+   * surface it appears on.
+   *
+   * When unset, both surfaces auto-detect by device_class ∈
+   * {occupancy, motion, presence}.
+   */
+  presence_entities?: Array<string | PresenceZoneEntry>;
+  /**
+   * @deprecated Use `presence_entities` instead. Beta.15+ honours
+   * `presence_entities` for both the room view and favorites pin; if
+   * unset, this field is read for backwards compat.
    */
   pin_zone_presence_to_favorites_entities?: Array<string | PresenceZoneEntry>;
 }

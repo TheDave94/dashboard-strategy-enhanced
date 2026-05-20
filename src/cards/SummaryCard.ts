@@ -66,22 +66,39 @@ class Simon42SummaryCard extends LitElement {
     :host {
       display: block;
       cursor: pointer;
-      /* Per-density tokens. The values below resolve to HA's design
-         tokens (--ha-space-N = N*4px) so themes can re-skin them, and
-         the compact variant just rebinds the four locals at the host
-         level — the rest of the CSS reads only --s42-* and inherits
-         consistently. */
+      /* Container queries scale to the tile's actual rendered width. */
+      container-type: inline-size;
+      container-name: s42-summary;
+
       --s42-pad: var(--ha-space-3, 12px);
       --s42-gap: var(--ha-space-2, 8px);
       --s42-icon: 28px;
       --s42-name: var(--ha-font-size-s, 13px);
     }
+    /* Narrow (< 160px wide cell): half-summary in a 4-col strip. */
+    @container s42-summary (max-width: 160px) {
+      :host {
+        --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
+        --s42-gap: var(--ha-space-3, 10px);
+        --s42-icon: 24px;
+      }
+    }
+    /* Wide (> 280px): summary card in a generous lane. */
+    @container s42-summary (min-width: 280px) {
+      :host {
+        --s42-icon: 32px;
+      }
+    }
+    /* Manual overrides win against the container queries. */
     :host([density="compact"]) {
-      /* Less aggressive than full -50% — drops ~25% padding, keeps
-         icon close to comfortable so the tile still reads at a glance. */
-      --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
-      --s42-gap: var(--ha-space-3, 10px);
-      --s42-icon: 26px;
+      --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px) !important;
+      --s42-gap: var(--ha-space-3, 10px) !important;
+      --s42-icon: 26px !important;
+    }
+    :host([density="comfortable"]) {
+      --s42-pad: var(--ha-space-3, 12px) !important;
+      --s42-gap: var(--ha-space-2, 8px) !important;
+      --s42-icon: 28px !important;
     }
     ha-card {
       padding: var(--s42-pad);

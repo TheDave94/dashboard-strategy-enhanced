@@ -97,7 +97,10 @@ function buildZonePresenceCard(
   hass: HomeAssistant,
 ): LovelaceCardConfig | null {
   const areaOpts = (config.areas_options || {})[areaId] || {};
-  const curated = areaOpts.pin_zone_presence_to_favorites_entities;
+  // Single source of truth — same field consulted by the Room view's
+  // auto-render. Legacy field kept for one release for backwards compat.
+  const curated =
+    areaOpts.presence_entities ?? areaOpts.pin_zone_presence_to_favorites_entities;
 
   let entities: unknown[];
   if (Array.isArray(curated) && curated.length > 0) {

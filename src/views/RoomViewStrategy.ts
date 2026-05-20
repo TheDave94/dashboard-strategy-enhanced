@@ -785,11 +785,16 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       });
     }
 
-    // Auto-rendered zone-presence section. Picks every visible
-    // binary_sensor in this area whose device_class is one of
-    // {occupancy, motion, presence}. When there are 2+ such sensors,
-    // render them as a single simon42-zone-presence-card so they show
-    // up as a compact row of icons rather than a tile per zone.
+    // Auto-rendered zone-presence section. Two sources, priority order:
+    //   1. Curated `areas_options.<area>.presence_entities` (string[] or
+    //      `{ entity, name?, icon?, color? }` objects). Same field
+    //      consulted by the favorites pin in OverviewSection, so a
+    //      curated list shows identically in both places.
+    //   2. Auto-detect: every visible binary_sensor in this area whose
+    //      device_class is one of {occupancy, motion, presence}.
+    //
+    // Renders when ≥2 entities (curated or detected) — a single sensor
+    // reads fine as a regular tile, the card adds value above that.
     //
     // Opt-out: areas_options.<area>.show_zone_presence === false, or
     // top-level show_zone_presence_in_rooms === false.
@@ -800,15 +805,26 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       dashboardConfig.show_zone_presence_in_rooms !== false;
 
     if (showZonePresence) {
-      const ZONE_CLASSES = new Set(['occupancy', 'motion', 'presence']);
-      const zoneEntities = visibleEntities
-        .map((e) => e.entity_id)
-        .filter((id) => {
-          if (!id.startsWith('binary_sensor.')) return false;
-          const s = hass.states[id];
-          const dc = s?.attributes?.device_class as string | undefined;
-          return dc !== undefined && ZONE_CLASSES.has(dc);
+      const curatedPresence =
+        areaOpts.presence_entities ??
+        areaOpts.pin_zone_presence_to_favorites_entities;
+      let zoneEntities: unknown[];
+      if (Array.isArray(curatedPresence) && curatedPresence.length > 0) {
+        zoneEntities = curatedPresence.filter((e) => {
+          if (typeof e === 'string') return e.length > 0;
+          return typeof (e as { entity?: unknown }).entity === 'string';
         });
+      } else {
+        const ZONE_CLASSES = new Set(['occupancy', 'motion', 'presence']);
+        zoneEntities = visibleEntities
+          .map((e) => e.entity_id)
+          .filter((id) => {
+            if (!id.startsWith('binary_sensor.')) return false;
+            const s = hass.states[id];
+            const dc = s?.attributes?.device_class as string | undefined;
+            return dc !== undefined && ZONE_CLASSES.has(dc);
+          });
+      }
 
       if (zoneEntities.length >= 2) {
         sections.push({

@@ -89,12 +89,24 @@ class Simon42CoversGroupCard extends LitElement {
   static styles = css`
     :host {
       display: block;
+      container-type: inline-size;
+      container-name: s42-covers;
       --s42-gap: var(--ha-space-2, 8px);
       --s42-tile-min: 300px;
     }
+    @container s42-covers (max-width: 400px) {
+      :host {
+        --s42-gap: var(--ha-space-1, 6px);
+        --s42-tile-min: 260px;
+      }
+    }
     :host([density="compact"]) {
-      --s42-gap: var(--ha-space-1, 6px);
-      --s42-tile-min: 280px;
+      --s42-gap: var(--ha-space-1, 6px) !important;
+      --s42-tile-min: 280px !important;
+    }
+    :host([density="comfortable"]) {
+      --s42-gap: var(--ha-space-2, 8px) !important;
+      --s42-tile-min: 300px !important;
     }
     :host([hidden]) {
       display: none;

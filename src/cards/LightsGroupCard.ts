@@ -77,7 +77,9 @@ class Simon42LightsGroupCard extends LitElement {
       display: none;
     }
     :host {
-      /* Per-density tokens — see SummaryCard for the pattern. */
+      container-type: inline-size;
+      container-name: s42-lights;
+
       --s42-gap: var(--ha-space-2, 8px);
       --s42-block-pad: var(--ha-space-3, 12px);
       --s42-block-radius: var(--ha-border-radius-lg, 16px);
@@ -85,14 +87,32 @@ class Simon42LightsGroupCard extends LitElement {
       --s42-tile-min: 300px;
       --s42-child-min: 260px;
     }
+    /* Narrow lanes (< 400px): tighter gaps, narrower tile-min so the
+       cards still fit one-per-row instead of overflowing. */
+    @container s42-lights (max-width: 400px) {
+      :host {
+        --s42-gap: var(--ha-space-1, 6px);
+        --s42-block-pad: var(--ha-space-2, 10px);
+        --s42-block-radius: var(--ha-border-radius-md, 14px);
+        --s42-toggle-size: 32px;
+        --s42-tile-min: 260px;
+        --s42-child-min: 220px;
+      }
+    }
+    /* Wide lanes (> 800px): comfortable defaults are already right;
+       no override needed. */
     :host([density="compact"]) {
-      /* Subtle reduction — same layout, just tighter. */
-      --s42-gap: var(--ha-space-1, 6px);
-      --s42-block-pad: var(--ha-space-2, 10px);
-      --s42-block-radius: var(--ha-border-radius-md, 14px);
-      --s42-toggle-size: 32px;
-      --s42-tile-min: 280px;
-      --s42-child-min: 240px;
+      --s42-gap: var(--ha-space-1, 6px) !important;
+      --s42-block-pad: var(--ha-space-2, 10px) !important;
+      --s42-block-radius: var(--ha-border-radius-md, 14px) !important;
+      --s42-toggle-size: 32px !important;
+      --s42-tile-min: 280px !important;
+      --s42-child-min: 240px !important;
+    }
+    :host([density="comfortable"]) {
+      --s42-gap: var(--ha-space-2, 8px) !important;
+      --s42-block-pad: var(--ha-space-3, 12px) !important;
+      --s42-tile-min: 300px !important;
     }
     .lights-section {
       display: flex;
