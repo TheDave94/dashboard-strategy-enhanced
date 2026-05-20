@@ -572,6 +572,20 @@ class Simon42CoversGroupCard extends LitElement {
     const covers = this._getRelevantCovers();
     return Math.ceil(covers.length / 3) + 1;
   }
+
+  public static getStubConfig(): { group_type: 'open' | 'closed' | 'partially_open' } {
+    return { group_type: 'open' };
+  }
 }
 
 customElements.define('simon42-covers-group-card', Simon42CoversGroupCard);
+
+window.customCards = window.customCards || [];
+if (!window.customCards.some((c) => c.type === 'simon42-covers-group-card')) {
+  window.customCards.push({
+    type: 'simon42-covers-group-card',
+    name: 'Simon42 Covers Group',
+    description: 'Grouped open/closed cover tiles with optional partially-open bucket, awnings, and windows.',
+    preview: true,
+  } as { type: string; name: string; description: string });
+}

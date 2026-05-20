@@ -8,6 +8,7 @@ import { Registry } from '../Registry';
 import { trackHassUpdate, debugLog, timeStart, timeEnd } from '../utils/debug';
 import { localize } from '../utils/localize';
 import { getBatteryEntities, SECURITY_EXCLUDED_PLATFORMS } from '../utils/entity-filter';
+import { bindActionHandler, type ActionHandlerEvent } from '../utils/action-handler';
 
 declare global {
   interface Window {
@@ -143,13 +144,23 @@ class Simon42SummaryCard extends LitElement {
   `;
 
   setConfig(config: SummaryCardConfig): void {
+    // HA convention: setConfig throws on invalid input so the visual
+    // editor surfaces the error inline instead of silently rendering
+    // an empty count.
+    if (!config || typeof config !== 'object') {
+      throw new Error('simon42-summary-card: config object required');
+    }
+    if (
+      !['lights', 'covers', 'security', 'batteries', 'climate'].includes(config.summary_type)
+    ) {
+      throw new Error(
+        "simon42-summary-card: summary_type must be one of 'lights' | 'covers' | 'security' | 'batteries' | 'climate'",
+      );
+    }
     this._config = config;
     this._relevantEntityIds = null;
-    // Reflect density onto a host attribute so the static CSS selector
-    // (:host([density="compact"])) can pick it up without rebuilding
-    // styles per instance.
-    if (config.density === 'compact') {
-      this.setAttribute('density', 'compact');
+    if (config.density === 'compact' || config.density === 'comfortable') {
+      this.setAttribute('density', config.density);
     } else {
       this.removeAttribute('density');
     }
@@ -364,33 +375,57 @@ class Simon42SummaryCard extends LitElement {
     return configs[this._config.summary_type];
   }
 
-  private _handleClick(): void {
-    if (!this.hass) return;
+  // Action dispatch — uses HA's action-handler directive (attached in
+  // updated()) so tap/hold/double-tap all work, plus Enter/Space when
+  // the card has focus. Matches the ZonePresenceCard contract; the
+  // SummaryCard config is always a navigate to its summary view.
+  private _onAction(ev: ActionHandlerEvent): void {
+    if (!this.hass || !this._config) return;
+    const action = ev.detail.action;
+    // Hold and double-tap default to more-info on the summary's first
+    // relevant entity (when available). Tap navigates to the view.
     const displayConfig = this._getDisplayConfig();
+    const first = this._relevantEntityIds && [...this._relevantEntityIds][0];
+    const config =
+      action === 'tap'
+        ? { tap_action: { action: 'navigate', navigation_path: displayConfig.path } }
+        : first
+          ? { entity: first, hold_action: { action: 'more-info' }, double_tap_action: { action: 'more-info' } }
+          : { tap_action: { action: 'navigate', navigation_path: displayConfig.path } };
     this.dispatchEvent(
       new CustomEvent('hass-action', {
         bubbles: true,
         composed: true,
-        detail: {
-          config: {
-            tap_action: {
-              action: 'navigate',
-              navigation_path: displayConfig.path,
-            },
-          },
-          action: 'tap',
-        },
-      })
+        detail: { config, action },
+      }),
     );
   }
 
-  protected render() {
+  protected updated(changed: PropertyValues): void {
+    if (!this.hass) return;
+    // Bind HA's global <action-handler> custom element to the
+    // ha-card once, so tap/hold/double-tap all dispatch a single
+    // @action event with `detail.action` set. Same pattern as
+    // ZonePresenceCard — see /tmp/simon42_audit_2026.md §2.2 for
+    // the rationale (raw @click loses keyboard + hold).
+    if (!changed.has('hass') && !changed.has('_config')) return;
+    const card = this.shadowRoot?.querySelector<HTMLElement>('ha-card');
+    if (!card) return;
+    bindActionHandler(card, { hasHold: true, hasDoubleClick: true });
+  }
 
+  protected render() {
+    if (!this._config) return html``;
     const display = this._getDisplayConfig();
     const colorCss = COLOR_MAP[display.color] || COLOR_MAP.grey;
 
     return html`
-      <ha-card @click=${() => this._handleClick()}>
+      <ha-card
+        role="button"
+        tabindex="0"
+        aria-label=${display.name}
+        @action=${this._onAction}
+      >
         <ha-icon class="icon" .icon=${display.icon} style="color: ${colorCss}"></ha-icon>
         <div class="name">${display.name}</div>
       </ha-card>
@@ -413,6 +448,13 @@ class Simon42SummaryCard extends LitElement {
   } {
     return { columns: 6, rows: 1, min_columns: 3, min_rows: 1 };
   }
+
+  // Picker preview — HA's "Add card" dialog calls this to seed the
+  // YAML when the user picks the card. We default to the lights
+  // summary (the most universally useful starting point).
+  public static getStubConfig(): SummaryCardConfig {
+    return { summary_type: 'lights' };
+  }
 }
 
 customElements.define('simon42-summary-card', Simon42SummaryCard);
@@ -421,5 +463,6 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'simon42-summary-card',
   name: 'Simon42 Summary Card',
-  description: 'Reactive summary card that counts entities dynamically',
-});
+  description: 'Reactive summary tile that counts entities (lights / covers / security / batteries / climate)',
+  preview: true,
+} as { type: string; name: string; description: string });
