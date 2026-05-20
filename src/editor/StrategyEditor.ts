@@ -2200,6 +2200,9 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const showAutomationsInRooms = this._config.show_automations_in_rooms === true;
     const showScriptsInRooms = this._config.show_scripts_in_rooms === true;
     const showCamerasInRooms = this._config.show_cameras_in_rooms !== false;
+    // Window / door contact badges default to visible — read as opt-out (!== false).
+    const showWindowContactsInRooms = this._config.show_window_contacts_in_rooms !== false;
+    const showDoorContactsInRooms = this._config.show_door_contacts_in_rooms !== false;
     const useDefaultAreaSort = this._config.use_default_area_sort === true;
 
     const allAreas = Object.values(this._hass!.areas).sort((a, b) => a.name.localeCompare(b.name));
@@ -2241,6 +2244,15 @@ class Simon42DashboardStrategyEditor extends LitElement {
         ${this._renderCheckbox('show-cameras-in-rooms', localize('editor.show_cameras_in_rooms'), showCamerasInRooms,
           (checked) => this._toggleChanged('show_cameras_in_rooms', checked, true))}
         <div class="description">${localize('editor.show_cameras_in_rooms_desc')}</div>
+
+        ${this._renderCheckbox('show-window-contacts-in-rooms', localize('editor.show_window_contacts_in_rooms'), showWindowContactsInRooms,
+          (checked) => this._toggleChanged('show_window_contacts_in_rooms', checked, true))}
+        <div class="description">${localize('editor.show_window_contacts_in_rooms_desc')}</div>
+
+        ${this._renderCheckbox('show-door-contacts-in-rooms', localize('editor.show_door_contacts_in_rooms'), showDoorContactsInRooms,
+          (checked) => this._toggleChanged('show_door_contacts_in_rooms', checked, true))}
+        <div class="description">${localize('editor.show_door_contacts_in_rooms_desc')}</div>
+
         ${this._renderCheckbox('hide-unavailable-in-rooms', localize('editor.hide_unavailable_in_rooms'),
           this._config.hide_unavailable_in_rooms !== false,
           (checked) => this._toggleChanged('hide_unavailable_in_rooms', checked, true))}
