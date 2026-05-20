@@ -31,6 +31,7 @@ import { renderSummariesTab } from './tabs/SummariesTab';
 import { renderSectionOrderTab } from './tabs/SectionOrderTab';
 import { renderAreasTab } from './tabs/AreasTab';
 import { renderRoomPinsTab } from './tabs/RoomPinsTab';
+import { renderLightFavoritesTab } from './tabs/LightFavoritesTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1467,55 +1468,22 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderLightFavoritesSection(): TemplateResult {
-    const lightFavs = this._config.light_favorite_entities || [];
+    if (!this._hass) return html``;
     const allEntities = this._getAllEntitiesForSelect();
-    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
-    const filtered = this._getFilteredEntities(this._lightFavSearch).filter((e) => e.entity_id.startsWith('light.'));
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_light_favorites')}</div>
-
-        ${lightFavs.length > 0 ? html`
-          <div class="entity-list-container" style="margin-bottom: 8px;">
-            ${lightFavs.map((entityId) => {
-              const name = entityMap.get(entityId) || entityId;
-              return html`
-                <div class="entity-list-item" data-entity-id=${entityId}>
-                  <span class="item-info">
-                    <span class="item-name">${name}</span>
-                    <span class="item-entity-id">${entityId}</span>
-                  </span>
-                  <button class="btn-remove" @click=${() => this._removeLightFavorite(entityId)}>&#x2715;</button>
-                </div>
-              `;
-            })}
-          </div>
-        ` : nothing}
-
-        <div class="entity-search-picker">
-          <input type="text" class="entity-search-input"
-            placeholder=${localize('editor.select_entity') + '...'}
-            .value=${this._lightFavSearch}
-            @input=${(e: Event) => { this._lightFavSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
-            @blur=${() => { setTimeout(() => { this._lightFavSearch = ''; this.requestUpdate(); }, 200); }}
-          />
-          ${this._lightFavSearch.length >= 2 ? html`
-            <div class="entity-search-results">
-              ${filtered.length > 0
-                ? filtered.map((entity) => html`
-                  <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addLightFavorite(entity.entity_id); this._lightFavSearch = ''; this.requestUpdate(); }}>
-                    <span class="entity-search-name">${entity.name}</span>
-                    <span class="entity-search-id">${entity.entity_id}</span>
-                  </div>
-                `)
-                : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
-              }
-            </div>
-          ` : nothing}
-        </div>
-        <div class="description">${localize('editor.light_favorites_desc')}</div>
-      </div>
-    `;
+    return renderLightFavoritesTab({
+      config: this._config,
+      search: this._lightFavSearch,
+      entityNameMap: new Map(allEntities.map((e) => [e.entity_id, e.name])),
+      filteredEntities: this._getFilteredEntities(this._lightFavSearch).filter((e) =>
+        e.entity_id.startsWith('light.'),
+      ),
+      onSearchChange: (value) => {
+        this._lightFavSearch = value;
+        this.requestUpdate();
+      },
+      onAddEntity: (entityId) => this._addLightFavorite(entityId),
+      onRemoveEntity: (entityId) => this._removeLightFavorite(entityId),
+    });
   }
 
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
