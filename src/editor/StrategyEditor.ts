@@ -28,6 +28,7 @@ import { isBadgeCandidate, isDefaultShowName, resolveShowName } from '../utils/b
 import { renderViewsTab } from './tabs/ViewsTab';
 import { renderOverviewTab } from './tabs/OverviewTab';
 import { renderSummariesTab } from './tabs/SummariesTab';
+import { renderSectionOrderTab } from './tabs/SectionOrderTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1179,205 +1180,32 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderSectionOrderPanel(): TemplateResult {
-    const order = this._getSectionsOrder();
-    const energyLinkDashboard = this._config.energy_link_dashboard !== false;
-    const showEnergy = this._config.show_energy !== false;
-    const showWeather = this._config.show_weather !== false;
-    const showEnergyDistributionCard = this._config.show_energy_distribution_card !== false;
-    // weather_presentation supersedes the legacy show_weather_forecast_card
-    // boolean. Resolution mirrors createWeatherSection:
-    //   explicit weather_presentation → use it
-    //   else show_weather_forecast_card === false → 'none'
-    //   else 'forecast_daily'
-    const weatherPresentation: WeatherPresentation =
-      this._config.weather_presentation ??
-      (this._config.show_weather_forecast_card === false ? 'none' : 'forecast_daily');
-    const weatherEntity = this._config.weather_entity || '';
-    const weatherEntities = this._getWeatherEntities();
-    const hiddenHeadings = new Set(this._config.hidden_section_headings || []);
-    const powerBadgeEntity = this._config.power_badge_entity || '';
-    const powerSensorEntities = this._getPowerSensorEntities();
-
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_order')}</div>
-        <div class="description" style="margin-left: 0; margin-bottom: 12px;">
-          ${localize('editor.section_order_desc')}
-        </div>
-        <div class="section-order-list" id="section-order-list">
-          ${order.map((key) => {
-            const meta = Simon42DashboardStrategyEditor._sectionMeta.get(key);
-            if (!meta) return nothing;
-            const disabled = this._isSectionDisabled(key);
-            const toggleable = this._isSectionToggleable(key);
-            return html`
-              <div class="section-order-item ${disabled ? 'disabled' : ''}"
-                data-section-key=${key}
-                draggable="true"
-                @dragstart=${this._handleSectionDragStart}
-                @dragend=${this._handleSectionDragEnd}
-                @dragover=${this._handleSectionDragOver}
-                @dragleave=${this._handleSectionDragLeave}
-                @drop=${this._handleSectionDrop}>
-                <span class="drag-handle" draggable="true">&#x2630;</span>
-                <ha-icon class="section-icon" icon=${meta.icon}></ha-icon>
-                <span class="section-label">${localize(meta.labelKey)}</span>
-                ${disabled && !toggleable ? html`<span class="section-hidden-tag">(${localize('editor.section_hidden')})</span>` : nothing}
-                ${toggleable ? html`
-                  <label class="section-toggle" @mousedown=${(e: Event) => { e.stopPropagation(); }}>
-                    <input type="checkbox"
-                      ?checked=${!disabled}
-                      @change=${(e: Event) => { this._toggleSectionVisibility(key, (e.target as HTMLInputElement).checked); }}
-                      @dragstart=${(e: Event) => { e.stopPropagation(); }} />
-                  </label>
-                ` : nothing}
-              </div>
-              ${key === 'weather' && showWeather ? html`
-                <div class="section-order-sub" style="flex-wrap: wrap;">
-                  <label for="weather-presentation">${localize('editor.weather_presentation')}</label>
-                  <select id="weather-presentation"
-                    .value=${weatherPresentation}
-                    @change=${(e: Event) => this._setWeatherPresentation((e.target as HTMLSelectElement).value as WeatherPresentation)}>
-                    <option value="forecast_daily" ?selected=${weatherPresentation === 'forecast_daily'}>${localize('editor.weather_presentation_forecast_daily')}</option>
-                    <option value="forecast_hourly" ?selected=${weatherPresentation === 'forecast_hourly'}>${localize('editor.weather_presentation_forecast_hourly')}</option>
-                    <option value="forecast_twice_daily" ?selected=${weatherPresentation === 'forecast_twice_daily'}>${localize('editor.weather_presentation_forecast_twice_daily')}</option>
-                    <option value="tile" ?selected=${weatherPresentation === 'tile'}>${localize('editor.weather_presentation_tile')}</option>
-                    <option value="none" ?selected=${weatherPresentation === 'none'}>${localize('editor.weather_presentation_none')}</option>
-                  </select>
-                </div>
-              ` : nothing}
-              ${key === 'weather' && showWeather && weatherEntities.length > 1 ? html`
-                <div class="section-order-sub" style="flex-wrap: wrap;">
-                  <label for="weather-entity">${localize('editor.weather_entity')}</label>
-                  <select id="weather-entity"
-                    .value=${weatherEntity}
-                    @change=${this._weatherEntityChanged}>
-                    <option value="" ?selected=${!weatherEntity}>${localize('editor.weather_entity_auto')}</option>
-                    ${weatherEntities.map((entity) => html`
-                      <option value=${entity.entity_id} ?selected=${entity.entity_id === weatherEntity}>
-                        ${entity.name}
-                      </option>
-                    `)}
-                  </select>
-                </div>
-              ` : nothing}
-              ${key === 'energy' && showEnergy ? html`
-                <div class="section-order-sub">
-                  <input type="checkbox" id="energy-link-dashboard"
-                    ?checked=${energyLinkDashboard}
-                    @change=${(e: Event) => { this._toggleChanged('energy_link_dashboard', (e.target as HTMLInputElement).checked, true); }} />
-                  <label for="energy-link-dashboard">${localize('editor.energy_link_dashboard')}</label>
-                </div>
-                <div class="section-order-sub">
-                  <input type="checkbox" id="show-energy-distribution-card"
-                    ?checked=${showEnergyDistributionCard}
-                    @change=${(e: Event) => { this._toggleChanged('show_energy_distribution_card', (e.target as HTMLInputElement).checked, true); }} />
-                  <label for="show-energy-distribution-card">${localize('editor.show_energy_distribution_card')}</label>
-                </div>
-                ${powerSensorEntities.length > 0 ? html`
-                  <div class="section-order-sub" style="display: block;">
-                    <label for="power-badge-entity" style="display: block; margin-bottom: 4px;">${localize('editor.power_badge_entity')}</label>
-                    <select id="power-badge-entity"
-                      style="width: 100%;"
-                      @change=${this._powerBadgeEntityChanged}>
-                      <option value="" ?selected=${!powerBadgeEntity}>${localize('editor.power_badge_none')}</option>
-                      ${powerSensorEntities.map((entity) => html`
-                        <option value=${entity.entity_id} ?selected=${entity.entity_id === powerBadgeEntity}>
-                          ${entity.name}
-                        </option>
-                      `)}
-                    </select>
-                    <div class="description">${localize('editor.power_badge_entity_desc')}</div>
-                  </div>
-                ` : nothing}
-              ` : nothing}
-            `;
-          })}
-        </div>
-
-        <details style="margin-top: 12px;">
-          <summary style="cursor: pointer; font-size: 13px; font-weight: 500; color: var(--primary-text-color); padding: 4px 0;">
-            ${localize('editor.hide_section_headings')}
-          </summary>
-          <div style="margin-left: 14px; margin-top: 6px;">
-            <div class="description" style="margin-left: 0; margin-bottom: 8px;">
-              ${localize('editor.hide_section_headings_desc')}
-            </div>
-            ${(['overview', 'summaries', 'favorites', 'custom_cards', 'areas', 'areas_other', 'weather', 'energy'] as const).map((hk) => html`
-              <div class="form-row">
-                <input type="checkbox" id="hide-heading-${hk}"
-                  ?checked=${hiddenHeadings.has(hk)}
-                  @change=${(e: Event) => { this._toggleHiddenHeading(hk, (e.target as HTMLInputElement).checked); }} />
-                <label for="hide-heading-${hk}">${localize('editor.heading_label_' + hk)}</label>
-              </div>
-            `)}
-          </div>
-        </details>
-
-        <div style="margin-top: 12px;">
-          ${this._renderCheckbox('show-unavailable-alert-badge', localize('editor.show_unavailable_alert_badge'),
-            this._config.show_unavailable_alert_badge === true,
-            (checked) => this._toggleChanged('show_unavailable_alert_badge', checked, false))}
-          <div class="description">${localize('editor.show_unavailable_alert_badge_desc')}</div>
-        </div>
-
-        <div style="margin-top: 12px;">
-          ${this._renderCheckbox('show-now-playing-badge', localize('editor.show_now_playing_badge'),
-            this._config.show_now_playing_badge === true,
-            (checked) => this._toggleChanged('show_now_playing_badge', checked, false))}
-          <div class="description">${localize('editor.show_now_playing_badge_desc')}</div>
-        </div>
-
-        <div style="margin-top: 12px;">
-          ${this._renderCheckbox('show-sun-badge', localize('editor.show_sun_badge'),
-            this._config.show_sun_badge === true,
-            (checked) => this._toggleChanged('show_sun_badge', checked, false))}
-          <div class="description">${localize('editor.show_sun_badge_desc')}</div>
-        </div>
-
-        <div style="margin-top: 12px;">
-          ${this._renderCheckbox('show-updates-badge', localize('editor.show_updates_badge'),
-            this._config.show_updates_badge === true,
-            (checked) => this._toggleChanged('show_updates_badge', checked, false))}
-          <div class="description">${localize('editor.show_updates_badge_desc')}</div>
-        </div>
-
-        <details style="margin-top: 12px;">
-          <summary style="cursor: pointer; font-size: 13px; font-weight: 500; color: var(--primary-text-color); padding: 4px 0;">
-            ${localize('editor.section_visibility')}
-          </summary>
-          <div style="margin-left: 14px; margin-top: 6px;">
-            <div class="description" style="margin-left: 0; margin-bottom: 8px;">
-              ${localize('editor.section_visibility_desc')}
-            </div>
-            ${order.map((key) => {
-              const meta = Simon42DashboardStrategyEditor._sectionMeta.get(key);
-              if (!meta) return nothing;
-              const rule = this._config.section_visibility?.[key];
-              return html`
-                <div style="border: 1px solid var(--divider-color); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
-                  <div style="font-weight: 500; margin-bottom: 6px;">${localize(meta.labelKey)}</div>
-                  <div class="form-row">
-                    <label for="visibility-entity-${key}" style="min-width: 80px; font-size: 12px;">${localize('editor.section_visibility_entity')}</label>
-                    <input type="text" id="visibility-entity-${key}" style="flex: 1;"
-                      placeholder="calendar.workday_sensor"
-                      .value=${rule?.entity || ''}
-                      @change=${(e: Event) => this._sectionVisibilityChanged(key, 'entity', (e.target as HTMLInputElement).value)} />
-                  </div>
-                  <div class="form-row">
-                    <label for="visibility-state-${key}" style="min-width: 80px; font-size: 12px;">${localize('editor.section_visibility_state')}</label>
-                    <input type="text" id="visibility-state-${key}" style="flex: 1;"
-                      placeholder="on"
-                      .value=${rule?.state || ''}
-                      @change=${(e: Event) => this._sectionVisibilityChanged(key, 'state', (e.target as HTMLInputElement).value)} />
-                  </div>
-                </div>
-              `;
-            })}
-          </div>
-        </details>
-      </div>
-    `;
+    // Migrated to a per-tab module in beta.23. Drag-drop state and
+    // every mutator stays on the editor class — only the render
+    // template is in the tab module — see src/editor/tabs/SectionOrderTab.ts.
+    if (!this._hass) return html``;
+    return renderSectionOrderTab({
+      hass: this._hass,
+      config: this._config,
+      order: this._getSectionsOrder(),
+      sectionMeta: Simon42DashboardStrategyEditor._sectionMeta,
+      weatherEntities: this._getWeatherEntities(),
+      powerSensorEntities: this._getPowerSensorEntities(),
+      isSectionDisabled: (k) => this._isSectionDisabled(k),
+      isSectionToggleable: (k) => this._isSectionToggleable(k),
+      onToggleChange: (k, v, d) => this._toggleChanged(k, v, d),
+      onSetWeatherPresentation: (v) => this._setWeatherPresentation(v),
+      onWeatherEntityChange: (e) => this._weatherEntityChanged(e),
+      onPowerBadgeEntityChange: (e) => this._powerBadgeEntityChanged(e),
+      onToggleSectionVisibility: (k, v) => this._toggleSectionVisibility(k, v),
+      onToggleHiddenHeading: (k, h) => this._toggleHiddenHeading(k, h),
+      onSectionVisibilityChange: (k, f, v) => this._sectionVisibilityChanged(k, f, v),
+      onDragStart: this._handleSectionDragStart,
+      onDragEnd: this._handleSectionDragEnd,
+      onDragOver: this._handleSectionDragOver,
+      onDragLeave: this._handleSectionDragLeave,
+      onDrop: this._handleSectionDrop,
+    });
   }
 
   private _toggleHiddenHeading(key: string, hide: boolean): void {
