@@ -25,6 +25,7 @@ const modulesPromise = Promise.all([
   import('./cards/LightsGroupCard'),
   import('./cards/CoversGroupCard'),
   import('./cards/ZonePresenceCard'),
+  import('./features/StickyLockFeature'),
   import('./views/OverviewViewStrategy'),
   import('./views/LightsViewStrategy'),
   import('./views/CoversViewStrategy'),

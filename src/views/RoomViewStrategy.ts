@@ -749,54 +749,37 @@ class Simon42ViewRoomStrategy extends HTMLElement {
       roomModeEntity &&
       Reflect.get(hass.states as Record<string, unknown>, roomModeEntity)
     ) {
-      const modeTile: LovelaceCardConfig = {
-        type: 'tile',
-        entity: roomModeEntity,
-        name: localize('room.room_mode'),
-        icon: dashboardConfig.room_mode_icon || 'mdi:home-account',
-        color: 'accent',
-        features: [{ type: 'select-options' }],
-        features_position: 'bottom',
-      };
-
-      // Optional sticky-lock companion. Only rendered when configured
-      // per-area AND the mode tile itself rendered. The sticky tile is
-      // narrow (3/12 columns) so it visually reads as a corner badge
-      // on the mode tile rather than a peer tile.
+      // Build the tile's `features:` array. The mode picker always
+      // gets `select-options`. When a sticky entity is configured
+      // (and present), we ALSO add our custom feature in the same
+      // row — keeps the whole control in one tile, no extra height.
+      const features: Array<Record<string, unknown>> = [{ type: 'select-options' }];
       const stickyEntity = areaOpts.room_mode_sticky_entity as string | undefined;
-      const stickyOn =
-        stickyEntity &&
-        (Reflect.get(hass.states as Record<string, unknown>, stickyEntity) as
-          | { state?: string }
-          | undefined)?.state === 'on';
-
       if (
         stickyEntity &&
         Reflect.get(hass.states as Record<string, unknown>, stickyEntity)
       ) {
-        sections.unshift({
-          type: 'grid',
-          cards: [
-            { ...modeTile, grid_options: { columns: 9 } },
-            {
-              type: 'tile',
-              entity: stickyEntity,
-              name: localize('room.sticky_lock'),
-              icon: stickyOn ? 'mdi:lock' : 'mdi:lock-open-variant',
-              color: stickyOn ? 'red' : 'grey',
-              vertical: true,
-              hide_state: false,
-              tap_action: { action: 'toggle' },
-              grid_options: { columns: 3 },
-            } as LovelaceCardConfig,
-          ],
-        });
-      } else {
-        sections.unshift({
-          type: 'grid',
-          cards: [{ ...modeTile, grid_options: { columns: 'full' } }],
+        features.push({
+          type: 'custom:simon42-sticky-lock-feature',
+          sticky_entity: stickyEntity,
         });
       }
+
+      sections.unshift({
+        type: 'grid',
+        cards: [
+          {
+            type: 'tile',
+            entity: roomModeEntity,
+            name: localize('room.room_mode'),
+            icon: dashboardConfig.room_mode_icon || 'mdi:home-account',
+            color: 'accent',
+            features,
+            features_position: 'bottom',
+            grid_options: { columns: 'full' },
+          } as LovelaceCardConfig,
+        ],
+      });
     }
 
     // Auto-rendered zone-presence section. Picks every visible
