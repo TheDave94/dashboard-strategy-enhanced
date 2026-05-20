@@ -106,6 +106,14 @@ export interface Simon42StrategyConfig {
   show_light_summary?: boolean; // default: true
   group_lights_by_floors?: boolean; // default: false
   nested_light_groups?: boolean; // default: false
+  /**
+   * When nested_light_groups is true, whether group tiles start
+   * expanded (members visible) or collapsed (chevron-to-reveal) in
+   * the dedicated Lights view. Default true — matches the room
+   * view's behaviour and avoids the "tap-the-tile-does-nothing"
+   * surprise. Set false to keep group children collapsed by default.
+   */
+  light_groups_default_expanded?: boolean;
   lights_sort_by?: 'last_changed' | 'name'; // default: 'last_changed'
   show_security_summary?: boolean; // default: true
   show_battery_summary?: boolean; // default: true
