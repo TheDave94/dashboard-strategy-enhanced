@@ -31,6 +31,13 @@ import { renderSummariesTab } from './tabs/SummariesTab';
 import { renderSectionOrderTab } from './tabs/SectionOrderTab';
 import { renderAreasTab } from './tabs/AreasTab';
 import { renderRoomPinsTab } from './tabs/RoomPinsTab';
+import { renderLightFavoritesTab } from './tabs/LightFavoritesTab';
+import { renderFavoritesTab } from './tabs/FavoritesTab';
+import { renderWeatherSensorsTab } from './tabs/WeatherSensorsTab';
+import { renderCustomCardsTab } from './tabs/CustomCardsTab';
+import { renderCustomSectionsTab } from './tabs/CustomSectionsTab';
+import { renderCustomBadgesTab } from './tabs/CustomBadgesTab';
+import { renderCustomViewsTab } from './tabs/CustomViewsTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1467,55 +1474,22 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderLightFavoritesSection(): TemplateResult {
-    const lightFavs = this._config.light_favorite_entities || [];
+    if (!this._hass) return html``;
     const allEntities = this._getAllEntitiesForSelect();
-    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
-    const filtered = this._getFilteredEntities(this._lightFavSearch).filter((e) => e.entity_id.startsWith('light.'));
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_light_favorites')}</div>
-
-        ${lightFavs.length > 0 ? html`
-          <div class="entity-list-container" style="margin-bottom: 8px;">
-            ${lightFavs.map((entityId) => {
-              const name = entityMap.get(entityId) || entityId;
-              return html`
-                <div class="entity-list-item" data-entity-id=${entityId}>
-                  <span class="item-info">
-                    <span class="item-name">${name}</span>
-                    <span class="item-entity-id">${entityId}</span>
-                  </span>
-                  <button class="btn-remove" @click=${() => this._removeLightFavorite(entityId)}>&#x2715;</button>
-                </div>
-              `;
-            })}
-          </div>
-        ` : nothing}
-
-        <div class="entity-search-picker">
-          <input type="text" class="entity-search-input"
-            placeholder=${localize('editor.select_entity') + '...'}
-            .value=${this._lightFavSearch}
-            @input=${(e: Event) => { this._lightFavSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
-            @blur=${() => { setTimeout(() => { this._lightFavSearch = ''; this.requestUpdate(); }, 200); }}
-          />
-          ${this._lightFavSearch.length >= 2 ? html`
-            <div class="entity-search-results">
-              ${filtered.length > 0
-                ? filtered.map((entity) => html`
-                  <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addLightFavorite(entity.entity_id); this._lightFavSearch = ''; this.requestUpdate(); }}>
-                    <span class="entity-search-name">${entity.name}</span>
-                    <span class="entity-search-id">${entity.entity_id}</span>
-                  </div>
-                `)
-                : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
-              }
-            </div>
-          ` : nothing}
-        </div>
-        <div class="description">${localize('editor.light_favorites_desc')}</div>
-      </div>
-    `;
+    return renderLightFavoritesTab({
+      config: this._config,
+      search: this._lightFavSearch,
+      entityNameMap: new Map(allEntities.map((e) => [e.entity_id, e.name])),
+      filteredEntities: this._getFilteredEntities(this._lightFavSearch).filter((e) =>
+        e.entity_id.startsWith('light.'),
+      ),
+      onSearchChange: (value) => {
+        this._lightFavSearch = value;
+        this.requestUpdate();
+      },
+      onAddEntity: (entityId) => this._addLightFavorite(entityId),
+      onRemoveEntity: (entityId) => this._removeLightFavorite(entityId),
+    });
   }
 
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
@@ -1556,76 +1530,28 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderFavoritesSection(): TemplateResult {
-    const favoriteEntities = this._config.favorite_entities || [];
+    if (!this._hass) return html``;
     const allEntities = this._getAllEntitiesForSelect();
-    const favoritesShowState = this._config.favorites_show_state === true;
-    const favoritesHideLastChanged = this._config.favorites_hide_last_changed === true;
-
-    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
-    const filteredEntities = this._getFilteredEntities(this._favoriteSearch);
-
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_favorites')}</div>
-
-        <div id="favorites-list" style="margin-bottom: 12px;">
-          ${favoriteEntities.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_favorites')}</div>`
-            : html`
-              <div class="entity-list-container">
-                ${favoriteEntities.map((entityId) => {
-                  const name = entityMap.get(entityId) || entityId;
-                  return html`
-                    <div class="entity-list-item" data-entity-id=${entityId}
-                      draggable="true"
-                      @dragstart=${(ev: DragEvent) => this._handleEntityDragStart(ev, 'favorites')}
-                      @dragend=${this._handleEntityDragEnd}
-                      @dragover=${this._handleEntityDragOver}
-                      @dragleave=${this._handleEntityDragLeave}
-                      @drop=${(ev: DragEvent) => this._handleEntityDrop(ev, 'favorites')}>
-                      <span class="drag-icon">&#x2630;</span>
-                      <span class="item-info">
-                        <span class="item-name">${name}</span>
-                        <span class="item-entity-id">${entityId}</span>
-                      </span>
-                      <button class="btn-remove" @click=${() => this._removeFavoriteEntity(entityId)}>&#x2715;</button>
-                    </div>
-                  `;
-                })}
-              </div>
-            `}
-        </div>
-
-        <div class="entity-search-picker">
-          <input type="text" class="entity-search-input"
-            placeholder=${localize('editor.select_entity') + '...'}
-            .value=${this._favoriteSearch}
-            @input=${(e: Event) => { this._favoriteSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
-            @blur=${() => { setTimeout(() => { this._favoriteSearch = ''; this.requestUpdate(); }, 200); }}
-          />
-          ${this._favoriteSearch.length >= 2 ? html`
-            <div class="entity-search-results">
-              ${filteredEntities.length > 0
-                ? filteredEntities.map((entity) => html`
-                  <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addFavoriteEntity(entity.entity_id); this._favoriteSearch = ''; this.requestUpdate(); }}>
-                    <span class="entity-search-name">${entity.name}</span>
-                    <span class="entity-search-id">${entity.entity_id}</span>
-                  </div>
-                `)
-                : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
-              }
-            </div>
-          ` : nothing}
-        </div>
-        <div class="description">${localize('editor.favorites_desc')}</div>
-
-        ${this._renderCheckbox('favorites-show-state', localize('editor.show_state'), favoritesShowState,
-          (checked) => this._toggleChanged('favorites_show_state', checked, false))}
-
-        ${this._renderCheckbox('favorites-hide-last-changed', localize('editor.hide_last_changed'), favoritesHideLastChanged,
-          (checked) => this._toggleChanged('favorites_hide_last_changed', checked, false))}
-      </div>
-    `;
+    return renderFavoritesTab({
+      config: this._config,
+      search: this._favoriteSearch,
+      entityNameMap: new Map(allEntities.map((e) => [e.entity_id, e.name])),
+      filteredEntities: this._getFilteredEntities(this._favoriteSearch),
+      renderCheckbox: (id, label, checked, onChange) =>
+        this._renderCheckbox(id, label, checked, onChange),
+      onSearchChange: (value) => {
+        this._favoriteSearch = value;
+        this.requestUpdate();
+      },
+      onAddEntity: (entityId) => this._addFavoriteEntity(entityId),
+      onRemoveEntity: (entityId) => this._removeFavoriteEntity(entityId),
+      onToggleChange: (k, v, d) => this._toggleChanged(k, v, d),
+      onDragStart: (ev) => this._handleEntityDragStart(ev, 'favorites'),
+      onDragEnd: this._handleEntityDragEnd,
+      onDragOver: this._handleEntityDragOver,
+      onDragLeave: this._handleEntityDragLeave,
+      onDrop: (ev) => this._handleEntityDrop(ev, 'favorites'),
+    });
   }
 
   // -- Weather sensors editor -------------------------------------------
@@ -1634,84 +1560,23 @@ class Simon42DashboardStrategyEditor extends LitElement {
   // Each row binds to a WeatherSensorConfig and exposes inline inputs for
   // icon / unit / round. Adding a row uses the same entity-search picker
   // pattern as favorites; removal is a single-click button.
-  //
-  // The picker filters to numeric-ish sensors by default but does not hard-
-  // restrict — any entity domain is accepted (the markdown row in the
-  // section renderer just calls `states(...)` against the id).
 
   private _renderWeatherSensorsSection(): TemplateResult {
-    const sensors = this._config.weather_sensors || [];
+    if (!this._hass) return html``;
     const allEntities = this._getAllEntitiesForSelect();
-    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
-    const filteredEntities = this._getFilteredEntities(this._weatherSensorSearch);
-
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_weather_sensors')}</div>
-        <div class="description" style="margin-left: 0; margin-bottom: 12px;">
-          ${localize('editor.weather_sensors_desc')}
-        </div>
-
-        <div id="weather-sensors-list" style="margin-bottom: 12px;">
-          ${sensors.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_weather_sensors')}</div>`
-            : sensors.map((sensor, index) => {
-                const name = entityMap.get(sensor.entity) || sensor.entity;
-                return html`
-                  <div class="custom-item" data-sensor-index=${index}>
-                    <div class="custom-item-header">
-                      <strong>
-                        ${name}
-                        <span class="item-entity-id" style="font-weight: normal; margin-left: 8px;">
-                          ${sensor.entity}
-                        </span>
-                      </strong>
-                      <button class="btn-remove" @click=${() => this._removeWeatherSensor(index)}>&#x2715;</button>
-                    </div>
-                    <div class="custom-item-fields">
-                      <div class="custom-item-row">
-                        <input type="text" style="flex: 2;"
-                          placeholder=${localize('editor.weather_sensors_icon')}
-                          .value=${sensor.icon || ''}
-                          @change=${(e: Event) => this._updateWeatherSensor(index, 'icon', (e.target as HTMLInputElement).value)} />
-                        <input type="text" style="flex: 1;"
-                          placeholder=${localize('editor.weather_sensors_unit')}
-                          .value=${sensor.unit || ''}
-                          @change=${(e: Event) => this._updateWeatherSensor(index, 'unit', (e.target as HTMLInputElement).value)} />
-                        <input type="number" style="flex: 1;" min="0" max="6" step="1"
-                          placeholder=${localize('editor.weather_sensors_round')}
-                          .value=${sensor.round !== undefined ? String(sensor.round) : ''}
-                          @change=${(e: Event) => this._updateWeatherSensor(index, 'round', (e.target as HTMLInputElement).value)} />
-                      </div>
-                    </div>
-                  </div>
-                `;
-              })}
-        </div>
-
-        <div class="entity-search-picker">
-          <input type="text" class="entity-search-input"
-            placeholder=${localize('editor.weather_sensors_add')}
-            .value=${this._weatherSensorSearch}
-            @input=${(e: Event) => { this._weatherSensorSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
-            @blur=${() => { setTimeout(() => { this._weatherSensorSearch = ''; this.requestUpdate(); }, 200); }}
-          />
-          ${this._weatherSensorSearch.length >= 2 ? html`
-            <div class="entity-search-results">
-              ${filteredEntities.length > 0
-                ? filteredEntities.map((entity) => html`
-                  <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addWeatherSensor(entity.entity_id); this._weatherSensorSearch = ''; this.requestUpdate(); }}>
-                    <span class="entity-search-name">${entity.name}</span>
-                    <span class="entity-search-id">${entity.entity_id}</span>
-                  </div>
-                `)
-                : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
-              }
-            </div>
-          ` : nothing}
-        </div>
-      </div>
-    `;
+    return renderWeatherSensorsTab({
+      config: this._config,
+      search: this._weatherSensorSearch,
+      entityNameMap: new Map(allEntities.map((e) => [e.entity_id, e.name])),
+      filteredEntities: this._getFilteredEntities(this._weatherSensorSearch),
+      onSearchChange: (value) => {
+        this._weatherSensorSearch = value;
+        this.requestUpdate();
+      },
+      onAddSensor: (entityId) => this._addWeatherSensor(entityId),
+      onRemoveSensor: (index) => this._removeWeatherSensor(index),
+      onUpdateSensor: (index, field, value) => this._updateWeatherSensor(index, field, value),
+    });
   }
 
   // Per device-class defaults used when adding a sensor via the picker.
@@ -1969,154 +1834,50 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderCustomCardsSection(): TemplateResult {
-    const customCards = this._config.custom_cards || [];
-    const customCardsHeading = this._config.custom_cards_heading || '';
-    const customCardsIcon = this._config.custom_cards_icon || '';
-
-    return html`
-      <div class="section">
-        <div class="section-title" style="display: flex; align-items: center; gap: 8px;">
-          ${localize('editor.section_custom_cards')}
-          <a href="https://github.com/TheRealSimon42/simon42-dashboard-strategy/blob/main/assets/Eigene-Karten-hinzufugen.gif"
-            target="_blank" rel="noopener"
-            style="color: var(--primary-color); text-decoration: none; font-size: 18px;"
-            title=${localize('editor.video_tutorial')}>&#x1F3AC;</a>
-        </div>
-        <div class="custom-item-row" style="margin-bottom: 12px;">
-          <input type="text" id="custom-cards-heading"
-            .value=${customCardsHeading}
-            placeholder=${localize('editor.custom_cards_heading_placeholder')}
-            style="flex: 2;"
-            @change=${this._customCardsHeadingChanged} />
-          <input type="text" id="custom-cards-icon"
-            .value=${customCardsIcon}
-            placeholder="mdi:cards"
-            style="flex: 1;"
-            @change=${this._customCardsIconChanged} />
-        </div>
-        <div class="description" style="margin-bottom: 8px;">${localize('editor.custom_cards_desc')}</div>
-
-        <div id="custom-cards-list">
-          ${customCards.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_cards')}</div>`
-            : customCards.map((card, index) => this._renderCustomCardItem(card, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomCard}>
-          ${localize('editor.add_custom_card')}
-        </button>
-        <div class="description">${localize('editor.custom_cards_help')}</div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomCardsTab({
+      config: this._config,
+      sectionMeta: Simon42DashboardStrategyEditor._sectionMeta,
+      onHeadingChange: (value) => this._customCardsHeadingChanged({ target: { value } } as unknown as Event),
+      onIconChange: (value) => this._customCardsIconChanged({ target: { value } } as unknown as Event),
+      onAddCard: () => this._addCustomCard(),
+      onRemoveCard: (index) => this._removeCustomCard(index),
+      onUpdateField: (index, field, value) => this._updateCustomCardField(index, field, value),
+      onUpdateYaml: (index, yamlString) => this._updateCustomCardYaml(index, yamlString),
+    });
   }
 
   private _renderCustomSectionsSection(): TemplateResult {
-    const customSections = this._config.custom_sections || [];
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_custom_sections')}</div>
-        <div class="description" style="margin-bottom: 8px;">${localize('editor.custom_sections_desc')}</div>
-
-        <div id="custom-sections-list">
-          ${customSections.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_sections')}</div>`
-            : customSections.map((s, index) => this._renderCustomSectionItem(s, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomSection}>
-          ${localize('editor.add_custom_section')}
-        </button>
-        <div class="description">${localize('editor.custom_sections_help')}</div>
-      </div>
-    `;
-  }
-
-  private _renderCustomSectionItem(section: CustomSection, index: number): TemplateResult {
-    const validationMsg = section._yaml_error
-      ? html`<span style="color: var(--error-color);">&#x274C; ${section._yaml_error}</span>`
-      : section.parsed_config
-        ? html`<span style="color: var(--success-color, green);">&#x2705; ${localize('editor.yaml_valid')}</span>`
-        : html``;
-
-    return html`
-      <div class="custom-item">
-        <div class="custom-item-header">
-          <span class="custom-item-index">#${index + 1}</span>
-          <button class="btn-icon" @click=${() => this._removeCustomSection(index)}
-            title=${localize('editor.remove')}>&#x274C;</button>
-        </div>
-        <div class="custom-item-fields">
-          <input type="text" .value=${section.key || ''}
-            placeholder=${localize('editor.custom_section_key_placeholder')}
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'key', (e.target as HTMLInputElement).value)} />
-          <input type="text" .value=${section.heading || ''}
-            placeholder=${localize('editor.custom_section_heading_placeholder')}
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'heading', (e.target as HTMLInputElement).value)} />
-          <input type="text" .value=${section.icon || ''}
-            placeholder="mdi:card-bulleted"
-            @change=${(e: Event) => this._updateCustomSectionField(index, 'icon', (e.target as HTMLInputElement).value)} />
-          <textarea rows="6" placeholder=${localize('editor.custom_section_yaml_placeholder')}
-            .value=${section.yaml || ''}
-            style="width: 100%;"
-            @change=${(e: Event) => this._updateCustomSectionYaml(index, (e.target as HTMLTextAreaElement).value)}></textarea>
-          <div class="custom-item-validation">${validationMsg}</div>
-        </div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomSectionsTab({
+      config: this._config,
+      onAdd: () => this._addCustomSection(),
+      onRemove: (index) => this._removeCustomSection(index),
+      onUpdateField: (index, field, value) =>
+        this._updateCustomSectionField(index, field, value),
+      onUpdateYaml: (index, yamlString) => this._updateCustomSectionYaml(index, yamlString),
+    });
   }
 
   private _renderCustomBadgesSection(): TemplateResult {
-    const customBadges = this._config.custom_badges || [];
-
-    return html`
-      <div class="section">
-        <div class="section-title" style="display: flex; align-items: center; gap: 8px;">
-          ${localize('editor.section_custom_badges')}
-          <a href="https://github.com/TheRealSimon42/simon42-dashboard-strategy/blob/main/assets/Custom-Badges-hinzufugen.gif"
-            target="_blank" rel="noopener"
-            style="color: var(--primary-color); text-decoration: none; font-size: 18px;"
-            title=${localize('editor.video_tutorial')}>&#x1F3AC;</a>
-        </div>
-
-        <div id="custom-badges-list">
-          ${customBadges.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_badges')}</div>`
-            : customBadges.map((badge, index) => this._renderCustomBadgeItem(badge, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomBadge}>
-          ${localize('editor.add_custom_badge')}
-        </button>
-        <div class="description">${localize('editor.custom_badges_help')}</div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomBadgesTab({
+      config: this._config,
+      onAdd: () => this._addCustomBadge(),
+      onRemove: (index) => this._removeCustomBadge(index),
+      onUpdateYaml: (index, yamlString) => this._updateCustomBadgeYaml(index, yamlString),
+    });
   }
 
   private _renderCustomViewsSection(): TemplateResult {
-    const customViews = this._config.custom_views || [];
-
-    return html`
-      <div class="section">
-        <div class="section-title" style="display: flex; align-items: center; gap: 8px;">
-          ${localize('editor.section_custom_views')}
-          <a href="https://github.com/TheRealSimon42/simon42-dashboard-strategy/blob/main/assets/Custom-View-hinzufugen.gif"
-            target="_blank" rel="noopener"
-            style="color: var(--primary-color); text-decoration: none; font-size: 18px;"
-            title=${localize('editor.video_tutorial')}>&#x1F3AC;</a>
-        </div>
-
-        <div id="custom-views-list">
-          ${customViews.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_views')}</div>`
-            : customViews.map((view, index) => this._renderCustomViewItem(view, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomView}>
-          ${localize('editor.add_custom_view')}
-        </button>
-        <div class="description">${localize('editor.custom_views_help')}</div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomViewsTab({
+      config: this._config,
+      onAdd: () => this._addCustomView(),
+      onRemove: (index) => this._removeCustomView(index),
+      onUpdateField: (index, field, value) => this._updateCustomViewField(index, field, value),
+      onUpdateYaml: (index, yamlString) => this._updateCustomViewYaml(index, yamlString),
+    });
   }
 
   // ====================================================================
@@ -2141,105 +1902,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
     `;
   }
 
-  private _renderCustomViewItem(view: CustomView, index: number): TemplateResult {
-    const validationMsg = view._yaml_error
-      ? html`<span style="color: var(--error-color);">&#x274C; ${view._yaml_error}</span>`
-      : view.yaml
-        ? html`<span style="color: var(--success-color, green);">&#x2705; ${localize('editor.yaml_valid')}</span>`
-        : nothing;
-
-    return html`
-      <div class="custom-item" data-index=${index}>
-        <div class="custom-item-header">
-          <strong>${view.title || localize('editor.new_view')}</strong>
-          <button class="btn-remove" @click=${() => this._removeCustomView(index)}>&#x2715;</button>
-        </div>
-        <div class="custom-item-fields">
-          <div class="custom-item-row">
-            <input type="text" .value=${view.title || ''} placeholder=${localize('editor.title_placeholder')}
-              style="flex: 2;"
-              @change=${(e: Event) => this._updateCustomViewField(index, 'title', (e.target as HTMLInputElement).value)} />
-            <input type="text" .value=${view.path || ''} placeholder=${localize('editor.path_placeholder')}
-              style="flex: 2;"
-              @change=${(e: Event) => this._updateCustomViewField(index, 'path', (e.target as HTMLInputElement).value)} />
-            <input type="text" .value=${view.icon || ''} placeholder="mdi:star"
-              style="flex: 1;"
-              @change=${(e: Event) => this._updateCustomViewField(index, 'icon', (e.target as HTMLInputElement).value)} />
-          </div>
-          <textarea rows="8" placeholder=${localize('editor.yaml_placeholder')}
-            .value=${view.yaml || ''}
-            style="width: 100%;"
-            @change=${(e: Event) => this._updateCustomViewYaml(index, (e.target as HTMLTextAreaElement).value)}></textarea>
-          <div class="custom-item-validation">
-            ${validationMsg}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  private _renderCustomCardItem(card: CustomCard, index: number): TemplateResult {
-    const validationMsg = card._yaml_error
-      ? html`<span style="color: var(--error-color);">&#x274C; ${card._yaml_error}</span>`
-      : card.yaml
-        ? html`<span style="color: var(--success-color, green);">&#x2705; ${localize('editor.yaml_valid')}</span>`
-        : nothing;
-
-    return html`
-      <div class="custom-item" data-index=${index}>
-        <div class="custom-item-header">
-          <strong>${card.title || localize('editor.new_card')}</strong>
-          <button class="btn-remove" @click=${() => this._removeCustomCard(index)}>&#x2715;</button>
-        </div>
-        <div class="custom-item-fields">
-          <input type="text" .value=${card.title || ''} placeholder=${localize('editor.card_title_placeholder')}
-            @change=${(e: Event) => this._updateCustomCardField(index, 'title', (e.target as HTMLInputElement).value)} />
-          <div class="custom-card-target">
-            <label>${localize('editor.target_section')}:</label>
-            <select
-              @change=${(e: Event) => this._updateCustomCardField(index, 'target_section', (e.target as HTMLSelectElement).value)}>
-              ${[...Simon42DashboardStrategyEditor._sectionMeta.entries()].map(([key, meta]) => html`
-                <option value=${key} ?selected=${(card.target_section || 'custom_cards') === key}>
-                  ${localize(meta.labelKey)}
-                </option>
-              `)}
-            </select>
-          </div>
-          <textarea rows="6" placeholder=${localize('editor.yaml_placeholder')}
-            .value=${card.yaml || ''}
-            style="width: 100%;"
-            @change=${(e: Event) => this._updateCustomCardYaml(index, (e.target as HTMLTextAreaElement).value)}></textarea>
-          <div class="custom-item-validation">
-            ${validationMsg}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  private _renderCustomBadgeItem(badge: CustomBadge, index: number): TemplateResult {
-    const validationMsg = badge._yaml_error
-      ? html`<span style="color: var(--error-color);">&#x274C; ${badge._yaml_error}</span>`
-      : badge.yaml
-        ? html`<span style="color: var(--success-color, green);">&#x2705; ${localize('editor.yaml_valid')}</span>`
-        : nothing;
-
-    return html`
-      <div class="custom-item" data-index=${index}>
-        <div class="custom-item-header">
-          <strong>Badge ${index + 1}</strong>
-          <button class="btn-remove" @click=${() => this._removeCustomBadge(index)}>&#x2715;</button>
-        </div>
-        <textarea rows="4" placeholder="type: entity&#10;entity: sun.sun"
-          .value=${badge.yaml || ''}
-          style="width: 100%;"
-          @change=${(e: Event) => this._updateCustomBadgeYaml(index, (e.target as HTMLTextAreaElement).value)}></textarea>
-        <div class="custom-item-validation">
-          ${validationMsg}
-        </div>
-      </div>
-    `;
-  }
 
   // ====================================================================
   // AREA RENDERERS
