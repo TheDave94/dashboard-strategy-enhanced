@@ -1,6 +1,6 @@
 {
   "name": "simon42-dashboard-strategy",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "type": "module",
   "license": "CC-BY-NC-SA-4.0",
@@ -15,6 +15,9 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "e2e:api": "vitest run tests/e2e/strategy-api.test.ts",
+    "e2e:browser": "playwright test",
+    "e2e": "npm run e2e:api && npm run e2e:browser",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -24,7 +27,9 @@
     "lit": "^3.3.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/js-yaml": "^4.0.9",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.58.1",
     "@typescript-eslint/parser": "^8.58.1",
     "@vitest/coverage-v8": "^2.1.9",
@@ -39,6 +44,7 @@
     "typescript": "^5.9.3",
     "vitest": "^2.1.9",
     "webpack": "^5.105.4",
-    "webpack-cli": "^7.0.2"
+    "webpack-cli": "^7.0.2",
+    "ws": "^8.20.1"
   }
 }

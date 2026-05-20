@@ -1,0 +1,61 @@
+name: E2E
+
+on:
+  # E2E needs a live HA target — only run when explicitly dispatched
+  # so we don't waste CI minutes on every commit.
+  workflow_dispatch:
+    inputs:
+      ha_url:
+        description: 'HA URL (defaults to repository secret HA_URL)'
+        required: false
+        type: string
+
+# The E2E job runs against a real HA. Configure two GitHub secrets:
+#   - HA_URL    — your HA URL (e.g. https://ha.example.com)
+#   - HA_TOKEN  — a long-lived access token
+# Skipped silently when either secret is missing.
+
+jobs:
+  api-smoke:
+    name: API smoke (real HA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run API smoke
+        env:
+          HA_URL: ${{ inputs.ha_url || secrets.HA_URL }}
+          HA_TOKEN: ${{ secrets.HA_TOKEN }}
+        run: npx vitest run tests/e2e/strategy-api.test.ts
+
+  browser:
+    name: Browser E2E (Playwright, real HA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # Installs Chromium + the system libs it needs. Ubuntu runners
+      # have most of them; `--with-deps` fills the rest via apt.
+      - run: npx playwright install --with-deps chromium
+      - name: Run browser E2E
+        env:
+          HA_URL: ${{ inputs.ha_url || secrets.HA_URL }}
+          HA_TOKEN: ${{ secrets.HA_TOKEN }}
+        run: npx playwright test
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
