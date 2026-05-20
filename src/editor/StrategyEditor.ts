@@ -32,6 +32,7 @@ import { renderSectionOrderTab } from './tabs/SectionOrderTab';
 import { renderAreasTab } from './tabs/AreasTab';
 import { renderRoomPinsTab } from './tabs/RoomPinsTab';
 import { renderLightFavoritesTab } from './tabs/LightFavoritesTab';
+import { renderFavoritesTab } from './tabs/FavoritesTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1524,76 +1525,28 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderFavoritesSection(): TemplateResult {
-    const favoriteEntities = this._config.favorite_entities || [];
+    if (!this._hass) return html``;
     const allEntities = this._getAllEntitiesForSelect();
-    const favoritesShowState = this._config.favorites_show_state === true;
-    const favoritesHideLastChanged = this._config.favorites_hide_last_changed === true;
-
-    const entityMap = new Map(allEntities.map((e) => [e.entity_id, e.name]));
-    const filteredEntities = this._getFilteredEntities(this._favoriteSearch);
-
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_favorites')}</div>
-
-        <div id="favorites-list" style="margin-bottom: 12px;">
-          ${favoriteEntities.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_favorites')}</div>`
-            : html`
-              <div class="entity-list-container">
-                ${favoriteEntities.map((entityId) => {
-                  const name = entityMap.get(entityId) || entityId;
-                  return html`
-                    <div class="entity-list-item" data-entity-id=${entityId}
-                      draggable="true"
-                      @dragstart=${(ev: DragEvent) => this._handleEntityDragStart(ev, 'favorites')}
-                      @dragend=${this._handleEntityDragEnd}
-                      @dragover=${this._handleEntityDragOver}
-                      @dragleave=${this._handleEntityDragLeave}
-                      @drop=${(ev: DragEvent) => this._handleEntityDrop(ev, 'favorites')}>
-                      <span class="drag-icon">&#x2630;</span>
-                      <span class="item-info">
-                        <span class="item-name">${name}</span>
-                        <span class="item-entity-id">${entityId}</span>
-                      </span>
-                      <button class="btn-remove" @click=${() => this._removeFavoriteEntity(entityId)}>&#x2715;</button>
-                    </div>
-                  `;
-                })}
-              </div>
-            `}
-        </div>
-
-        <div class="entity-search-picker">
-          <input type="text" class="entity-search-input"
-            placeholder=${localize('editor.select_entity') + '...'}
-            .value=${this._favoriteSearch}
-            @input=${(e: Event) => { this._favoriteSearch = (e.target as HTMLInputElement).value; this.requestUpdate(); }}
-            @blur=${() => { setTimeout(() => { this._favoriteSearch = ''; this.requestUpdate(); }, 200); }}
-          />
-          ${this._favoriteSearch.length >= 2 ? html`
-            <div class="entity-search-results">
-              ${filteredEntities.length > 0
-                ? filteredEntities.map((entity) => html`
-                  <div class="entity-search-result" @mousedown=${(e: Event) => { e.preventDefault(); this._addFavoriteEntity(entity.entity_id); this._favoriteSearch = ''; this.requestUpdate(); }}>
-                    <span class="entity-search-name">${entity.name}</span>
-                    <span class="entity-search-id">${entity.entity_id}</span>
-                  </div>
-                `)
-                : html`<div class="entity-search-no-results">${localize('editor.no_results')}</div>`
-              }
-            </div>
-          ` : nothing}
-        </div>
-        <div class="description">${localize('editor.favorites_desc')}</div>
-
-        ${this._renderCheckbox('favorites-show-state', localize('editor.show_state'), favoritesShowState,
-          (checked) => this._toggleChanged('favorites_show_state', checked, false))}
-
-        ${this._renderCheckbox('favorites-hide-last-changed', localize('editor.hide_last_changed'), favoritesHideLastChanged,
-          (checked) => this._toggleChanged('favorites_hide_last_changed', checked, false))}
-      </div>
-    `;
+    return renderFavoritesTab({
+      config: this._config,
+      search: this._favoriteSearch,
+      entityNameMap: new Map(allEntities.map((e) => [e.entity_id, e.name])),
+      filteredEntities: this._getFilteredEntities(this._favoriteSearch),
+      renderCheckbox: (id, label, checked, onChange) =>
+        this._renderCheckbox(id, label, checked, onChange),
+      onSearchChange: (value) => {
+        this._favoriteSearch = value;
+        this.requestUpdate();
+      },
+      onAddEntity: (entityId) => this._addFavoriteEntity(entityId),
+      onRemoveEntity: (entityId) => this._removeFavoriteEntity(entityId),
+      onToggleChange: (k, v, d) => this._toggleChanged(k, v, d),
+      onDragStart: (ev) => this._handleEntityDragStart(ev, 'favorites'),
+      onDragEnd: this._handleEntityDragEnd,
+      onDragOver: this._handleEntityDragOver,
+      onDragLeave: this._handleEntityDragLeave,
+      onDrop: (ev) => this._handleEntityDrop(ev, 'favorites'),
+    });
   }
 
   // -- Weather sensors editor -------------------------------------------
