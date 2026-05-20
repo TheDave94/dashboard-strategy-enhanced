@@ -6,6 +6,8 @@
 // used throughout the strategy codebase.
 // ====================================================================
 
+import type { LovelaceCardConfig } from './lovelace';
+
 // -- Section Ordering -------------------------------------------------
 
 export type SectionKey =
@@ -191,6 +193,15 @@ export interface Simon42StrategyConfig {
   presence_zones?: Array<string | PresenceZoneEntry>;
   presence_zones_name?: string;
   presence_zones_icon?: string;
+  /**
+   * Opaque list of LovelaceCardConfig objects rendered inside the
+   * overview's favorites subsection, immediately after the favorite
+   * entity tiles (and after any pin_*_to_favorites cards). The escape
+   * hatch for "I want X card inside favorites" when neither the
+   * favorite_entities tile-list nor the pin_*_to_favorites flags fit.
+   * Cards are forwarded verbatim — anything HA can render is valid.
+   */
+  favorites_cards?: LovelaceCardConfig[];
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
@@ -307,6 +318,22 @@ export interface AreaOptions {
    * sensors that you don't want grouped into a card.
    */
   show_zone_presence?: boolean;
+  /**
+   * Pin this area's auto-rendered room-mode tile into the overview's
+   * favorites subsection. The tile is identical to the one at the top
+   * of the room view (mode picker + sticky-lock feature when
+   * configured). Default false. Useful when the user lives in one
+   * room and wants its mode controls visible at a glance on the
+   * overview without manually setting up a custom_cards entry.
+   */
+  pin_room_mode_to_favorites?: boolean;
+  /**
+   * Pin this area's auto-rendered zone-presence card into the
+   * overview's favorites subsection. Same auto-detection rules as
+   * the room view (≥2 binary_sensors with device_class ∈
+   * {occupancy, motion, presence}). Default false.
+   */
+  pin_zone_presence_to_favorites?: boolean;
 }
 
 export interface GroupOptions {
