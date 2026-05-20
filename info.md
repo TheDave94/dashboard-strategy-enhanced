@@ -13,7 +13,7 @@ A substantially improved fork of [simon42's dashboard strategy](https://github.c
 
 ## Installation
 
-HACS custom repository → `TheDave94/simon42-dashboard-strategy`, category Lovelace.
+HACS custom repository → `TheDave94/dashboard-strategy-enhanced`, category Lovelace.
 
 Then create a dashboard with:
 

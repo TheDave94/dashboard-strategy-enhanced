@@ -1,8 +1,8 @@
 # Dashboard Strategy Enhanced
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/v/release/TheDave94/simon42-dashboard-strategy?style=for-the-badge&color=green)](https://github.com/TheDave94/simon42-dashboard-strategy/releases)
-[![GitHub Stars](https://img.shields.io/github/stars/TheDave94/simon42-dashboard-strategy?style=for-the-badge&color=yellow)](https://github.com/TheDave94/simon42-dashboard-strategy/stargazers)
+[![GitHub Release](https://img.shields.io/github/v/release/TheDave94/dashboard-strategy-enhanced?style=for-the-badge&color=green)](https://github.com/TheDave94/dashboard-strategy-enhanced/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/TheDave94/dashboard-strategy-enhanced?style=for-the-badge&color=yellow)](https://github.com/TheDave94/dashboard-strategy-enhanced/stargazers)
 ![AI-Assisted](https://img.shields.io/badge/AI--Assisted-blue?style=for-the-badge)
 [![License](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey?style=for-the-badge)](LICENSE)
 
@@ -50,11 +50,11 @@ Five custom elements that the strategy emits internally, all also available as s
 
 ## Installation
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheDave94&repository=simon42-dashboard-strategy&category=plugin)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheDave94&repository=dashboard-strategy-enhanced&category=plugin)
 
 ### Via HACS (recommended)
 
-1. HACS → **Custom repositories** → add `https://github.com/TheDave94/simon42-dashboard-strategy`, type **Dashboard**.
+1. HACS → **Custom repositories** → add `https://github.com/TheDave94/dashboard-strategy-enhanced`, type **Dashboard**.
 2. Install. Hard-refresh your browser.
 3. Create a new dashboard (Settings → Dashboards → Add dashboard → New dashboard from scratch).
 4. Open the dashboard → edit mode → ⋮ → **Raw configuration editor** → replace contents with:
@@ -148,7 +148,7 @@ The `presence_entities` list is the single source — the favorites pin and the 
 
 ## Versioning
 
-- **2.0+** — current line, HA 2026.5+ baseline. See [release notes](https://github.com/TheDave94/simon42-dashboard-strategy/releases) per version.
+- **2.0+** — current line, HA 2026.5+ baseline. See [release notes](https://github.com/TheDave94/dashboard-strategy-enhanced/releases) per version.
 - **2.1 (in progress)** — completes the editor migration to `<ha-form>` tab modules.
 - **2.x** — bugfixes + incremental feature work on the v2.0 baseline.
 
@@ -162,4 +162,4 @@ This project started as a fork of [TheRealSimon42/simon42-dashboard-strategy](ht
 
 ## Contributing
 
-Bug reports, feature requests, and PRs welcome at [TheDave94/simon42-dashboard-strategy](https://github.com/TheDave94/simon42-dashboard-strategy/issues). Translations into additional locales are particularly appreciated — drop a `src/translations/<lang>.json` mirroring `en.json` and submit a PR.
+Bug reports, feature requests, and PRs welcome at [TheDave94/dashboard-strategy-enhanced](https://github.com/TheDave94/dashboard-strategy-enhanced/issues). Translations into additional locales are particularly appreciated — drop a `src/translations/<lang>.json` mirroring `en.json` and submit a PR.
