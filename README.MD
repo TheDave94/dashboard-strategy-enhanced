@@ -1,10 +1,20 @@
-# simon42 Dashboard Strategy
+# simon42 Dashboard Strategy — Community Fork
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/v/release/TheRealSimon42/simon42-dashboard-strategy?style=for-the-badge&color=green)](https://github.com/TheRealSimon42/simon42-dashboard-strategy/releases)
-[![GitHub Stars](https://img.shields.io/github/stars/TheRealSimon42/simon42-dashboard-strategy?style=for-the-badge&color=yellow)](https://github.com/TheRealSimon42/simon42-dashboard-strategy/stargazers)
+[![GitHub Release](https://img.shields.io/github/v/release/TheDave94/simon42-dashboard-strategy?style=for-the-badge&color=green)](https://github.com/TheDave94/simon42-dashboard-strategy/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/TheDave94/simon42-dashboard-strategy?style=for-the-badge&color=yellow)](https://github.com/TheDave94/simon42-dashboard-strategy/stargazers)
 ![AI-Assisted](https://img.shields.io/badge/AI--Assisted-blue?style=for-the-badge)
 [![License](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey?style=for-the-badge)](LICENSE)
+
+> ### 🍴 This is a community fork
+>
+> This repository is a community-maintained fork of [TheRealSimon42/simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy), maintained by [@TheDave94](https://github.com/TheDave94). It exists to ship community fixes and features that have been [submitted as PRs to upstream](https://github.com/TheRealSimon42/simon42-dashboard-strategy/pulls?q=is%3Apr+author%3ATheDave94) but haven't been merged yet — install this fork if you don't want to wait.
+>
+> **What's extra in the fork** (beyond upstream `main`): six new optional overview sections (plants, agenda, todos, persons, vacuums, maintenance), five opt-in live header badges (power, unavailable, now-playing, sun, updates), per-section + per-room conditional visibility, Security view (locks, doors, garages, windows, smoke/gas), `custom_sections` user-declared sections, snapshot tests, translation lint + ESLint enforcement in CI, release-please automation. The full grouped-PR list is on the [v1.4.0 release notes](https://github.com/TheDave94/simon42-dashboard-strategy/releases/tag/v1.4.0-thedave).
+>
+> **Installation**: scroll to [Installation (Fork)](#installation-fork) below — install as a HACS custom repository pointing at `TheDave94/simon42-dashboard-strategy`. Switching between upstream and fork is a HACS uninstall + reinstall; no manual file cleanup required.
+>
+> **Upstream-friendly**: changes are still submitted upstream and the fork tracks upstream `main`. If the maintainer merges them, this fork will resync. Bug reports for fork-only behavior go to [TheDave94/simon42-dashboard-strategy/issues](https://github.com/TheDave94/simon42-dashboard-strategy/issues); everything else still belongs upstream.
 
 Eine modulare und hochkonfigurierbare Dashboard-Strategy für Home Assistant, die automatisch Views basierend auf Bereichen, Entitäten und deren Zuständen generiert.
 
@@ -68,19 +78,36 @@ Wenn dir die simon42 Dashboard Strategy hilft, unterstütze die Weiterentwicklun
 - **Mehrsprachig** — Deutsch und Englisch, automatische Erkennung aus HA-Einstellungen, Fallback auf Englisch
 - **Performance-optimiert** — Code-Split Bundles, Registry-Caching, Tile-Card-Pooling
 
-## Installation
+## Installation (Fork)
 
-### HACS (empfohlen)
+<a id="installation-fork"></a>
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheRealSimon42&repository=simon42-dashboard-strategy&category=plugin)
+> Installs **this fork** (`TheDave94/simon42-dashboard-strategy`). Replace with the upstream owner if you'd rather use the original.
+
+### HACS Custom Repository (empfohlen)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheDave94&repository=simon42-dashboard-strategy&category=plugin)
 
 <details>
 <summary>Alternative zum Button</summary>
 
-1. Gehe zu HACS → **Custom repositories**
-2. Füge das Repository hinzu: `https://github.com/TheRealSimon42/simon42-dashboard-strategy`
-3. Lade die "Simon42 Dashboard Strategy" herunter
-4. Klicke nach dem Download in HACS auf die Meldung "Neu laden", um die Installation abzuschließen
+1. Gehe zu HACS → ⋮ → **Custom repositories**
+2. Füge das Repository hinzu:
+   - **Repository:** `https://github.com/TheDave94/simon42-dashboard-strategy`
+   - **Type:** Dashboard
+3. Klicke auf **ADD**, dann auf den neuen Eintrag → **Download**.
+4. Lade die Dashboard-Seite neu (Hard-Refresh: `Cmd+Shift+R` / `Ctrl+Shift+R`).
+
+</details>
+
+<details>
+<summary>Wechsel von Upstream zu diesem Fork (oder zurück)</summary>
+
+1. In HACS den vorherigen Eintrag deinstallieren (drei Punkte → Remove).
+2. Custom repository wie oben hinzufügen.
+3. Neue Version installieren, Browser hart neu laden.
+
+Es ist kein manuelles Aufräumen in `/config/www/community/` nötig — HACS löscht den alten Plugin-Ordner beim Deinstallieren.
 
 </details>
 
