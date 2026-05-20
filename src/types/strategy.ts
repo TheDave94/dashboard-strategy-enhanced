@@ -19,7 +19,8 @@ export type SectionKey =
   | 'todos'
   | 'persons'
   | 'vacuums'
-  | 'maintenance';
+  | 'maintenance'
+  | 'presence';
 
 export const DEFAULT_SECTIONS_ORDER: SectionKey[] = [
   'overview',
@@ -44,7 +45,8 @@ export type HeadingKey =
   | 'todos'
   | 'persons'
   | 'vacuums'
-  | 'maintenance';
+  | 'maintenance'
+  | 'presence';
 
 export const ALL_HEADING_KEYS: HeadingKey[] = [
   'overview',
@@ -60,6 +62,7 @@ export const ALL_HEADING_KEYS: HeadingKey[] = [
   'persons',
   'vacuums',
   'maintenance',
+  'presence',
 ];
 
 // -- Main Strategy Config ---------------------------------------------
@@ -159,6 +162,27 @@ export interface Simon42StrategyConfig {
    * single-row layout for ~½ the vertical footprint.
    */
   summary_card_density?: 'compact' | 'comfortable';
+  /**
+   * Globally enable / disable the auto-rendered zone-presence card in
+   * room views. Default true: each room view picks up its
+   * binary_sensors with device_class ∈ {occupancy, motion, presence}
+   * and renders them as one compact `simon42-zone-presence-card`
+   * (only when ≥2 such sensors are present in the area — a single
+   * sensor reads fine as a normal tile). Set false to suppress
+   * across the whole dashboard.
+   */
+  show_zone_presence_in_rooms?: boolean;
+  /**
+   * Optional curated zone-presence card for the overview. When set,
+   * the strategy renders a `simon42-zone-presence-card` in its own
+   * 'presence' section on the overview with the listed entities.
+   * The list is opaque to the strategy — each entry is forwarded to
+   * the card as-is, so all per-entry overrides (name, icon, color,
+   * tap_action) work. Auto-hides when the list is empty or omitted.
+   */
+  presence_zones?: Array<string | PresenceZoneEntry>;
+  presence_zones_name?: string;
+  presence_zones_icon?: string;
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
@@ -236,6 +260,21 @@ export interface AreasDisplay {
   order?: string[];
 }
 
+/**
+ * Single entry in `presence_zones[]`. Mirrors the shape the
+ * simon42-zone-presence-card accepts so the strategy can forward
+ * values verbatim. All fields besides `entity` are optional.
+ */
+export interface PresenceZoneEntry {
+  entity: string;
+  name?: string;
+  icon?: string;
+  color?: string;
+  tap_action?: Record<string, unknown>;
+  hold_action?: Record<string, unknown>;
+  double_tap_action?: Record<string, unknown>;
+}
+
 export interface AreaOptions {
   groups_options?: Record<string, GroupOptions>;
   /**
@@ -245,6 +284,21 @@ export interface AreaOptions {
    * is used. The tile is omitted when neither path resolves an entity.
    */
   room_mode_entity?: string;
+  /**
+   * Optional sticky-lock companion rendered next to the room-mode
+   * tile in the room view. Typically `input_boolean.<area>_sticky` —
+   * when on, your room automation suppresses auto-mode-changes. The
+   * companion tile is only rendered when this is set AND the
+   * room-mode tile itself rendered.
+   */
+  room_mode_sticky_entity?: string;
+  /**
+   * Per-area opt-out for the auto-rendered zone-presence card in the
+   * room view. Defaults to true. Set to false to skip the auto-render
+   * for this area only — useful when an area has many occupancy/motion
+   * sensors that you don't want grouped into a card.
+   */
+  show_zone_presence?: boolean;
 }
 
 export interface GroupOptions {

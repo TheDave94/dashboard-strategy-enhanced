@@ -113,7 +113,8 @@
     "automations": "Automations",
     "scripts": "Scripts",
     "room_pins": "Room Pins",
-    "room_mode": "Room Mode"
+    "room_mode": "Room Mode",
+    "sticky_lock": "Sticky"
   },
   "zone_presence": {
     "title": "Presence"

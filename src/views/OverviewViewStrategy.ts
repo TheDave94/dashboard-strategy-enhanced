@@ -23,6 +23,7 @@ import { createTodosSection } from '../sections/TodosSection';
 import { createPersonsSection } from '../sections/PersonsSection';
 import { createVacuumsSection } from '../sections/VacuumsSection';
 import { createMaintenanceSection } from '../sections/MaintenanceSection';
+import { createPresenceZonesSection } from '../sections/PresenceZonesSection';
 import { createOverviewView } from '../utils/view-builder';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 
@@ -242,6 +243,14 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       ['persons', createPersonsSection(hass, dashboardConfig.show_persons_section === true)],
       ['vacuums', createVacuumsSection(hass, dashboardConfig.show_vacuums_section === true)],
       ['maintenance', createMaintenanceSection(hass, dashboardConfig.show_maintenance_section === true)],
+      [
+        'presence',
+        createPresenceZonesSection(
+          dashboardConfig.presence_zones,
+          dashboardConfig.presence_zones_name,
+          dashboardConfig.presence_zones_icon,
+        ),
+      ],
     ]);
     for (const { key, section } of customSections) {
       sectionMap.set(key, section);

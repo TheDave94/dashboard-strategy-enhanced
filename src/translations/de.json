@@ -113,7 +113,8 @@
     "automations": "Automationen",
     "scripts": "Skripte",
     "room_pins": "Raum-Pins",
-    "room_mode": "Raum-Modus"
+    "room_mode": "Raum-Modus",
+    "sticky_lock": "Sticky"
   },
   "zone_presence": {
     "title": "Anwesenheit"
