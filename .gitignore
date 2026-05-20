@@ -7,3 +7,5 @@ dist/simon42-dashboard-strategy.js.map
 .DS_Store
 .codacy/
 coverage/
+playwright-report/
+test-results/
