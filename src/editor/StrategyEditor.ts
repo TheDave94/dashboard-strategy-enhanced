@@ -26,6 +26,7 @@ import type { AreaRegistryEntry, EntityRegistryEntry } from '../types/registries
 import { localize } from '../utils/localize';
 import { isBadgeCandidate, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
 import { renderViewsTab } from './tabs/ViewsTab';
+import { renderOverviewTab } from './tabs/OverviewTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1485,82 +1486,33 @@ class Simon42DashboardStrategyEditor extends LitElement {
   // -- Overview section --------------------------------------------------
 
   private _renderOverviewSection(): TemplateResult {
-    const showClockCard = this._config.show_clock_card !== false;
-    const showSearchCard = this._config.show_search_card === true;
-    const showPersonBadges = this._config.show_person_badges !== false;
+    // Migrated to ha-form in beta.21. The legacy "search card deps
+    // missing" warning is preserved here as a sibling block — it's
+    // a pure informational notice, not a form input. ha-form drives
+    // every actual config field via the schema.
+    if (!this._hass) return html``;
     const hasSearchCardDeps = this._checkSearchCardDependencies();
-    const alarmEntity = this._config.alarm_entity || '';
-    const alarmEntities = this._getAlarmEntities();
-
+    const showSearchCard = this._config.show_search_card === true;
     return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_overview')}</div>
-
-        ${this._renderCheckbox('show-clock-card', localize('editor.show_clock_card'), showClockCard,
-          (checked) => this._toggleChanged('show_clock_card', checked, true))}
-        <div class="description">${localize('editor.show_clock_card_desc')}</div>
-
-        <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 12px; margin-bottom: 4px;">
-          ${localize('editor.person_badge_layout')}
-        </div>
-        ${(['minimal', 'with_state', 'with_state_and_time'] as const).map((opt) => {
-          const current = this._config.person_badge_layout || 'with_state';
-          return html`
-            <div class="form-row">
-              <input type="radio" id="person-badge-${opt}" name="person-badge-layout" value=${opt}
-                ?checked=${current === opt}
-                @change=${() => this._personBadgeLayoutChanged(opt)} />
-              <label for="person-badge-${opt}">${localize('editor.person_badge_layout_' + opt)}</label>
-            </div>
-          `;
-        })}
-        <div class="description">${localize('editor.person_badge_layout_desc')}</div>
-
-        <div class="form-row">
-          <label for="alarm-entity" style="margin-right: 8px; min-width: 120px;">${localize('editor.alarm_entity')}</label>
-          <select id="alarm-entity"
-            style="flex: 1;"
-            @change=${this._alarmEntityChanged}>
-            <option value="" ?selected=${!alarmEntity}>${localize('editor.alarm_none')}</option>
-            ${alarmEntities.map((entity) => html`
-              <option value=${entity.entity_id} ?selected=${entity.entity_id === alarmEntity}>
-                ${entity.name}
-              </option>
-            `)}
-          </select>
-        </div>
-        <div class="description">${localize('editor.alarm_desc')}</div>
-
-        ${this._renderCheckbox('show-search-card', localize('editor.show_search_card'), showSearchCard,
-          (checked) => this._toggleChanged('show_search_card', checked, false))}
-        <div class="description">
-          ${hasSearchCardDeps
-            ? localize('editor.show_search_card_desc')
-            : html`<span>&#x26A0;&#xFE0F; ${unsafeHTML(localize('editor.show_search_card_missing'))}</span>`}
-        </div>
-
-        ${this._renderCheckbox('show-person-badges', localize('editor.show_person_badges'), showPersonBadges,
-          (checked) => this._toggleChanged('show_person_badges', checked, true))}
-        <div class="description">${localize('editor.show_person_badges_desc')}</div>
-        ${showSearchCard ? html`
-          <div style="margin-left: 26px; margin-bottom: 8px;">
-            <div style="font-size: 13px; font-weight: 500; color: var(--primary-text-color); margin-top: 4px; margin-bottom: 4px;">
-              ${localize('editor.search_card_variant')}
-            </div>
-            ${(['custom', 'tip'] as const).map((opt) => {
-              const current = this._config.search_card_variant === 'tip' ? 'tip' : 'custom';
-              return html`
-                <div class="form-row">
-                  <input type="radio" id="search-variant-${opt}" name="search-card-variant" value=${opt}
-                    ?checked=${current === opt}
-                    @change=${() => this._searchCardVariantChanged(opt)} />
-                  <label for="search-variant-${opt}">${localize('editor.search_card_variant_' + opt)}</label>
-                </div>
-              `;
-            })}
-          </div>
-        ` : nothing}
-      </div>
+      ${renderOverviewTab({
+        hass: this._hass,
+        config: this._config,
+        onChange: (patch) => {
+          const newConfig: Simon42StrategyConfig = { ...this._config, ...patch };
+          for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
+            if (patch[key] === undefined) {
+              delete (newConfig as Record<string, unknown>)[key as string];
+            }
+          }
+          this._config = newConfig;
+          this._fireConfigChanged(newConfig);
+        },
+      })}
+      ${showSearchCard && !hasSearchCardDeps
+        ? html`<div class="description" style="margin-top: -8px;">
+            <span>&#x26A0;&#xFE0F; ${unsafeHTML(localize('editor.show_search_card_missing'))}</span>
+          </div>`
+        : nothing}
     `;
   }
 
