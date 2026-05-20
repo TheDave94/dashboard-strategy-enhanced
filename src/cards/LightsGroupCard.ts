@@ -86,12 +86,13 @@ class Simon42LightsGroupCard extends LitElement {
       --s42-child-min: 260px;
     }
     :host([density="compact"]) {
-      --s42-gap: var(--ha-space-1, 4px);
-      --s42-block-pad: var(--ha-space-2, 8px);
-      --s42-block-radius: var(--ha-border-radius-md, 12px);
-      --s42-toggle-size: 30px;
-      --s42-tile-min: 240px;
-      --s42-child-min: 220px;
+      /* Subtle reduction — same layout, just tighter. */
+      --s42-gap: var(--ha-space-1, 6px);
+      --s42-block-pad: var(--ha-space-2, 10px);
+      --s42-block-radius: var(--ha-border-radius-md, 14px);
+      --s42-toggle-size: 32px;
+      --s42-tile-min: 280px;
+      --s42-child-min: 240px;
     }
     .lights-section {
       display: flex;

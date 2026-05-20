@@ -198,13 +198,14 @@ class Simon42ZonePresenceCard extends LitElement {
       --s42-header-size: var(--ha-font-size-m, 14px);
     }
     :host([density="compact"]) {
-      --s42-pad-block: var(--ha-space-2, 8px);
-      --s42-pad-inline: var(--ha-space-3, 12px);
-      --s42-header-mb: var(--ha-space-2, 6px);
-      --s42-zone-gap-col: var(--ha-space-2, 8px);
-      --s42-zone-pad: var(--ha-space-1, 4px) var(--ha-space-1, 2px);
-      --s42-icon-wrap: 28px;
-      --s42-icon-size: 18px;
+      /* Gentle reduction — keeps icon legibility while trimming chrome. */
+      --s42-pad-block: var(--ha-space-2, 10px);
+      --s42-pad-inline: var(--ha-space-3, 14px);
+      --s42-header-mb: var(--ha-space-2, 8px);
+      --s42-zone-gap-col: var(--ha-space-2, 10px);
+      --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
+      --s42-icon-wrap: 32px;
+      --s42-icon-size: 20px;
     }
     ha-card {
       padding: var(--s42-pad-block) var(--s42-pad-inline);

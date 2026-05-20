@@ -77,9 +77,11 @@ class Simon42SummaryCard extends LitElement {
       --s42-name: var(--ha-font-size-s, 13px);
     }
     :host([density="compact"]) {
-      --s42-pad: var(--ha-space-2, 8px) var(--ha-space-3, 12px);
-      --s42-gap: var(--ha-space-3, 12px);
-      --s42-icon: 22px;
+      /* Less aggressive than full -50% — drops ~25% padding, keeps
+         icon close to comfortable so the tile still reads at a glance. */
+      --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
+      --s42-gap: var(--ha-space-3, 10px);
+      --s42-icon: 26px;
     }
     ha-card {
       padding: var(--s42-pad);
