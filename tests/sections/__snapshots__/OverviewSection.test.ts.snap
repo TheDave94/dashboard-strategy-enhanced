@@ -25,13 +25,13 @@ exports[`createOverviewSection > matches the snapshot for a default config 1`] =
       "cards": [
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "lights",
           "type": "custom:simon42-summary-card",
         },
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "covers",
           "type": "custom:simon42-summary-card",
         },
@@ -42,14 +42,14 @@ exports[`createOverviewSection > matches the snapshot for a default config 1`] =
       "cards": [
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "security",
           "type": "custom:simon42-summary-card",
         },
         {
           "areas_options": {},
           "battery_critical_threshold": undefined,
-          "density": "comfortable",
+          "density": undefined,
           "hide_battery_notes_entities": undefined,
           "hide_mobile_app_batteries": undefined,
           "summary_type": "batteries",
@@ -74,13 +74,13 @@ exports[`createOverviewSection > matches the snapshot when show_clock_card is di
       "cards": [
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "lights",
           "type": "custom:simon42-summary-card",
         },
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "covers",
           "type": "custom:simon42-summary-card",
         },
@@ -91,14 +91,14 @@ exports[`createOverviewSection > matches the snapshot when show_clock_card is di
       "cards": [
         {
           "areas_options": {},
-          "density": "comfortable",
+          "density": undefined,
           "summary_type": "security",
           "type": "custom:simon42-summary-card",
         },
         {
           "areas_options": {},
           "battery_critical_threshold": undefined,
-          "density": "comfortable",
+          "density": undefined,
           "hide_battery_notes_entities": undefined,
           "hide_mobile_app_batteries": undefined,
           "summary_type": "batteries",
