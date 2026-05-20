@@ -36,6 +36,8 @@ import { renderFavoritesTab } from './tabs/FavoritesTab';
 import { renderWeatherSensorsTab } from './tabs/WeatherSensorsTab';
 import { renderCustomCardsTab } from './tabs/CustomCardsTab';
 import { renderCustomSectionsTab } from './tabs/CustomSectionsTab';
+import { renderCustomBadgesTab } from './tabs/CustomBadgesTab';
+import { renderCustomViewsTab } from './tabs/CustomViewsTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -1858,57 +1860,24 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderCustomBadgesSection(): TemplateResult {
-    const customBadges = this._config.custom_badges || [];
-
-    return html`
-      <div class="section">
-        <div class="section-title" style="display: flex; align-items: center; gap: 8px;">
-          ${localize('editor.section_custom_badges')}
-          <a href="https://github.com/TheRealSimon42/simon42-dashboard-strategy/blob/main/assets/Custom-Badges-hinzufugen.gif"
-            target="_blank" rel="noopener"
-            style="color: var(--primary-color); text-decoration: none; font-size: 18px;"
-            title=${localize('editor.video_tutorial')}>&#x1F3AC;</a>
-        </div>
-
-        <div id="custom-badges-list">
-          ${customBadges.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_badges')}</div>`
-            : customBadges.map((badge, index) => this._renderCustomBadgeItem(badge, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomBadge}>
-          ${localize('editor.add_custom_badge')}
-        </button>
-        <div class="description">${localize('editor.custom_badges_help')}</div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomBadgesTab({
+      config: this._config,
+      onAdd: () => this._addCustomBadge(),
+      onRemove: (index) => this._removeCustomBadge(index),
+      onUpdateYaml: (index, yamlString) => this._updateCustomBadgeYaml(index, yamlString),
+    });
   }
 
   private _renderCustomViewsSection(): TemplateResult {
-    const customViews = this._config.custom_views || [];
-
-    return html`
-      <div class="section">
-        <div class="section-title" style="display: flex; align-items: center; gap: 8px;">
-          ${localize('editor.section_custom_views')}
-          <a href="https://github.com/TheRealSimon42/simon42-dashboard-strategy/blob/main/assets/Custom-View-hinzufugen.gif"
-            target="_blank" rel="noopener"
-            style="color: var(--primary-color); text-decoration: none; font-size: 18px;"
-            title=${localize('editor.video_tutorial')}>&#x1F3AC;</a>
-        </div>
-
-        <div id="custom-views-list">
-          ${customViews.length === 0
-            ? html`<div class="empty-state">${localize('editor.no_custom_views')}</div>`
-            : customViews.map((view, index) => this._renderCustomViewItem(view, index))}
-        </div>
-
-        <button class="btn-primary" style="margin-top: 8px;" @click=${this._addCustomView}>
-          ${localize('editor.add_custom_view')}
-        </button>
-        <div class="description">${localize('editor.custom_views_help')}</div>
-      </div>
-    `;
+    if (!this._hass) return html``;
+    return renderCustomViewsTab({
+      config: this._config,
+      onAdd: () => this._addCustomView(),
+      onRemove: (index) => this._removeCustomView(index),
+      onUpdateField: (index, field, value) => this._updateCustomViewField(index, field, value),
+      onUpdateYaml: (index, yamlString) => this._updateCustomViewYaml(index, yamlString),
+    });
   }
 
   // ====================================================================
