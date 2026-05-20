@@ -13,16 +13,14 @@ export default [
         sourceType: 'module',
       },
     },
-    // Source-level `// eslint-disable-next-line security/detect-object-injection`
-    // markers document Codacy-flagged bracket-access call sites. We load the
-    // security plugin here (rules off) so those directives resolve to a known
-    // rule name. We also disable reportUnusedDisableDirectives so the markers
-    // stay quiet for ESLint while remaining authoritative for Codacy.
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
-    },
     plugins: {
       '@typescript-eslint': tseslint,
+      // eslint-plugin-security loaded so its rules are *known names*,
+      // but they're all disabled below. None of the strategy's
+      // bracket-access call sites involve user-controlled property
+      // names — entity IDs come from HA's typed registry or the
+      // dashboard config — and the previous per-line eslint-disable
+      // markers were noise. See audit §2.11.
       security,
     },
     rules: {
@@ -32,9 +30,14 @@ export default [
       // Pragmatic overrides
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      // Disabled — the strategy reads hass.states[entity_id] with
+      // entity IDs sourced from HA's typed registry. False-positive
+      // density was high and signal was zero.
+      'security/detect-object-injection': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'webpack.config.ts'],
+    ignores: ['dist/**', 'node_modules/**'],
   },
 ];

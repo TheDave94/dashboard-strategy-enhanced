@@ -283,7 +283,6 @@ class Simon42CoversGroupCard extends LitElement {
     ];
 
     return sortedKeys.map((floorId) => {
-      // eslint-disable-next-line security/detect-object-injection -- floorId comes from HA floor registry keys
       const floor = floorId ? floors[floorId] : null;
       return {
         floorId,

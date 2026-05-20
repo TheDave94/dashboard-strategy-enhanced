@@ -162,9 +162,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
 
     // Motorized windows (cover.* with device_class=window — e.g. Velux electric)
     if (motorizedWindows.length > 0) {
-      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const open = motorizedWindows.filter((e) => hass.states[e]?.state === 'open');
-      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const closed = motorizedWindows.filter((e) => hass.states[e]?.state === 'closed');
       const cards: LovelaceCardConfig[] = [];
 
@@ -302,9 +300,7 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
 
     // Water leak / moisture sensors
     if (waterLeak.length > 0) {
-      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const active = waterLeak.filter((e) => hass.states[e]?.state === 'on');
-      // eslint-disable-next-line security/detect-object-injection -- entity IDs come from HA registry
       const inactive = waterLeak.filter((e) => hass.states[e]?.state === 'off');
       const cards: LovelaceCardConfig[] = [];
 
@@ -321,7 +317,6 @@ class Simon42ViewSecurityStrategy extends HTMLElement {
 
     // User-picked extra entities (smart appliances, custom sensors, etc.)
     const extraEntities: string[] = (config.config?.security_extra_entities || []).filter(
-      // eslint-disable-next-line security/detect-object-injection -- entity IDs are user-picked from the editor entity registry
       (id: string) => hass.states[id] !== undefined
     );
     if (extraEntities.length > 0) {

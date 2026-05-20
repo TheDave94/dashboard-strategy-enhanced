@@ -173,7 +173,6 @@ class Simon42DashboardStrategyEditor extends LitElement {
     return Object.keys(this._hass.states)
       .filter((entityId) => entityId.startsWith('weather.'))
       .map((entityId) => {
-        // eslint-disable-next-line security/detect-object-injection -- entityId iterated from hass.states keys
         const stateObj = this._hass!.states[entityId];
         return {
           entity_id: entityId,
@@ -189,14 +188,12 @@ class Simon42DashboardStrategyEditor extends LitElement {
     return Object.keys(this._hass.states)
       .filter((entityId) => {
         if (!entityId.startsWith('sensor.')) return false;
-        // eslint-disable-next-line security/detect-object-injection -- entityId iterated from hass.states keys
         const stateObj = this._hass!.states[entityId];
         const dc = stateObj?.attributes?.device_class;
         const unit = stateObj?.attributes?.unit_of_measurement;
         return dc === 'power' || unit === 'W' || unit === 'kW';
       })
       .map((entityId) => {
-        // eslint-disable-next-line security/detect-object-injection -- entityId iterated from hass.states keys
         const stateObj = this._hass!.states[entityId];
         return {
           entity_id: entityId,

@@ -3,6 +3,7 @@
 // ====================================================================
 
 import type { LovelaceViewConfig } from '../types/lovelace';
+import { resolveDensity } from '../utils/density';
 
 class Simon42ViewLightsStrategy extends HTMLElement {
   static async generate(config: any, _hass: any): Promise<LovelaceViewConfig> {
@@ -16,7 +17,7 @@ class Simon42ViewLightsStrategy extends HTMLElement {
     // expand wasn't discoverable. Matches RoomViewStrategy's behaviour
     // for its inline lights section. Users can override.
     const defaultExpanded = dashboardConfig.light_groups_default_expanded !== false;
-    const density = dashboardConfig.dashboard_density === 'compact' ? 'compact' : undefined;
+    const density = resolveDensity(dashboardConfig);
 
     const card = (group_type: 'on' | 'off') => ({
       type: 'custom:simon42-lights-group-card',

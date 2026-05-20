@@ -15,6 +15,7 @@ import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 import { localize } from '../utils/localize';
+import { resolveDensity } from '../utils/density';
 import { BADGE_COLOR_MAP, getColorForEntity, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
 
 // HA supported_features bitmask values
@@ -488,8 +489,7 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     };
 
     if (roomEntities.lights.length > 0) {
-      const lightsDensity =
-        dashboardConfig.dashboard_density === 'compact' ? 'compact' : undefined;
+      const lightsDensity = resolveDensity(dashboardConfig);
       sections.push({
         type: 'grid',
         cards: [

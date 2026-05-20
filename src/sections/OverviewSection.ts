@@ -12,6 +12,7 @@ import type { Simon42StrategyConfig, CustomCard } from '../types/strategy';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
+import { densityProp, resolveDensity } from '../utils/density';
 
 // --------------------------------------------------------------------
 // Helpers to surface room-section cards inside the favorites grid.
@@ -124,11 +125,10 @@ function buildZonePresenceCard(
     entities = zoneEntities;
   }
 
-  const density = config.dashboard_density === 'compact' ? 'compact' : undefined;
   return {
     type: 'custom:simon42-zone-presence-card',
     entities,
-    ...(density ? { density } : {}),
+    ...densityProp(config),
     grid_options: { columns: 6, rows: 'auto' },
   };
 }
@@ -232,14 +232,8 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   // Build summary cards based on config
   const summaryCards: LovelaceCardConfig[] = [];
   // Density: container queries scale cards to their actual cell size
-  // by default. `dashboard_density` is the manual override (forces
-  // compact / comfortable regardless of container width).
-  const density: 'comfortable' | 'compact' | undefined =
-    config.dashboard_density === 'compact'
-      ? 'compact'
-      : config.dashboard_density === 'comfortable'
-        ? 'comfortable'
-        : undefined;
+  // by default. `dashboard_density` is the manual override.
+  const density = resolveDensity(config);
 
   if (showLightSummary) {
     summaryCards.push({

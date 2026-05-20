@@ -87,6 +87,18 @@ class Registry {
 
   /** Initialization flag */
   private static _initialized: boolean = false;
+  /**
+   * Identity of the `hass.entities` object the Registry was last built
+   * from. HA mutates `hass` via Object.assign of new references on
+   * registry updates (entity renames, area assignments) — the entity
+   * map identity flips even when individual entries are unchanged. By
+   * comparing identity we rebuild only when there's actually new
+   * data, which keeps initialize() idempotent within a single render
+   * pass but invalidates correctly on real registry events.
+   */
+  private static _builtFromEntities: unknown = null;
+  private static _builtFromDevices: unknown = null;
+  private static _builtFromAreas: unknown = null;
 
   /**
    * Reset the Registry singleton between tests so each test starts with a
@@ -96,6 +108,9 @@ class Registry {
    */
   static resetForTesting(): void {
     Registry._initialized = false;
+    Registry._builtFromEntities = null;
+    Registry._builtFromDevices = null;
+    Registry._builtFromAreas = null;
   }
 
   // =====================================================================
@@ -105,14 +120,26 @@ class Registry {
   /**
    * Initialize the registry from hass object and strategy config.
    * Synchronous — reads directly from hass.entities/devices/areas.
-   * Idempotent: skips if already initialized.
+   * Idempotent across one render pass; rebuilds when the underlying
+   * hass registries' identity changes (HA replaces the maps on
+   * registry updates).
    */
   static initialize(hass: HomeAssistant, config: Simon42StrategyConfig): void {
-    if (Registry._initialized) return;
+    if (
+      Registry._initialized &&
+      Registry._builtFromEntities === hass.entities &&
+      Registry._builtFromDevices === hass.devices &&
+      Registry._builtFromAreas === hass.areas
+    ) {
+      return;
+    }
 
     timeStart('registry-init');
     Registry._hass = hass;
     Registry._config = config;
+    Registry._builtFromEntities = hass.entities;
+    Registry._builtFromDevices = hass.devices;
+    Registry._builtFromAreas = hass.areas;
 
     // Initialize localization from hass language settings
     setupLocalize(hass);

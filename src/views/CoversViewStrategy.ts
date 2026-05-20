@@ -4,6 +4,7 @@
 
 import type { LovelaceViewConfig } from '../types/lovelace';
 import { localize } from '../utils/localize';
+import { resolveDensity } from '../utils/density';
 
 class Simon42ViewCoversStrategy extends HTMLElement {
   static async generate(config: any, _hass: any): Promise<LovelaceViewConfig> {
@@ -17,7 +18,7 @@ class Simon42ViewCoversStrategy extends HTMLElement {
     const hasAwnings = allDeviceClasses.includes('awning');
     const hasWindows = allDeviceClasses.includes('window');
 
-    const density = strategyConfig.dashboard_density === 'compact' ? 'compact' : undefined;
+    const density = resolveDensity(strategyConfig);
     const baseConfig = {
       entities: config.entities,
       config: config.config,
