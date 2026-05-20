@@ -1,6 +1,6 @@
 {
   "name": "simon42-dashboard-strategy",
-  "version": "1.4.0-thedave",
+  "version": "1.4.1-thedave",
   "private": true,
   "type": "module",
   "scripts": {
