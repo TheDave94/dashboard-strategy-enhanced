@@ -25,6 +25,7 @@ import { DEFAULT_SECTIONS_ORDER } from '../types/strategy';
 import type { AreaRegistryEntry, EntityRegistryEntry } from '../types/registries';
 import { localize } from '../utils/localize';
 import { isBadgeCandidate, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
+import { renderViewsTab } from './tabs/ViewsTab';
 
 // -- Supporting types for the editor ------------------------------------
 
@@ -2433,22 +2434,26 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _renderViewsSection(): TemplateResult {
-    const showSummaryViews = this._config.show_summary_views === true;
-    const showRoomViews = this._config.show_room_views === true;
-
-    return html`
-      <div class="section">
-        <div class="section-title">${localize('editor.section_views')}</div>
-
-        ${this._renderCheckbox('show-summary-views', localize('editor.show_summary_views'), showSummaryViews,
-          (checked) => this._toggleChanged('show_summary_views', checked, false))}
-        <div class="description">${localize('editor.show_summary_views_desc')}</div>
-
-        ${this._renderCheckbox('show-room-views', localize('editor.show_room_views'), showRoomViews,
-          (checked) => this._toggleChanged('show_room_views', checked, false))}
-        <div class="description">${localize('editor.show_room_views_desc')}</div>
-      </div>
-    `;
+    // Migrated to a per-tab module in beta.20 — establishes the
+    // ha-form schema pattern that the rest of the editor will follow
+    // in subsequent betas. See src/editor/tabs/ViewsTab.ts.
+    if (!this._hass) return html``;
+    return renderViewsTab({
+      hass: this._hass,
+      config: this._config,
+      onChange: (patch) => {
+        const newConfig: Simon42StrategyConfig = { ...this._config, ...patch };
+        // Strip default-equal keys so the saved config stays sparse —
+        // matches _toggleChanged(key, value, false) semantics.
+        for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
+          if (patch[key] === undefined) {
+            delete (newConfig as Record<string, unknown>)[key as string];
+          }
+        }
+        this._config = newConfig;
+        this._fireConfigChanged(newConfig);
+      },
+    });
   }
 
   private _renderCustomCardsSection(): TemplateResult {
