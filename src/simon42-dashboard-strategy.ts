@@ -169,6 +169,20 @@ class Simon42DashboardStrategy extends HTMLElement {
 
 // Register strategy custom element IMMEDIATELY — no heavy imports needed.
 // This ensures HA's 5-second timeout is satisfied even on slow networks.
+//
+// Register under BOTH naming conventions:
+//   - `ll-strategy-simon42-dashboard` (legacy, pre-2025 HA)
+//   - `ll-strategy-dashboard-simon42-dashboard` (current convention:
+//     `ll-strategy-<type>-<name>`, enforced by recent HA versions which
+//     drop the legacy fallback and surface as "Timeout waiting for
+//     strategy element ll-strategy-dashboard-simon42-dashboard to be
+//     registered" until both are present).
+// customElements.define() refuses to register the same class twice, so
+// the second registration uses an empty subclass.
 customElements.define('ll-strategy-simon42-dashboard', Simon42DashboardStrategy);
+customElements.define(
+  'll-strategy-dashboard-simon42-dashboard',
+  class extends Simon42DashboardStrategy {}
+);
 
 console.log(`Simon42 Dashboard Strategy v${STRATEGY_VERSION} loaded`);
