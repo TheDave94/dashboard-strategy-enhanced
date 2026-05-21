@@ -42,6 +42,7 @@
 // ====================================================================
 
 import { LitElement, html, css, nothing, type PropertyValues, type TemplateResult } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
@@ -121,13 +122,8 @@ function resolveColor(color: string | undefined): string {
 // --------------------------------------------------------------------
 
 class Simon42ZonePresenceCard extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-    _config: { state: true },
-  };
-
-  public hass?: HomeAssistant;
-  private _config?: ZonePresenceCardConfig;
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
+  @state() accessor _config: ZonePresenceCardConfig | undefined;
 
   static styles = css`
     :host {

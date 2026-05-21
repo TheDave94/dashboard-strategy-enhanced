@@ -10,6 +10,7 @@
 // ====================================================================
 
 import { LitElement, html, css, type TemplateResult } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types/homeassistant';
 import { setupLocalize, localize } from '../utils/localize';
 
@@ -45,17 +46,10 @@ export function createSimpleConfigEditor(
 }
 
 class SimpleConfigEditorElement extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-    schema: { attribute: false },
-    labelPrefix: { attribute: false },
-    _config: { state: true },
-  };
-
-  public hass?: HomeAssistant;
-  public schema: HaFormSchemaItem[] = [];
-  public labelPrefix = '';
-  private _config: Record<string, unknown> = {};
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
+  @property({ attribute: false }) accessor schema: HaFormSchemaItem[] = [];
+  @property({ attribute: false }) accessor labelPrefix = '';
+  @state() accessor _config: Record<string, unknown> = {};
 
   public setConfig(config: Record<string, unknown>): void {
     this._config = { ...config };

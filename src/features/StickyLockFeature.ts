@@ -28,6 +28,7 @@
 // ====================================================================
 
 import { LitElement, html, css, nothing, type PropertyValues, type TemplateResult } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
 import { setupLocalize, localize } from '../utils/localize';
 
@@ -60,15 +61,9 @@ const MDI_LOCK = 'mdi:lock';
 const MDI_LOCK_OPEN = 'mdi:lock-open-variant';
 
 class Simon42StickyLockFeature extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-    context: { attribute: false },
-    _config: { state: true },
-  };
-
-  public hass?: HomeAssistant;
-  public context?: CardFeatureContext;
-  private _config?: StickyLockFeatureConfig;
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
+  @property({ attribute: false }) accessor context: CardFeatureContext | undefined;
+  @state() accessor _config: StickyLockFeatureConfig | undefined;
 
   // HA calls this with the YAML feature config. Required to throw on
   // bad input (the docs example does too).
