@@ -9,7 +9,7 @@
 - **Ten custom cards / features** — summary, zone-presence, lights group, covers group, sparkline, notification banners, routines, screensaver, voice FAB, sticky-lock + cost-overlay features.
 - **HACS plugins always optional.** Built-in fallback path works without any of them. Less shiny without HACS, but never broken.
 - **Plugin extension API** — third-party plugins can `window.oriel.registerSection(...)` to add sections.
-- **HA 2026.5+** baseline with modern design tokens, container queries, and code-split bundles.
+- **HA 2025.5+** minimum (hard floor for the strategy API); modern design tokens, container queries, and code-split bundles where available.
 
 ## Installation
 
