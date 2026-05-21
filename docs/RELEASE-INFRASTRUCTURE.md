@@ -42,14 +42,14 @@ Steps:
    | _Everything else_ | **No access** | Minimum-blast-radius principle |
 
 6. **Where can this GitHub App be installed**: **Only on this account**. Not org-wide.
-7. **Create the App.** Note the **App ID** displayed on the App's settings page — small integer like `1234567`.
+7. **Create the App.** On the App's settings page, note the **Client ID** — looks like `Iv23li...` rather than a plain integer. (There's also an App ID — an integer — but we no longer use it; v3.x of `create-github-app-token` deprecated the `app-id` input in favour of `client-id`.)
 8. **Generate a private key**: scroll to **Private keys** → **Generate a private key**. A `.pem` file downloads to your machine. **Save it securely — it cannot be re-downloaded.** Anyone with this key can mint tokens that act as the App.
 9. **Install the App on `TheDave94/oriel-dashboard` only.** Sidebar → **Install App** → pick the account → **Only select repositories** → check `oriel-dashboard`.
 10. **Add two repo secrets** to `oriel-dashboard` — Settings → Secrets and variables → Actions → **New repository secret**:
 
     | Secret name | Value |
     |---|---|
-    | `RELEASE_APP_ID` | The App ID integer from step 7. |
+    | `RELEASE_APP_CLIENT_ID` | The Client ID from step 7 (`Iv23li...`). |
     | `RELEASE_APP_PRIVATE_KEY` | Full contents of the `.pem` from step 8, including the `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` lines. |
 
 After step 10, the workflow change in `.github/workflows/release-please.yml` (committed alongside this doc) will pick up the App identity automatically on the next push to `main`.
@@ -63,7 +63,7 @@ After step 10, the workflow change in `.github/workflows/release-please.yml` (co
   id: app-token
   uses: actions/create-github-app-token@<pinned SHA>
   with:
-    app-id: ${{ secrets.RELEASE_APP_ID }}
+    client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
     private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
 - name: Release Please
@@ -97,7 +97,7 @@ If step 4's auto-fire fails, **do not** paper over with a fallback `gh workflow 
 Most common causes:
 
 - **App not installed on this repo.** Error mentions `Installation not found` or `404 Not Found` resolving the installation. Fix: go through step 9 of the setup above.
-- **`RELEASE_APP_ID` secret missing or wrong type.** Error mentions `id: must be a number` or `app-id is required`. Fix: confirm the secret exists in repo Settings → Secrets → Actions and matches the integer on the App's settings page.
+- **`RELEASE_APP_CLIENT_ID` secret missing.** Error mentions `client-id is required` or the App-token step fails immediately. Fix: confirm the secret exists in repo Settings → Secrets → Actions and matches the Client ID (`Iv23li...`) on the App's settings page.
 - **`RELEASE_APP_PRIVATE_KEY` malformed.** Error mentions `invalid PEM` or `PKCS#1 format expected`. Fix: re-copy the full `.pem` including the `-----BEGIN` / `-----END` lines and the newlines between them. GitHub secrets preserve newlines if you paste with them.
 
 ### Symptom: release-please runs but doesn't open a PR
@@ -130,49 +130,6 @@ Annually, or after any security incident:
 4. Replace `RELEASE_APP_PRIVATE_KEY` in the repo's Actions secrets with the new `.pem` contents.
 5. Trigger a release-please run to confirm the new key works (push any small `chore:` commit to main, or use `gh workflow run release-please.yml`). If the workflow succeeds, the new key is in use.
 6. Now go back to the App's settings and **delete the old key**. Two-key window closes.
-
-## Known follow-up: migrate `app-id` → `client-id`
-
-`actions/create-github-app-token` v3.x emits this warning on every
-release-please run:
-
-```
-Input 'app-id' has been deprecated with message: Use 'client-id' instead.
-```
-
-Non-fatal — v3.2.0 still accepts `app-id`. But a future major version
-will drop it. To clear:
-
-1. Open the App's settings page on GitHub.
-2. The **Client ID** field is on the same page as **App ID** — looks
-   like `Iv23li...` rather than the plain integer.
-3. Add a new repo secret `RELEASE_APP_CLIENT_ID` with the Client ID
-   value. (GitHub Actions secrets can't be renamed, so it's
-   add-new-then-delete-old.)
-4. In `.github/workflows/release-please.yml`, change:
-
-   ```yaml
-   - name: Mint release-bot token
-     uses: actions/create-github-app-token@...
-     with:
-       app-id: ${{ secrets.RELEASE_APP_ID }}
-   ```
-
-   to:
-
-   ```yaml
-   - name: Mint release-bot token
-     uses: actions/create-github-app-token@...
-     with:
-       client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
-   ```
-
-5. Confirm a release-please run succeeds without the deprecation
-   warning.
-6. Delete the old `RELEASE_APP_ID` secret from repo settings.
-
-The Client ID and App ID identify the same App; the migration is
-just adopting the newer-recommended input name.
 
 ## Out of scope
 
