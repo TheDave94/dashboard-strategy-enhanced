@@ -13,6 +13,7 @@
 import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types/homeassistant';
+import { onActivateKey } from '../utils/keyboard-activation';
 
 interface ScreensaverCardConfig {
   type: string;
@@ -153,7 +154,14 @@ class OrielScreensaverCard extends LitElement {
     });
 
     return html`
-      <div class="overlay active" @click=${this._dismiss}>
+      <div
+        class="overlay active"
+        role="button"
+        tabindex="0"
+        aria-label="Dismiss screensaver"
+        @click=${this._dismiss}
+        @keydown=${onActivateKey(() => this._dismiss())}
+      >
         ${showClock ? html`<div class="clock">${hh}:${mm}</div>` : nothing}
         ${showDate ? html`<div class="date">${dateStr}</div>` : nothing}
         ${entState

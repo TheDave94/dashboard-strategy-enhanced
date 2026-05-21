@@ -18,6 +18,7 @@ import {
 } from '../../onboarding/features';
 import { PERSONAS, suggestPersonas, type Persona, type StepperAnswers } from '../../onboarding/personas';
 import { detectHints, type AdaptiveHint } from '../../onboarding/hints';
+import { onActivateKey } from '../../utils/keyboard-activation';
 
 interface SetupTabContext {
   hass: HomeAssistant;
@@ -69,7 +70,14 @@ export function renderSetupTab(ctx: SetupTabContext): TemplateResult {
 
   return html`
     <div class="setup-panel">
-      <div class="setup-header" @click=${ctx.onToggleCollapsed}>
+      <div
+        class="setup-header"
+        role="button"
+        tabindex="0"
+        aria-expanded=${ctx.collapsed ? 'false' : 'true'}
+        @click=${ctx.onToggleCollapsed}
+        @keydown=${onActivateKey(ctx.onToggleCollapsed)}
+      >
         <div class="setup-header-title">
           <ha-icon icon="mdi:rocket-launch-outline"></ha-icon>
           <span>Setup &amp; advanced features</span>

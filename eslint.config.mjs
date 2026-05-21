@@ -1,6 +1,8 @@
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import security from 'eslint-plugin-security';
+import lit from 'eslint-plugin-lit';
+import litA11y from 'eslint-plugin-lit-a11y';
 import prettier from 'eslint-config-prettier';
 
 export default [
@@ -22,9 +24,24 @@ export default [
       // dashboard config — and the previous per-line eslint-disable
       // markers were noise. See audit §2.11.
       security,
+      // eslint-plugin-lit catches Lit template authorship mistakes
+      // (unknown directive bindings, attribute-vs-property typos,
+      // mis-quoted values, etc.) at lint time so they don't surface
+      // as silent rendering bugs.
+      lit,
+      // eslint-plugin-lit-a11y enforces baseline a11y on Lit templates
+      // — alt text, label associations, keyboard parity for click
+      // handlers, etc. v4.6.1 onboarding closes two existing keyboard-
+      // activation bugs in SetupTab + ScreensaverCard; this plugin
+      // prevents that class of regression.
+      'lit-a11y': litA11y,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      // Lit + lit-a11y recommended rule sets. The plugin authors keep
+      // these focused on real bugs (no opinionated style nits).
+      ...lit.configs.recommended.rules,
+      ...litA11y.configs.recommended.rules,
       // Prettier handles formatting
       ...prettier.rules,
       // Pragmatic overrides
