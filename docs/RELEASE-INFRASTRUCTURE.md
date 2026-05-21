@@ -131,6 +131,49 @@ Annually, or after any security incident:
 5. Trigger a release-please run to confirm the new key works (push any small `chore:` commit to main, or use `gh workflow run release-please.yml`). If the workflow succeeds, the new key is in use.
 6. Now go back to the App's settings and **delete the old key**. Two-key window closes.
 
+## Known follow-up: migrate `app-id` → `client-id`
+
+`actions/create-github-app-token` v3.x emits this warning on every
+release-please run:
+
+```
+Input 'app-id' has been deprecated with message: Use 'client-id' instead.
+```
+
+Non-fatal — v3.2.0 still accepts `app-id`. But a future major version
+will drop it. To clear:
+
+1. Open the App's settings page on GitHub.
+2. The **Client ID** field is on the same page as **App ID** — looks
+   like `Iv23li...` rather than the plain integer.
+3. Add a new repo secret `RELEASE_APP_CLIENT_ID` with the Client ID
+   value. (GitHub Actions secrets can't be renamed, so it's
+   add-new-then-delete-old.)
+4. In `.github/workflows/release-please.yml`, change:
+
+   ```yaml
+   - name: Mint release-bot token
+     uses: actions/create-github-app-token@...
+     with:
+       app-id: ${{ secrets.RELEASE_APP_ID }}
+   ```
+
+   to:
+
+   ```yaml
+   - name: Mint release-bot token
+     uses: actions/create-github-app-token@...
+     with:
+       client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
+   ```
+
+5. Confirm a release-please run succeeds without the deprecation
+   warning.
+6. Delete the old `RELEASE_APP_ID` secret from repo settings.
+
+The Client ID and App ID identify the same App; the migration is
+just adopting the newer-recommended input name.
+
 ## Out of scope
 
 The release-bot App is for `release-please` only. Don't migrate other workflows to it.
