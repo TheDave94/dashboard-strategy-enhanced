@@ -1065,11 +1065,49 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   // -- Main render ------------------------------------------------------
 
+  /**
+   * Open the current dashboard URL in a new tab so the user can see
+   * the effects of their config without manually navigating. Tries
+   * to derive the dashboard URL from the editor's location — the
+   * editor opens inside HA's dashboard editor modal, so the
+   * referrer URL contains the dashboard's storage URL path. Falls
+   * back to opening / which lands on HA's default dashboard.
+   *
+   * Roadmap A3 (lighter): can't render a live preview without an
+   * iframe sandbox, but eliminating the "navigate manually to see
+   * the result" friction is the bulk of the UX win.
+   */
+  private _openPreview = (): void => {
+    // Try to extract the dashboard path. HA's edit-dashboard URL
+    // looks like /lovelace/0 or /<url_path>/0 — we strip the
+    // trailing view index to get the dashboard root.
+    let url = '/';
+    try {
+      const referrer = document.referrer || window.location.pathname;
+      const m = referrer.match(/\/([a-z0-9_-]+)(?:\/\d+)?(?:\?.*)?$/i);
+      if (m && m[1]) {
+        url = `/${m[1]}/0`;
+      }
+    } catch {
+      /* ignore */
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   protected render() {
     if (!this._hass) return nothing;
 
     return html`
       <div class="card-config">
+        <div class="preview-action" style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+          <button
+            class="btn-primary"
+            @click=${this._openPreview}
+            title=${localize('editor.preview_dashboard') || 'Open the dashboard in a new tab to preview your changes'}
+          >
+            ${localize('editor.preview_dashboard') || '👁  Preview dashboard'}
+          </button>
+        </div>
         ${this._renderOverviewSection()}
         ${this._renderSummariesSection()}
         ${this._renderFavoritesSection()}
