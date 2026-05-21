@@ -223,6 +223,23 @@ export interface Simon42StrategyConfig {
    *  (typically a weather.* or temperature sensor). */
   panel_screensaver_entity?: string;
   /**
+   * Ephemeral safety alert banner. Each trigger watches an entity;
+   * when the entity reports `active_state` (default 'on'), a sticky
+   * banner appears at the top of the overview. Tap dismisses for
+   * the session; re-fires on next inactive→active transition.
+   *
+   * Common triggers: smoke / gas / water-leak alarms, doorbells,
+   * security alarms, motion in monitored zones.
+   */
+  notification_triggers?: Array<{
+    entity: string;
+    active_state?: string;
+    title?: string;
+    message?: string;
+    severity?: 'info' | 'warning' | 'critical';
+    icon?: string;
+  }>;
+  /**
    * Per-mode section-order overrides. The strategy reads the current
    * value of `house_mode_entity` (or `input_select.house_mode` by
    * convention) at generate() time and picks the matching override.

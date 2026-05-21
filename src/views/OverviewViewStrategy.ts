@@ -346,6 +346,27 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
+    // Notification banner — prepend a `simon42-notification-card` to
+    // the overview when notification_triggers are configured. The
+    // card auto-hides when no trigger is active, sticky-positions
+    // itself when something fires. Always emitted (cost is one tiny
+    // custom element that renders nothing when idle).
+    if (
+      Array.isArray(dashboardConfig.notification_triggers) &&
+      dashboardConfig.notification_triggers.length > 0
+    ) {
+      overviewSections.unshift({
+        type: 'grid',
+        cards: [
+          {
+            type: 'custom:simon42-notification-card',
+            triggers: dashboardConfig.notification_triggers,
+            grid_options: { columns: 'full', rows: 'auto' },
+          } as LovelaceCardConfig,
+        ],
+      });
+    }
+
     // Wall-panel screensaver — when `panel_mode: 'wall'`, append a
     // single full-screen screensaver card to the overview. The card
     // itself is `position: fixed` so it sits above everything; the
