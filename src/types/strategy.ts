@@ -43,6 +43,7 @@ export type HeadingKey =
   | 'areas_other'
   | 'weather'
   | 'energy'
+  | 'plants'
   | 'agenda'
   | 'todos'
   | 'persons'
@@ -59,6 +60,7 @@ export const ALL_HEADING_KEYS: HeadingKey[] = [
   'areas_other',
   'weather',
   'energy',
+  'plants',
   'agenda',
   'todos',
   'persons',
@@ -102,6 +104,24 @@ export interface OrielConfig {
    * Available since v4.2.
    */
   energy_presentation?: EnergyPresentation;
+  /**
+   * Replace per-plant tiles with a single registry-known HACS card per
+   * plant entity. Picks from `src/utils/section-card-registry.ts`
+   * (currently: `flower-card`). When unset, the section renders the
+   * default tile-per-plant layout.
+   *
+   * Available since v4.2.
+   */
+  plants_presentation?: string;
+  /**
+   * Replace per-vacuum tiles with a single registry-known HACS card
+   * per vacuum entity (currently: `xiaomi-vacuum-map-card`,
+   * `vacuum-card`). When unset, the section renders the default
+   * tile-per-vacuum layout.
+   *
+   * Available since v4.2.
+   */
+  vacuums_presentation?: string;
   show_search_card?: boolean; // default: false
   /**
    * Which kind of search affordance to render when show_search_card is true.

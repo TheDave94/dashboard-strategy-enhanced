@@ -246,7 +246,12 @@ class OrielViewOverview extends HTMLElement {
           dashboardConfig.energy_presentation,
         ),
       ],
-      ['plants', createPlantsSection(hass, dashboardConfig.show_plants_section === true)],
+      ['plants', createPlantsSection(
+        hass,
+        dashboardConfig.show_plants_section === true,
+        hiddenHeadings.has('plants'),
+        dashboardConfig.plants_presentation,
+      )],
       ['agenda', createAgendaSection(
         hass,
         dashboardConfig.show_agenda_section === true,
@@ -254,7 +259,12 @@ class OrielViewOverview extends HTMLElement {
       )],
       ['todos', createTodosSection(hass, dashboardConfig.show_todos_section === true, dashboardConfig.todos_entities)],
       ['persons', createPersonsSection(hass, dashboardConfig.show_persons_section === true)],
-      ['vacuums', createVacuumsSection(hass, dashboardConfig.show_vacuums_section === true)],
+      ['vacuums', createVacuumsSection(
+        hass,
+        dashboardConfig.show_vacuums_section === true,
+        hiddenHeadings.has('vacuums'),
+        dashboardConfig.vacuums_presentation,
+      )],
       ['maintenance', createMaintenanceSection(hass, dashboardConfig.show_maintenance_section === true)],
       [
         'presence',

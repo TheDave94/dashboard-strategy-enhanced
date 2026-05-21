@@ -17,7 +17,7 @@
 // pick it up at the next page load — no per-card boilerplate.
 // ====================================================================
 
-export type SectionKind = 'weather' | 'energy' | 'agenda' | 'todos';
+export type SectionKind = 'weather' | 'energy' | 'agenda' | 'todos' | 'plants' | 'vacuums';
 
 export interface KnownCard {
   /**
@@ -146,6 +146,47 @@ export const KNOWN_CARDS: KnownCard[] = [
     elementTag: 'todo-list-card',
     hacs: { name: 'todo-list-card', repository: 'Yethal/todo-list-card' },
     buildConfig: () => ({ type: 'custom:todo-list-card' }),
+  },
+
+  // ---------------- Plants ----------------
+  // Both flower-card variants are single-entity cards. The strategy
+  // emits one per plant in the section.
+  {
+    id: 'flower-card',
+    label: 'Flower Card',
+    section: 'plants',
+    elementTag: 'flower-card',
+    hacs: { name: 'flower-card', repository: 'custom-cards/flower-card' },
+    buildConfig: (entity) => ({
+      type: 'custom:flower-card',
+      ...(entity ? { entity } : {}),
+    }),
+  },
+
+  // ---------------- Vacuums ----------------
+  // Single-entity vacuum visualisations — strategy emits one per
+  // vacuum / lawn_mower in the section.
+  {
+    id: 'xiaomi-vacuum-map-card',
+    label: 'Xiaomi Vacuum Map Card',
+    section: 'vacuums',
+    elementTag: 'xiaomi-vacuum-map-card',
+    hacs: { name: 'xiaomi-vacuum-map-card', repository: 'PiotrMachowski/lovelace-xiaomi-vacuum-map-card' },
+    buildConfig: (entity) => ({
+      type: 'custom:xiaomi-vacuum-map-card',
+      ...(entity ? { entity } : {}),
+    }),
+  },
+  {
+    id: 'vacuum-card',
+    label: 'Vacuum Card',
+    section: 'vacuums',
+    elementTag: 'vacuum-card',
+    hacs: { name: 'vacuum-card', repository: 'denysdovhan/vacuum-card' },
+    buildConfig: (entity) => ({
+      type: 'custom:vacuum-card',
+      ...(entity ? { entity } : {}),
+    }),
   },
 ];
 

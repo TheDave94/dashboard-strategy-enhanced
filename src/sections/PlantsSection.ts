@@ -9,16 +9,22 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
+import { findKnownCard } from '../utils/section-card-registry';
 
 /**
  * Creates the plants section.
  * Returns null when there are no plant.* entities in HA, even if the
  * toggle is enabled — modular auto-hide.
+ *
+ * `presentation` (v4.2+) lets users swap the default tile-per-plant
+ * grid for a registry-known HACS card (currently `flower-card`).
+ * One card is emitted per plant entity.
  */
 export function createPlantsSection(
   hass: HomeAssistant,
   enabled: boolean,
-  hideHeading: boolean = false
+  hideHeading: boolean = false,
+  presentation?: string,
 ): LovelaceSectionConfig | null {
   if (!enabled) return null;
 
@@ -35,6 +41,15 @@ export function createPlantsSection(
       heading: localize('sections.plants'),
       icon: 'mdi:flower-tulip',
     });
+  }
+
+  // Registry swap — emit the HACS card once per plant.
+  const known = presentation ? findKnownCard(presentation) : null;
+  if (known && known.section === 'plants') {
+    for (const entityId of plantIds) {
+      cards.push(known.buildConfig(entityId) as LovelaceCardConfig);
+    }
+    return { type: 'grid', cards };
   }
 
   for (const entityId of plantIds) {
