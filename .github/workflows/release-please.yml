@@ -47,14 +47,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Mint a short-lived installation token from oriel-release-bot.
-      # The App's RELEASE_APP_ID + RELEASE_APP_PRIVATE_KEY repo secrets
-      # drive the exchange. Pinned by SHA per the repo's third-party-
-      # action policy; current SHA is v3.2.0.
+      # The App's RELEASE_APP_CLIENT_ID + RELEASE_APP_PRIVATE_KEY repo
+      # secrets drive the exchange. Pinned by SHA per the repo's
+      # third-party-action policy; current SHA is v3.2.0.
+      #
+      # We use `client-id` (the App's Client ID, looks like `Iv23li…`)
+      # rather than `app-id` (the plain integer App ID) — v3.x of
+      # create-github-app-token deprecated the `app-id` input. Both
+      # identifiers reference the same App; Client ID is the newer-
+      # recommended input.
       - name: Mint release-bot token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ secrets.RELEASE_APP_ID }}
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
       # release-please now runs under the App identity. Commits it
