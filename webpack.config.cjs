@@ -34,7 +34,9 @@ const config = {
     chunkFilename: 'simon42-dashboard-strategy-[name].[contenthash:8].js',
     path: path.resolve(__dirname, 'dist'),
     // publicPath must match the HA resource URL path for async chunk loading.
-    publicPath: '/hacsfiles/simon42-dashboard-strategy/',
+    // After the upstream → TheDave94/dashboard-strategy-enhanced repo rename,
+    // HACS serves this plugin from `/hacsfiles/dashboard-strategy-enhanced/`.
+    publicPath: '/hacsfiles/dashboard-strategy-enhanced/',
   },
   resolve: {
     extensions: ['.ts', '.js'],
