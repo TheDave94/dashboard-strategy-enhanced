@@ -200,6 +200,18 @@ export interface Simon42StrategyConfig {
    */
   density?: 'compact' | 'cozy' | 'comfortable';
   /**
+   * Defer mounting of sections beyond the initial viewport via
+   * IntersectionObserver. Improves first-render time on dashboards
+   * with many sections. Default true (on); set false to disable.
+   *
+   * Combine with `lazy_sections_threshold` to tune which sections
+   * are deferred — sections 0 through threshold-1 stay eager,
+   * sections at index >= threshold get wrapped in
+   * `simon42-lazy-card`.
+   */
+  lazy_sections?: boolean;
+  lazy_sections_threshold?: number;
+  /**
    * Globally enable / disable the auto-rendered zone-presence card in
    * room views. Default true: each room view picks up its
    * binary_sensors with device_class ∈ {occupancy, motion, presence}

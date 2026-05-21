@@ -300,6 +300,29 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
+    // Lazy-mount sections beyond the initial viewport (Roadmap C7).
+    // First N sections render eagerly; beyond N, each card is wrapped
+    // in a `simon42-lazy-card` that defers mounting until the
+    // IntersectionObserver fires. Threshold default 3 sections.
+    // Opt-out via `dashboardConfig.lazy_sections: false`.
+    const lazyEnabled = dashboardConfig.lazy_sections !== false;
+    const lazyThreshold = dashboardConfig.lazy_sections_threshold ?? 3;
+    if (lazyEnabled && overviewSections.length > lazyThreshold) {
+      for (let i = lazyThreshold; i < overviewSections.length; i++) {
+        const section = overviewSections[i];
+        if (!section?.cards) continue;
+        section.cards = section.cards.map((card) => {
+          // Heading cards stay eager — they're tiny and headings being
+          // visible-but-deferred would create a "stub" effect.
+          if (card.type === 'heading') return card;
+          return {
+            type: 'custom:simon42-lazy-card',
+            card,
+          } as LovelaceCardConfig;
+        });
+      }
+    }
+
     const totalCards = overviewSections.reduce((sum, s) => sum + (s.cards?.length || 0), 0);
     timeEnd('overview-generate');
     debugLog(`Overview: ${overviewSections.length} sections, ${totalCards} cards, ${personBadges.length} badges`);
