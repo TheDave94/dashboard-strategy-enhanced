@@ -212,6 +212,23 @@ export interface Simon42StrategyConfig {
   lazy_sections?: boolean;
   lazy_sections_threshold?: number;
   /**
+   * Per-mode section-order overrides. The strategy reads the current
+   * value of `house_mode_entity` (or `input_select.house_mode` by
+   * convention) at generate() time and picks the matching override.
+   * Falls back to `sections_order` when no mode matches.
+   *
+   * Example:
+   *   sections_order_by_mode:
+   *     morning: [overview, weather, energy, summaries, areas]
+   *     evening: [overview, summaries, areas, favorites, weather]
+   *     night:   [overview, security, alarm, areas]
+   *     away:    [overview, security, areas, weather]
+   *
+   * Keys match the lowercase form of the input_select option name
+   * (e.g. option "At Home" → key "at home" or "at_home" — both work).
+   */
+  sections_order_by_mode?: Record<string, string[]>;
+  /**
    * Globally enable / disable the auto-rendered zone-presence card in
    * room views. Default true: each room view picks up its
    * binary_sensors with device_class ∈ {occupancy, motion, presence}
