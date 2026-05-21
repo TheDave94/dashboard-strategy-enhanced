@@ -378,6 +378,15 @@ export interface AreaOptions {
    * {occupancy, motion, presence}.
    */
   presence_entities?: Array<string | PresenceZoneEntry>;
+  /**
+   * Render the first camera in this area as a full-width hero card
+   * at the top of the room view (no heading, live view). Default
+   * false — cameras render in their own "Cameras" section as before.
+   *
+   * Useful for areas where the camera IS the headline (front door,
+   * baby monitor, garage). Works best with a single camera per area.
+   */
+  camera_hero?: boolean;
 }
 
 export interface GroupOptions {
