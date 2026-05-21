@@ -232,6 +232,51 @@ export interface Simon42StrategyConfig {
    * security alarms, motion in monitored zones.
    */
   /**
+   * Per-HA-user config overrides. Map keyed by user UUID. Each
+   * entry's `override` block is deep-merged on top of the base
+   * config for that user, so a kid's HA account can see fewer
+   * sections, an admin can see extras, etc. Arrays in the override
+   * REPLACE arrays in the base (no concatenation) — overrides
+   * commonly want to specify a fresh list.
+   *
+   * The user UUID can be found via the HA settings → People → click
+   * a user, or via the People API.
+   *
+   * Example:
+   *   users:
+   *     "1a2b3c...":
+   *       name: "Kid 1"
+   *       override:
+   *         show_security_summary: false
+   *         show_battery_summary: false
+   *         sections_order: [overview, summaries, areas]
+   *
+   * Available since v3.0.
+   */
+  users?: Record<
+    string,
+    {
+      name?: string;
+      override?: Simon42StrategyConfig;
+    }
+  >;
+  /**
+   * Per-role config overrides. Keys are 'admin' (matches
+   * `hass.user.is_admin === true`) or any custom label assigned to
+   * users via HA's user-labels system. Multiple roles can match a
+   * single user; their overrides are merged in label order. Where
+   * a key collides between `users_by_role` and `users`, the user-
+   * specific entry wins.
+   *
+   * Available since v3.0.
+   */
+  users_by_role?: Record<
+    string,
+    {
+      override?: Simon42StrategyConfig;
+    }
+  >;
+  /**
    * Emit a Routines section on the overview (collected scenes +
    * scripts, ranked by last-used). Default false — opt-in.
    */

@@ -50,7 +50,7 @@ const modulesPromise = Promise.all([
 void modulesPromise.then(() => { t('all chunks loaded'); });
 
 class Simon42DashboardStrategy extends HTMLElement {
-  static async generate(config: Simon42StrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
+  static async generate(rawConfig: Simon42StrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
     generateCallCount++;
     t(`generate() called (#${generateCallCount})`);
 
@@ -61,6 +61,16 @@ class Simon42DashboardStrategy extends HTMLElement {
     const { getVisibleAreasFromHass } = await import('./utils/name-utils');
     const { localize } = await import('./utils/localize');
     const { getDensityPresetSpec } = await import('./utils/density-presets');
+    const { resolveUserConfig } = await import('./utils/user-overrides');
+
+    // v3.0: resolve per-user / per-role overrides on top of the base
+    // config. When `users` / `users_by_role` are unset, this is a
+    // no-op and `config` is identical to `rawConfig`. See
+    // src/utils/user-overrides.ts for the merge rules.
+    const config = resolveUserConfig(rawConfig, hass);
+    if (config !== rawConfig) {
+      t('user-overrides applied');
+    }
     t('imports done');
 
     const getStrategy = (tag: string): any => customElements.get(tag);
