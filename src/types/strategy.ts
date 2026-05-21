@@ -183,6 +183,23 @@ export interface Simon42StrategyConfig {
    */
   dashboard_density?: 'compact' | 'comfortable';
   /**
+   * Strategy-wide layout density preset. Distinct from
+   * `dashboard_density` (which is the per-card token override):
+   * `density` controls the *grid sizing* the strategy emits —
+   * sections column count, gap between sections, minimum tile
+   * width. Three presets:
+   *
+   *   - `compact`     — 4 columns, tight gaps, 200px tile-min.
+   *                    Fits ~8 tiles on a phone in landscape.
+   *   - `cozy`        — 3 columns, medium gaps, 280px tile-min.
+   *                    Balanced; works well on tablets.
+   *   - `comfortable` — HA defaults; spacious, 360px+ tile-min.
+   *
+   * Default `comfortable` (HA's standard). Editor surfaces it as
+   * a segmented control on the Overview tab.
+   */
+  density?: 'compact' | 'cozy' | 'comfortable';
+  /**
    * Globally enable / disable the auto-rendered zone-presence card in
    * room views. Default true: each room view picks up its
    * binary_sensors with device_class ∈ {occupancy, motion, presence}

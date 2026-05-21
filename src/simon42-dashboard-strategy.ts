@@ -55,6 +55,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     const { Registry } = await import('./Registry');
     const { getVisibleAreasFromHass } = await import('./utils/name-utils');
     const { localize } = await import('./utils/localize');
+    const { getDensityPresetSpec } = await import('./utils/density-presets');
     t('imports done');
 
     const getStrategy = (tag: string): any => customElements.get(tag);
@@ -126,21 +127,40 @@ class Simon42DashboardStrategy extends HTMLElement {
     );
     t(`${visibleAreas.length} room views resolved`);
 
+    // Apply density preset to every emitted view. Comfortable
+    // (default) is a no-op — only compact/cozy add max_columns +
+    // CSS-variable overrides.
+    const densitySpec = getDensityPresetSpec(config);
+    const densityOverlay = (v: LovelaceViewConfig): LovelaceViewConfig => {
+      if (densitySpec.max_columns === undefined && !densitySpec.inline_style) return v;
+      const out: LovelaceViewConfig = { ...v };
+      if (densitySpec.max_columns !== undefined) {
+        (out as { max_columns?: number }).max_columns = densitySpec.max_columns;
+      }
+      // HA sections-view honors inline `style` on the view config; this
+      // sets per-view CSS custom properties without touching the
+      // global theme.
+      if (densitySpec.inline_style) {
+        (out as { style?: string }).style = densitySpec.inline_style;
+      }
+      return out;
+    };
+
     const views: LovelaceViewConfig[] = [
-      {
+      densityOverlay({
         title: localize('views.overview'),
         path: 'home',
         icon: 'mdi:home',
         ...overviewConfig,
-      },
-      ...enabledDefs.map((def, i) => ({
+      }),
+      ...enabledDefs.map((def, i) => densityOverlay({
         title: def.title,
         path: def.path,
         icon: def.icon,
         subview: !showSummaryViews,
         ...utilityConfigs[i],
       })),
-      ...visibleAreas.map((area, i) => ({
+      ...visibleAreas.map((area, i) => densityOverlay({
         title: area.name,
         path: area.area_id,
         icon: area.icon || 'mdi:floor-plan',
