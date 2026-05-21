@@ -10,12 +10,12 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface RoomPinsTabContext {
   hass: HomeAssistant;
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   search: string;
   allEntitiesForSelect: Array<{
     entity_id: string;

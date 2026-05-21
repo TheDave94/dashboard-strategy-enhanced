@@ -37,7 +37,7 @@ interface Routine {
   lastUsedMs: number;
 }
 
-class Simon42RoutinesCard extends LitElement {
+class DashboardEnhancedRoutinesCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   private _config!: RoutinesCardConfig;
 
@@ -106,7 +106,7 @@ class Simon42RoutinesCard extends LitElement {
   `;
 
   public setConfig(config: RoutinesCardConfig): void {
-    this._config = config ?? { type: 'custom:simon42-routines-card' };
+    this._config = config ?? { type: 'custom:dashboard-enhanced-routines-card' };
   }
 
   public getCardSize(): number {
@@ -219,11 +219,11 @@ class Simon42RoutinesCard extends LitElement {
   }
 
   public static getStubConfig(): RoutinesCardConfig {
-    return { type: 'custom:simon42-routines-card' };
+    return { type: 'custom:dashboard-enhanced-routines-card' };
   }
 }
 
-customElements.define('simon42-routines-card', Simon42RoutinesCard);
+customElements.define('dashboard-enhanced-routines-card', DashboardEnhancedRoutinesCard);
 
 declare global {
   interface Window {
@@ -232,10 +232,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-routines-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-routines-card')) {
   window.customCards.push({
-    type: 'simon42-routines-card',
-    name: 'Simon42 Routines',
+    type: 'dashboard-enhanced-routines-card',
+    name: 'DashboardEnhanced Routines',
     description: 'Auto-collected scenes & scripts, ranked by last-used. One-tap trigger.',
     preview: true,
   } as { type: string; name: string; description: string });

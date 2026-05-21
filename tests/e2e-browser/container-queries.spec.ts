@@ -19,7 +19,7 @@ import { test, expect } from '@playwright/test';
 
 const HA_URL = process.env.HA_URL;
 const HA_TOKEN = process.env.HA_TOKEN;
-const DASHBOARD_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-simon42';
+const DASHBOARD_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-dashboard-enhanced';
 
 test.skip(!HA_URL || !HA_TOKEN, 'HA_URL and HA_TOKEN env vars are required');
 
@@ -43,7 +43,7 @@ test.beforeEach(async ({ context }) => {
   );
 });
 
-// Resolve a CSS custom property on the first matching simon42 zone-
+// Resolve a CSS custom property on the first matching dashboard-enhanced zone-
 // presence card, piercing shadow boundaries. Returns the string the
 // browser computed for the property at that viewport.
 async function readCardCssVar(page: import('@playwright/test').Page, varName: string): Promise<string> {
@@ -63,7 +63,7 @@ async function readCardCssVar(page: import('@playwright/test').Page, varName: st
       }
       return null;
     }
-    const card = findInShadow(document, 'simon42-zone-presence-card');
+    const card = findInShadow(document, 'dashboard-enhanced-zone-presence-card');
     if (!card) return '';
     return getComputedStyle(card).getPropertyValue(name).trim();
   }, varName);
@@ -72,20 +72,20 @@ async function readCardCssVar(page: import('@playwright/test').Page, varName: st
 const PX = /^\d+(\.\d+)?px$/;
 
 test.describe('container-query scaling', () => {
-  test('zone-presence card resolves --s42-* tokens at desktop + mobile', async ({ page }) => {
+  test('zone-presence card resolves --de-* tokens at desktop + mobile', async ({ page }) => {
     // Desktop width.
     await page.setViewportSize({ width: 1600, height: 900 });
     await page.goto(`/${DASHBOARD_PATH}/0`, { waitUntil: 'load' });
     await page.waitForLoadState('networkidle', { timeout: 30_000 });
     await page.waitForTimeout(2_500);
-    const desktopIconWrap = await readCardCssVar(page, '--s42-icon-wrap');
-    const desktopPadBlock = await readCardCssVar(page, '--s42-pad-block');
+    const desktopIconWrap = await readCardCssVar(page, '--de-icon-wrap');
+    const desktopPadBlock = await readCardCssVar(page, '--de-pad-block');
 
     // Mobile width.
     await page.setViewportSize({ width: 375, height: 800 });
     await page.waitForTimeout(800);
-    const mobileIconWrap = await readCardCssVar(page, '--s42-icon-wrap');
-    const mobilePadBlock = await readCardCssVar(page, '--s42-pad-block');
+    const mobileIconWrap = await readCardCssVar(page, '--de-icon-wrap');
+    const mobilePadBlock = await readCardCssVar(page, '--de-pad-block');
 
     // eslint-disable-next-line no-console
     console.log(`[cq] zone-presence desktop: icon-wrap="${desktopIconWrap}" pad-block="${desktopPadBlock}"`);

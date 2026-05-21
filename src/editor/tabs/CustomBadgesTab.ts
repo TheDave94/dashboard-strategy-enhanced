@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { Simon42StrategyConfig, CustomBadge } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig, CustomBadge } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomBadgesTabContext {
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onUpdateYaml: (index: number, yamlString: string) => void;

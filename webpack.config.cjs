@@ -23,15 +23,15 @@ const pkg = require('./package.json');
 /** @type {import('webpack').Configuration} */
 const config = {
   mode: 'production',
-  entry: './src/simon42-dashboard-strategy.ts',
+  entry: './src/dashboard-enhanced-strategy.ts',
   // Separate `.map` files alongside `.js`. Lets bug reports show real
   // source frames; doesn't reference them via `//# sourceMappingURL=`
   // so the HACS bundle itself stays tiny on first byte.
   devtool: 'hidden-source-map',
   output: {
     clean: true,
-    filename: 'simon42-dashboard-strategy.js',
-    chunkFilename: 'simon42-dashboard-strategy-[name].[contenthash:8].js',
+    filename: 'dashboard-enhanced-strategy.js',
+    chunkFilename: 'dashboard-enhanced-strategy-[name].[contenthash:8].js',
     path: path.resolve(__dirname, 'dist'),
     // publicPath must match the HA resource URL path for async chunk loading.
     // After the upstream → TheDave94/dashboard-strategy-enhanced repo rename,
@@ -101,7 +101,7 @@ const config = {
     // that lied at runtime (it stayed at '1.3.4-beta.9' through a
     // dozen releases — beta.16 audit caught this).
     new webpack.DefinePlugin({
-      __SIMON42_VERSION__: JSON.stringify(pkg.version),
+      __STRATEGY_VERSION__: JSON.stringify(pkg.version),
     }),
     new CompressionPlugin({
       algorithm: 'gzip',

@@ -1,5 +1,5 @@
 // ====================================================================
-// simon42-voice-fab — floating voice-command button (v3.2.4)
+// dashboard-enhanced-voice-fab — floating voice-command button (v3.2.4)
 // ====================================================================
 // Wraps HA's built-in `<ha-voice-command-button>` (or an Assist API
 // trigger if the underlying element isn't registered) and anchors it
@@ -24,7 +24,7 @@ interface VoiceFabConfig {
   offset?: string;
 }
 
-class Simon42VoiceFab extends LitElement {
+class DashboardEnhancedVoiceFab extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _config: VoiceFabConfig | undefined;
 
@@ -34,8 +34,8 @@ class Simon42VoiceFab extends LitElement {
     }
     .fab {
       position: fixed;
-      bottom: var(--simon42-voice-fab-offset, 16px);
-      right: var(--simon42-voice-fab-offset, 16px);
+      bottom: var(--dashboard-enhanced-voice-fab-offset, 16px);
+      right: var(--dashboard-enhanced-voice-fab-offset, 16px);
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -66,7 +66,7 @@ class Simon42VoiceFab extends LitElement {
   public setConfig(config: VoiceFabConfig): void {
     this._config = config;
     if (config.offset) {
-      this.style.setProperty('--simon42-voice-fab-offset', config.offset);
+      this.style.setProperty('--dashboard-enhanced-voice-fab-offset', config.offset);
     }
   }
 
@@ -117,11 +117,11 @@ class Simon42VoiceFab extends LitElement {
   }
 
   public static getStubConfig(): VoiceFabConfig {
-    return { type: 'custom:simon42-voice-fab' };
+    return { type: 'custom:dashboard-enhanced-voice-fab' };
   }
 }
 
-customElements.define('simon42-voice-fab', Simon42VoiceFab);
+customElements.define('dashboard-enhanced-voice-fab', DashboardEnhancedVoiceFab);
 
 declare global {
   interface Window {
@@ -130,10 +130,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-voice-fab')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-voice-fab')) {
   window.customCards.push({
-    type: 'simon42-voice-fab',
-    name: 'Simon42 Voice FAB',
+    type: 'dashboard-enhanced-voice-fab',
+    name: 'DashboardEnhanced Voice FAB',
     description: 'Floating voice-command button that calls HA Assist on tap.',
   });
 }

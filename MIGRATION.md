@@ -4,7 +4,7 @@ Upgrade notes for users moving between major versions. Reverse-chronological —
 
 ## v1.x → v2.0+
 
-The v2.0 release diverged substantially from the simon42 upstream and introduced changes that aren't backward-compatible with v1.x. If you're coming from a v1.x install (HACS will offer the upgrade), here's what to expect.
+The v2.0 release diverged substantially from the dashboard-enhanced upstream and introduced changes that aren't backward-compatible with v1.x. If you're coming from a v1.x install (HACS will offer the upgrade), here's what to expect.
 
 ### Home Assistant version
 
@@ -12,10 +12,10 @@ The v2.0 release diverged substantially from the simon42 upstream and introduced
 
 ### Element name conventions (HA-internal, transparent to most users)
 
-- The legacy element registration `ll-strategy-simon42-dashboard` was removed. Only `ll-strategy-dashboard-simon42-dashboard` remains (the canonical naming HA enforces in 2026.5+).
-- View strategies renamed from `ll-strategy-simon42-view-*` → `ll-strategy-view-simon42-view-*`.
+- The legacy element registration `ll-strategy-dashboard-enhanced-dashboard` was removed. Only `ll-strategy-dashboard-dashboard-enhanced` remains (the canonical naming HA enforces in 2026.5+).
+- View strategies renamed from `ll-strategy-dashboard-enhanced-view-*` → `ll-strategy-view-dashboard-enhanced-view-*`.
 
-**You don't need to update anything.** Existing dashboards using `type: custom:simon42-dashboard` keep working — the strategy type name is unchanged for backwards compatibility.
+**You don't need to update anything.** Existing dashboards using `type: custom:dashboard-enhanced` keep working — the strategy type name is unchanged for backwards compatibility.
 
 ### Config field renames
 
@@ -44,7 +44,7 @@ All of these are configurable via the visual editor — open Edit dashboard, no 
 
 ### Custom cards now available standalone
 
-The five custom elements the strategy emits internally — `simon42-summary-card`, `simon42-zone-presence-card`, `simon42-lights-group-card`, `simon42-covers-group-card`, `simon42-sticky-lock-feature` — are now also pickable from HA's "Add card" picker. Each has a visual `<ha-form>` config editor.
+The five custom elements the strategy emits internally — `dashboard-enhanced-summary-card`, `dashboard-enhanced-zone-presence-card`, `dashboard-enhanced-lights-group-card`, `dashboard-enhanced-covers-group-card`, `dashboard-enhanced-sticky-lock-feature` — are now also pickable from HA's "Add card" picker. Each has a visual `<ha-form>` config editor.
 
 If you want one of these cards outside a strategy-managed dashboard, just pick it from the picker. Existing strategy dashboards keep using them automatically.
 
@@ -57,9 +57,9 @@ If you want one of these cards outside a strategy-managed dashboard, just pick i
 
 ### Repo URL
 
-The repository was renamed `TheDave94/simon42-dashboard-strategy` → `TheDave94/dashboard-strategy-enhanced`. GitHub keeps a redirect, so existing HACS installs and external links keep working. New installs should reference the new URL.
+The repository was renamed `TheDave94/dashboard-enhanced-strategy` → `TheDave94/dashboard-strategy-enhanced`. GitHub keeps a redirect, so existing HACS installs and external links keep working. New installs should reference the new URL.
 
-The package on HACS still ships as `simon42-dashboard-strategy.js` — the filename is unchanged for backwards compat.
+The package on HACS still ships as `dashboard-enhanced-strategy.js` — the filename is unchanged for backwards compat.
 
 ### Performance
 

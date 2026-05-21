@@ -15,7 +15,7 @@ import { test, expect } from '@playwright/test';
 
 const HA_URL = process.env.HA_URL;
 const HA_TOKEN = process.env.HA_TOKEN;
-const DASHBOARD_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-simon42';
+const DASHBOARD_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-dashboard-enhanced';
 
 test.skip(!HA_URL || !HA_TOKEN, 'HA_URL and HA_TOKEN env vars are required');
 
@@ -57,7 +57,7 @@ test.describe('dashboard rendering', () => {
     // Give the strategy.generate() promise a chance to settle.
     await page.waitForTimeout(2_500);
 
-    // Snapshot rendered output and look for at least one simon42 card.
+    // Snapshot rendered output and look for at least one dashboard-enhanced card.
     const root = page.locator('home-assistant');
     await expect(root).toBeAttached();
     // Drill into the shadow tree: home-assistant → ha-drawer →
@@ -78,7 +78,7 @@ test.describe('dashboard rendering', () => {
         walk(root);
         return out;
       }
-      const cards = findInShadow(document, 'simon42-zone-presence-card, simon42-summary-card, simon42-lights-group-card, simon42-covers-group-card');
+      const cards = findInShadow(document, 'dashboard-enhanced-zone-presence-card, dashboard-enhanced-summary-card, dashboard-enhanced-lights-group-card, dashboard-enhanced-covers-group-card');
       return cards.map((c) => c.tagName.toLowerCase());
     });
 
@@ -109,7 +109,7 @@ test.describe('dashboard rendering', () => {
     );
 
     // eslint-disable-next-line no-console
-    console.log(`[e2e] matched simon42 cards: ${JSON.stringify(cardMatches)}`);
+    console.log(`[e2e] matched dashboard-enhanced cards: ${JSON.stringify(cardMatches)}`);
     // eslint-disable-next-line no-console
     console.log(`[e2e] console errors (filtered): ${realErrors.length}`);
 

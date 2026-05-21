@@ -16,10 +16,10 @@ const webpack = require('webpack');
 const config = {
   mode: 'development',
   devtool: 'source-map',
-  entry: './src/simon42-dashboard-strategy.ts',
+  entry: './src/dashboard-enhanced-strategy.ts',
   output: {
     clean: true,
-    filename: 'simon42-dashboard-strategy.js',
+    filename: 'dashboard-enhanced-strategy.js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {

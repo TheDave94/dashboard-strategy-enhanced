@@ -42,7 +42,7 @@ const ICON_BY_SEVERITY = {
   critical: 'mdi:alert-octagon',
 };
 
-class Simon42NotificationCard extends LitElement {
+class DashboardEnhancedNotificationCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _dismissedIds = new Set<string>();
 
@@ -98,7 +98,7 @@ class Simon42NotificationCard extends LitElement {
 
   public setConfig(config: NotificationCardConfig): void {
     if (!config || !Array.isArray(config.triggers)) {
-      throw new Error('simon42-notification-card: `triggers` array required');
+      throw new Error('dashboard-enhanced-notification-card: `triggers` array required');
     }
     this._config = config;
   }
@@ -178,7 +178,7 @@ class Simon42NotificationCard extends LitElement {
   }
 }
 
-customElements.define('simon42-notification-card', Simon42NotificationCard);
+customElements.define('dashboard-enhanced-notification-card', DashboardEnhancedNotificationCard);
 
 declare global {
   interface Window {
@@ -187,10 +187,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-notification-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-notification-card')) {
   window.customCards.push({
-    type: 'simon42-notification-card',
-    name: 'Simon42 Notification Banner',
+    type: 'dashboard-enhanced-notification-card',
+    name: 'DashboardEnhanced Notification Banner',
     description:
       'Ephemeral safety-alert banner at the top of the overview. Sticky on scroll, auto-hides when no trigger active, re-fires on state transition.',
   });

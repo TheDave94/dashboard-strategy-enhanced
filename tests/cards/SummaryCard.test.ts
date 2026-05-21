@@ -18,10 +18,10 @@ type SummaryCardEl = HTMLElement & {
 };
 
 function mount(): SummaryCardEl {
-  return document.createElement('simon42-summary-card') as SummaryCardEl;
+  return document.createElement('dashboard-enhanced-summary-card') as SummaryCardEl;
 }
 
-describe('simon42-summary-card', () => {
+describe('dashboard-enhanced-summary-card', () => {
   describe('setConfig', () => {
     let el: SummaryCardEl;
     beforeEach(() => {
@@ -84,14 +84,14 @@ describe('simon42-summary-card', () => {
   describe('picker integration', () => {
     it('publishes itself to window.customCards with preview:true', () => {
       const entry = (window.customCards || []).find(
-        (c: { type: string }) => c.type === 'simon42-summary-card',
+        (c: { type: string }) => c.type === 'dashboard-enhanced-summary-card',
       ) as { type: string; preview?: boolean } | undefined;
       expect(entry).toBeDefined();
       expect(entry?.preview).toBe(true);
     });
 
     it('getStubConfig returns a valid summary_type', () => {
-      const ctor = customElements.get('simon42-summary-card') as
+      const ctor = customElements.get('dashboard-enhanced-summary-card') as
         | (typeof HTMLElement & { getStubConfig?: () => { summary_type: string } })
         | undefined;
       expect(ctor).toBeDefined();

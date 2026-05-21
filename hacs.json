@@ -1,6 +1,6 @@
 {
-  "name": "Simon42 Dashboard Strategy",
-  "filename": "simon42-dashboard-strategy.js",
+  "name": "Dashboard Enhanced Strategy",
+  "filename": "dashboard-enhanced-strategy.js",
   "content_in_root": false,
   "render_readme": true,
   "homeassistant": "2026.5.0"

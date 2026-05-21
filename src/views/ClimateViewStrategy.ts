@@ -4,15 +4,15 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 
 interface ClimateViewStrategyParams {
-  config?: Simon42StrategyConfig;
+  config?: DashboardEnhancedStrategyConfig;
 }
 
-class Simon42ViewClimateStrategy extends HTMLElement {
+class DashboardEnhancedViewClimateStrategy extends HTMLElement {
   static async generate(
     config: ClimateViewStrategyParams,
     hass: HomeAssistant,
@@ -86,4 +86,4 @@ class Simon42ViewClimateStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-simon42-view-climate', Simon42ViewClimateStrategy);
+customElements.define('ll-strategy-view-dashboard-enhanced-view-climate', DashboardEnhancedViewClimateStrategy);

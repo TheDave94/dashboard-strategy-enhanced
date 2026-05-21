@@ -7,11 +7,11 @@
 // taps. Per-browser; never sent anywhere.
 //
 // Privacy: all data stays in the user's browser localStorage. Reset
-// via `simon42UsageReset()` from devtools or by deleting the
-// `simon42_usage_v1` key.
+// via `dashboardEnhancedUsageReset()` from devtools or by deleting the
+// `dashboard_enhanced_usage_v1` key.
 // ====================================================================
 
-const STORAGE_KEY = 'simon42_usage_v1';
+const STORAGE_KEY = 'dashboard_enhanced_usage_v1';
 const THRESHOLD = 50; // taps before suggestion surfaces
 const MAX_ENTRIES = 500;
 
@@ -85,7 +85,7 @@ export function reset(): void {
 }
 
 if (typeof window !== 'undefined') {
-  (window as unknown as { simon42UsageReset?: () => void }).simon42UsageReset = reset;
+  (window as unknown as { dashboardEnhancedUsageReset?: () => void }).dashboardEnhancedUsageReset = reset;
 }
 
 /** Has the user crossed the suggestion threshold? */

@@ -10,7 +10,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import {
   FEATURE_REGISTRY,
   type FeatureCategory,
@@ -19,7 +19,7 @@ import {
 
 interface SetupTabContext {
   hass: HomeAssistant;
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   onDismiss: () => void;

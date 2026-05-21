@@ -3,11 +3,11 @@
     "title": "Dynamisches Dashboard"
   },
   "card": {
-    "simon42-summary-card": {
+    "dashboard-enhanced-summary-card": {
       "summary_type": "Zusammenfassungs-Typ",
       "density": "Dichte-Override"
     },
-    "simon42-lights-group-card": {
+    "dashboard-enhanced-lights-group-card": {
       "group_type": "Gruppentyp",
       "group_by_floors": "Nach Etagen gruppieren",
       "nested_groups": "Verschachtelte Lichtgruppen",
@@ -16,12 +16,12 @@
       "heading_label": "Überschrift",
       "heading_icon": "Überschrift-Icon"
     },
-    "simon42-covers-group-card": {
+    "dashboard-enhanced-covers-group-card": {
       "group_type": "Gruppentyp",
       "show_partially_open": "Teilweise-offen-Gruppe anzeigen",
       "group_by_floors": "Nach Etagen gruppieren"
     },
-    "simon42-zone-presence-card": {
+    "dashboard-enhanced-zone-presence-card": {
       "name": "Überschrift",
       "icon": "Überschrift-Icon",
       "entities": "Zonen-Entitäten"

@@ -28,7 +28,7 @@ interface LazyCardConfig {
   placeholder_height?: string;
 }
 
-class Simon42LazyCard extends LitElement {
+class DashboardEnhancedLazyCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _mounted = false;
 
@@ -43,13 +43,13 @@ class Simon42LazyCard extends LitElement {
     }
     .placeholder {
       width: 100%;
-      min-height: var(--s42-lazy-min-height, 200px);
+      min-height: var(--de-lazy-min-height, 200px);
     }
   `;
 
   public setConfig(config: LazyCardConfig): void {
     if (!config?.card || typeof config.card !== 'object') {
-      throw new Error('simon42-lazy-card: `card` config required');
+      throw new Error('dashboard-enhanced-lazy-card: `card` config required');
     }
     this._config = config;
   }
@@ -89,7 +89,7 @@ class Simon42LazyCard extends LitElement {
       const minHeight = this._config?.placeholder_height ?? '200px';
       return html`<div
         class="placeholder"
-        style=${`--s42-lazy-min-height: ${minHeight}`}
+        style=${`--de-lazy-min-height: ${minHeight}`}
       ></div>`;
     }
     // HA exposes <hui-card> as a public custom element for embedding
@@ -99,7 +99,7 @@ class Simon42LazyCard extends LitElement {
   }
 }
 
-customElements.define('simon42-lazy-card', Simon42LazyCard);
+customElements.define('dashboard-enhanced-lazy-card', DashboardEnhancedLazyCard);
 
 declare global {
   interface Window {
@@ -108,10 +108,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-lazy-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-lazy-card')) {
   window.customCards.push({
-    type: 'simon42-lazy-card',
-    name: 'Simon42 Lazy Card',
+    type: 'dashboard-enhanced-lazy-card',
+    name: 'DashboardEnhanced Lazy Card',
     description:
       'IntersectionObserver wrapper that defers child card mounting until the viewport reaches it. Used internally by the strategy to lazy-mount sections beyond the initial viewport.',
   });

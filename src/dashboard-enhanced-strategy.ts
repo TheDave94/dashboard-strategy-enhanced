@@ -7,7 +7,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from './types/homeassistant';
-import type { Simon42StrategyConfig } from './types/strategy';
+import type { DashboardEnhancedStrategyConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 
 // Injected at build time by webpack DefinePlugin from package.json#version.
@@ -15,7 +15,7 @@ import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 // in any .d.ts (an alternative is a global.d.ts; this is cheaper).
 // Install the plugin extension entry point (v3.5.0). Runs at module
 // load, before any HA strategy lifecycle method — so plugins can call
-// `window.simon42Strategy.registerSection(...)` from their own
+// `window.dashboardEnhanced.registerSection(...)` from their own
 // `customElements.define()`-time modules.
 import { installExtensionEntryPoint } from './extension/registry';
 installExtensionEntryPoint();
@@ -38,16 +38,16 @@ if (typeof document !== 'undefined') {
   );
 }
 
-declare const __SIMON42_VERSION__: string;
+declare const __STRATEGY_VERSION__: string;
 const STRATEGY_VERSION =
-  typeof __SIMON42_VERSION__ !== 'undefined'
-    ? __SIMON42_VERSION__
+  typeof __STRATEGY_VERSION__ !== 'undefined'
+    ? __STRATEGY_VERSION__
     : 'dev';
 
-const DEBUG = new URLSearchParams(window.location.search).has('s42_debug');
+const DEBUG = new URLSearchParams(window.location.search).has('de_debug');
 const T0 = performance.now();
 const t = (label: string) => {
-  if (DEBUG) console.log(`[s42-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`);
+  if (DEBUG) console.log(`[de-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`);
 };
 let generateCallCount = 0;
 
@@ -76,8 +76,8 @@ const modulesPromise = Promise.all([
 
 void modulesPromise.then(() => { t('all chunks loaded'); });
 
-class Simon42DashboardStrategy extends HTMLElement {
-  static async generate(rawConfig: Simon42StrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
+class DashboardEnhancedDashboardStrategy extends HTMLElement {
+  static async generate(rawConfig: DashboardEnhancedStrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
     generateCallCount++;
     t(`generate() called (#${generateCallCount})`);
 
@@ -135,7 +135,7 @@ class Simon42DashboardStrategy extends HTMLElement {
     const showClimate = config.show_climate_summary === true;
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
-    const overviewConfig = await getStrategy('ll-strategy-view-simon42-view-overview').generate(
+    const overviewConfig = await getStrategy('ll-strategy-view-dashboard-enhanced-view-overview').generate(
       { dashboardConfig: config },
       hass
     );
@@ -144,23 +144,23 @@ class Simon42DashboardStrategy extends HTMLElement {
     // Only resolve utility views for enabled summaries
     const utilityViewDefs = [
       { enabled: showLights, title: localize('views.lights'), path: 'lights', icon: 'mdi:lamps',
-        resolve: () => getStrategy('ll-strategy-view-simon42-view-lights').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-lights').generate({ config }, hass) },
       { enabled: showCovers, title: localize('views.covers'), path: 'covers', icon: 'mdi:blinds-horizontal',
-        resolve: () => getStrategy('ll-strategy-view-simon42-view-covers').generate(
+        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-covers').generate(
           { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
       { enabled: showSecurity, title: localize('views.security'), path: 'security', icon: 'mdi:security',
-        resolve: () => getStrategy('ll-strategy-view-simon42-view-security').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-security').generate({ config }, hass) },
       { enabled: showBatteries, title: localize('views.batteries'), path: 'batteries', icon: 'mdi:battery-alert',
-        resolve: () => getStrategy('ll-strategy-view-simon42-view-batteries').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-batteries').generate({ config }, hass) },
       { enabled: showClimate, title: localize('views.climate'), path: 'climate', icon: 'mdi:thermostat',
-        resolve: () => getStrategy('ll-strategy-view-simon42-view-climate').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-climate').generate({ config }, hass) },
     ];
 
     const enabledDefs = utilityViewDefs.filter((d) => d.enabled);
     const utilityConfigs = await Promise.all(enabledDefs.map((d) => d.resolve()));
     t('utility views resolved');
 
-    const roomStrategy = getStrategy('ll-strategy-view-simon42-view-room');
+    const roomStrategy = getStrategy('ll-strategy-view-dashboard-enhanced-view-room');
     const roomConfigs = await Promise.all(
       visibleAreas.map((area) => {
         const areaOptions = config.areas_options?.[area.area_id];
@@ -271,8 +271,8 @@ class Simon42DashboardStrategy extends HTMLElement {
 
   static async getConfigElement(): Promise<HTMLElement> {
     await import('./editor/StrategyEditor');
-    await customElements.whenDefined('simon42-dashboard-strategy-editor');
-    return document.createElement('simon42-dashboard-strategy-editor');
+    await customElements.whenDefined('dashboard-enhanced-strategy-editor');
+    return document.createElement('dashboard-enhanced-strategy-editor');
   }
 
   /**
@@ -302,14 +302,14 @@ class Simon42DashboardStrategy extends HTMLElement {
         title: 'Standard',
         description: 'Defaults for most homes — overview, summaries, areas, weather, energy.',
         icon: 'mdi:home-outline',
-        strategy_config: { type: 'custom:simon42-dashboard' },
+        strategy_config: { type: 'custom:dashboard-enhanced' },
       },
       {
         title: 'Minimal',
         description: 'Just clock + area cards. No summaries, no extra sections.',
         icon: 'mdi:home-minus-outline',
         strategy_config: {
-          type: 'custom:simon42-dashboard',
+          type: 'custom:dashboard-enhanced',
           show_light_summary: false,
           show_covers_summary: false,
           show_security_summary: false,
@@ -323,7 +323,7 @@ class Simon42DashboardStrategy extends HTMLElement {
         description: 'All sections + all header badges enabled. Easy to disable later.',
         icon: 'mdi:home-lightning-bolt',
         strategy_config: {
-          type: 'custom:simon42-dashboard',
+          type: 'custom:dashboard-enhanced',
           show_climate_summary: true,
           show_plants_section: true,
           show_agenda_section: true,
@@ -344,6 +344,6 @@ class Simon42DashboardStrategy extends HTMLElement {
 // Register the strategy custom element under HA's current naming
 // convention (`ll-strategy-<type>-<name>`). HA 2026.5+ enforces this
 // strictly and the fork no longer carries a pre-2025 fallback.
-customElements.define('ll-strategy-dashboard-simon42-dashboard', Simon42DashboardStrategy);
+customElements.define('ll-strategy-dashboard-dashboard-enhanced', DashboardEnhancedDashboardStrategy);
 
-console.log(`Simon42 Dashboard Strategy v${STRATEGY_VERSION} loaded`);
+console.log(`Dashboard Enhanced Strategy v${STRATEGY_VERSION} loaded`);

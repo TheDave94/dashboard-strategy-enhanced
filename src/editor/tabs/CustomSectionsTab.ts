@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, type TemplateResult } from 'lit';
-import type { Simon42StrategyConfig, CustomSection } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig, CustomSection } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomSectionsTabContext {
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onUpdateField: (index: number, field: 'key' | 'heading' | 'icon', value: string) => void;

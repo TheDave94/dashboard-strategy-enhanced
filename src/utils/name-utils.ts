@@ -1,7 +1,7 @@
 // ====================================================================
 // Name & Entity Utility Functions
 // ====================================================================
-// Ported from dist/utils/simon42-helpers.js with full TypeScript types,
+// Ported from dist/utils/dashboard-enhanced-helpers.js with full TypeScript types,
 // module-level RegExp caches, and regex-escaping for area names.
 // ====================================================================
 

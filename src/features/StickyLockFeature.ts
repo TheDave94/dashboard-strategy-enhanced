@@ -60,7 +60,7 @@ interface CardFeatureContext {
 const MDI_LOCK = 'mdi:lock';
 const MDI_LOCK_OPEN = 'mdi:lock-open-variant';
 
-class Simon42StickyLockFeature extends LitElement {
+class DashboardEnhancedStickyLockFeature extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @property({ attribute: false }) accessor context: CardFeatureContext | undefined;
   @state() accessor _config: StickyLockFeatureConfig | undefined;
@@ -69,7 +69,7 @@ class Simon42StickyLockFeature extends LitElement {
   // bad input (the docs example does too).
   public setConfig(config: StickyLockFeatureConfig): void {
     if (!config?.sticky_entity || typeof config.sticky_entity !== 'string') {
-      throw new Error('simon42-sticky-lock-feature: `sticky_entity` is required');
+      throw new Error('dashboard-enhanced-sticky-lock-feature: `sticky_entity` is required');
     }
     this._config = config;
   }
@@ -77,7 +77,7 @@ class Simon42StickyLockFeature extends LitElement {
   // Optional but recommended: lets HA's feature-row layout know how
   // tall we want to be. Tile-card's bottom row is 42px by default.
   public static getStubConfig(): StickyLockFeatureConfig {
-    return { type: 'custom:simon42-sticky-lock-feature', sticky_entity: '' };
+    return { type: 'custom:dashboard-enhanced-sticky-lock-feature', sticky_entity: '' };
   }
 
   protected shouldUpdate(changed: PropertyValues): boolean {
@@ -171,15 +171,15 @@ class Simon42StickyLockFeature extends LitElement {
   `;
 }
 
-customElements.define('simon42-sticky-lock-feature', Simon42StickyLockFeature);
+customElements.define('dashboard-enhanced-sticky-lock-feature', DashboardEnhancedStickyLockFeature);
 
 // Surface the feature in HA's "Add feature" picker in the tile-card
 // visual editor.
 window.customCardFeatures = window.customCardFeatures || [];
-if (!window.customCardFeatures.some((f) => f.type === 'simon42-sticky-lock-feature')) {
+if (!window.customCardFeatures.some((f) => f.type === 'dashboard-enhanced-sticky-lock-feature')) {
   window.customCardFeatures.push({
-    type: 'simon42-sticky-lock-feature',
-    name: 'Sticky Lock (Simon42)',
+    type: 'dashboard-enhanced-sticky-lock-feature',
+    name: 'Sticky Lock (DashboardEnhanced)',
     // Only offer this feature when the parent tile points at an
     // input_select (the room-mode use-case). Users adapting the
     // feature to other domains can still wire it manually via YAML.

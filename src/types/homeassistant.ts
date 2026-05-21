@@ -2,7 +2,7 @@
 // HomeAssistant Interface
 // ====================================================================
 // Minimal typed representation of the `hass` object passed to strategies.
-// Only includes properties actually used by the simon42 dashboard strategy.
+// Only includes properties actually used by the dashboard-enhanced dashboard strategy.
 // ====================================================================
 
 import {

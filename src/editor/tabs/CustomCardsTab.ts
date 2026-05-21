@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { Simon42StrategyConfig, CustomCard, SectionKey } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig, CustomCard, SectionKey } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomCardsTabContext {
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   sectionMeta: Map<SectionKey, { icon: string; labelKey: string }>;
   onHeadingChange: (value: string) => void;
   onIconChange: (value: string) => void;

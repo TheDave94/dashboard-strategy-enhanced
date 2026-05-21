@@ -7,7 +7,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { Simon42StrategyConfig, CustomCard, CustomSection } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig, CustomCard, CustomSection } from '../types/strategy';
 import { DEFAULT_SECTIONS_ORDER } from '../types/strategy';
 import type { LovelaceViewConfig, LovelaceSectionConfig, LovelaceBadgeConfig, LovelaceCardConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
@@ -129,16 +129,16 @@ function renderCustomCards(cards: CustomCard[]): LovelaceCardConfig[] {
 }
 
 interface OverviewViewStrategyParams {
-  dashboardConfig?: Simon42StrategyConfig;
+  dashboardConfig?: DashboardEnhancedStrategyConfig;
 }
 
-class Simon42ViewOverviewStrategy extends HTMLElement {
+class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
   static async generate(
     config: OverviewViewStrategyParams,
     hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
     timeStart('overview-generate');
-    const dashboardConfig: Simon42StrategyConfig = config.dashboardConfig || {};
+    const dashboardConfig: DashboardEnhancedStrategyConfig = config.dashboardConfig || {};
 
     // Initialize Registry (idempotent — skips if already done by another view)
     Registry.initialize(hass, dashboardConfig);
@@ -326,7 +326,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
 
     // Lazy-mount sections beyond the initial viewport (Roadmap C7).
     // First N sections render eagerly; beyond N, each card is wrapped
-    // in a `simon42-lazy-card` that defers mounting until the
+    // in a `dashboard-enhanced-lazy-card` that defers mounting until the
     // IntersectionObserver fires. Threshold default 3 sections.
     // Opt-out via `dashboardConfig.lazy_sections: false`.
     const lazyEnabled = dashboardConfig.lazy_sections !== false;
@@ -340,7 +340,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
           // visible-but-deferred would create a "stub" effect.
           if (card.type === 'heading') return card;
           return {
-            type: 'custom:simon42-lazy-card',
+            type: 'custom:dashboard-enhanced-lazy-card',
             card,
           } as LovelaceCardConfig;
         });
@@ -348,7 +348,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     }
 
     // Routines section — when `show_routines_section: true`, append
-    // a `simon42-routines-card` (auto-collects scene + script entities
+    // a `dashboard-enhanced-routines-card` (auto-collects scene + script entities
     // ranked by last_changed). Skipped silently if no routines exist.
     if (dashboardConfig.show_routines_section === true) {
       overviewSections.push({
@@ -361,7 +361,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
             icon: 'mdi:script-text-play',
           },
           {
-            type: 'custom:simon42-routines-card',
+            type: 'custom:dashboard-enhanced-routines-card',
             max: dashboardConfig.routines_max ?? 8,
             grid_options: { columns: 'full', rows: 'auto' },
           } as LovelaceCardConfig,
@@ -369,7 +369,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       });
     }
 
-    // Notification banner — prepend a `simon42-notification-card` to
+    // Notification banner — prepend a `dashboard-enhanced-notification-card` to
     // the overview when notification_triggers are configured. The
     // card auto-hides when no trigger is active, sticky-positions
     // itself when something fires. Always emitted (cost is one tiny
@@ -382,7 +382,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:simon42-notification-card',
+            type: 'custom:dashboard-enhanced-notification-card',
             triggers: dashboardConfig.notification_triggers,
             grid_options: { columns: 'full', rows: 'auto' },
           } as LovelaceCardConfig,
@@ -439,7 +439,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:simon42-voice-fab',
+            type: 'custom:dashboard-enhanced-voice-fab',
             grid_options: { columns: 'full', rows: 0 },
           } as LovelaceCardConfig,
         ],
@@ -456,7 +456,7 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:simon42-screensaver-card',
+            type: 'custom:dashboard-enhanced-screensaver-card',
             idle_minutes: dashboardConfig.panel_screensaver_after_minutes ?? 5,
             ...(dashboardConfig.panel_screensaver_entity
               ? { entity: dashboardConfig.panel_screensaver_entity }
@@ -612,4 +612,4 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-simon42-view-overview', Simon42ViewOverviewStrategy);
+customElements.define('ll-strategy-view-dashboard-enhanced-view-overview', DashboardEnhancedViewOverviewStrategy);

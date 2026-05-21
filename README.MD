@@ -27,11 +27,11 @@ Five custom elements that the strategy emits internally, all also available as s
 
 | Element | What it does |
 |---|---|
-| `simon42-summary-card` | Reactive count tile for a domain bucket (lights on, partially-open covers, low batteries, etc.). Tap → navigate to the corresponding summary view. CSS container-query sized. |
-| `simon42-zone-presence-card` | Per-area presence indicator strip. Icons + colors per zone, theme-aware. Curated entity list via `presence_entities` or auto-detected from device_class. |
-| `simon42-lights-group-card` | Reactive on/off light tile grid. Nested groups (HA light groups expand inline), floor grouping, inline batch controls. |
-| `simon42-covers-group-card` | Open / partially-open / closed groups with batch open/close. Awnings and windows get their own buckets. |
-| `simon42-sticky-lock-feature` | Custom tile feature that pins a room-mode `input_select` against auto-changes (sits in the standard tile feature row, doesn't grow the tile vertically). |
+| `dashboard-enhanced-summary-card` | Reactive count tile for a domain bucket (lights on, partially-open covers, low batteries, etc.). Tap → navigate to the corresponding summary view. CSS container-query sized. |
+| `dashboard-enhanced-zone-presence-card` | Per-area presence indicator strip. Icons + colors per zone, theme-aware. Curated entity list via `presence_entities` or auto-detected from device_class. |
+| `dashboard-enhanced-lights-group-card` | Reactive on/off light tile grid. Nested groups (HA light groups expand inline), floor grouping, inline batch controls. |
+| `dashboard-enhanced-covers-group-card` | Open / partially-open / closed groups with batch open/close. Awnings and windows get their own buckets. |
+| `dashboard-enhanced-sticky-lock-feature` | Custom tile feature that pins a room-mode `input_select` against auto-changes (sits in the standard tile feature row, doesn't grow the tile vertically). |
 
 ### Configuration
 
@@ -61,12 +61,12 @@ Five custom elements that the strategy emits internally, all also available as s
 
 ```yaml
 strategy:
-  type: custom:simon42-dashboard
+  type: custom:dashboard-enhanced
 ```
 
 Save, exit the raw editor without modifying any auto-generated views. The strategy regenerates the dashboard on every page load.
 
-> The strategy element name is kept as `simon42-dashboard` (matching the original) for backwards compatibility with existing installs.
+> The strategy element name is kept as `dashboard-enhanced-dashboard` (matching the original) for backwards compatibility with existing installs.
 
 ### Manual installation
 
@@ -77,7 +77,7 @@ Save, exit the raw editor without modifying any auto-generated views. The strate
 lovelace:
   mode: storage
   resources:
-    - url: /local/community/dashboard-strategy/simon42-dashboard-strategy.js
+    - url: /local/community/dashboard-strategy/dashboard-enhanced-strategy.js
       type: module
 ```
 
@@ -114,7 +114,7 @@ Each custom card is also usable standalone — pick it from HA's "Add card" pick
 **Example: zone-presence card with curated entities and per-zone icons/colors**
 
 ```yaml
-type: custom:simon42-zone-presence-card
+type: custom:dashboard-enhanced-zone-presence-card
 name: Living Room Presence
 entities:
   - { entity: binary_sensor.couch_occupied, icon: mdi:sofa, color: light-blue }
@@ -127,7 +127,7 @@ entities:
 
 ```yaml
 strategy:
-  type: custom:simon42-dashboard
+  type: custom:dashboard-enhanced
   dashboard_density: compact   # default: omit (container queries auto-scale per card)
 ```
 
@@ -135,7 +135,7 @@ strategy:
 
 ```yaml
 strategy:
-  type: custom:simon42-dashboard
+  type: custom:dashboard-enhanced
   areas_options:
     living_room:
       pin_zone_presence_to_favorites: true
@@ -154,7 +154,7 @@ The `presence_entities` list is the single source — the favorites pin and the 
 
 ## Acknowledgments
 
-This project started as a fork of [TheRealSimon42/simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy) — credit to [@TheRealSimon42](https://github.com/TheRealSimon42) for the original strategy that established the UX foundation (auto-generated room views, summary tiles, area grid) preserved here. As of v2.0 this fork has diverged substantially with custom cards, container-query scaling, ha-form editor migration, and HA 2026.5+ architectural updates that aren't going back upstream.
+This project started as a fork of [TheRealDashboardEnhanced/dashboard-enhanced-strategy](https://github.com/TheRealDashboardEnhanced/dashboard-enhanced-strategy) — credit to [@TheRealDashboardEnhanced](https://github.com/TheRealDashboardEnhanced) for the original strategy that established the UX foundation (auto-generated room views, summary tiles, area grid) preserved here. As of v2.0 this fork has diverged substantially with custom cards, container-query scaling, ha-form editor migration, and HA 2026.5+ architectural updates that aren't going back upstream.
 
 ## License
 

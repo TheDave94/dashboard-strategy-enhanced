@@ -4,13 +4,13 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 import { getBatteryEntities } from '../utils/entity-filter';
 
 interface BatteriesViewStrategyParams {
-  config?: Simon42StrategyConfig;
+  config?: DashboardEnhancedStrategyConfig;
 }
 
 function getAreaNameForEntity(entityId: string, hass: HomeAssistant): string | null {
@@ -67,7 +67,7 @@ function createBatterySection(
   };
 }
 
-class Simon42ViewBatteriesStrategy extends HTMLElement {
+class DashboardEnhancedViewBatteriesStrategy extends HTMLElement {
   static async generate(
     config: BatteriesViewStrategyParams,
     hass: HomeAssistant,
@@ -152,4 +152,4 @@ class Simon42ViewBatteriesStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-simon42-view-batteries', Simon42ViewBatteriesStrategy);
+customElements.define('ll-strategy-view-dashboard-enhanced-view-batteries', DashboardEnhancedViewBatteriesStrategy);

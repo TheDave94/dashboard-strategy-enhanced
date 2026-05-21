@@ -6,7 +6,7 @@
 // double-tap, including keyboard activation (Enter / Space) when the
 // target has `tabindex`.
 //
-// Used by simon42-zone-presence-card (per-zone dot), simon42-summary-
+// Used by dashboard-enhanced-zone-presence-card (per-zone dot), dashboard-enhanced-summary-
 // card (the whole tile), and any future card that needs richer-than-
 // `@click` interaction. Identical contract to HA's official
 // `actionHandler` directive — we expose a `bindActionHandler(node,

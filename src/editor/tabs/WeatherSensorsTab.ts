@@ -6,11 +6,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface WeatherSensorsTabContext {
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   search: string;
   entityNameMap: Map<string, string>;
   filteredEntities: Array<{ entity_id: string; name: string }>;

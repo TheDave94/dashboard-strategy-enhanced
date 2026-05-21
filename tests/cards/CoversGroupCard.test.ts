@@ -12,10 +12,10 @@ type CoversGroupCardEl = HTMLElement & {
 };
 
 function mount(): CoversGroupCardEl {
-  return document.createElement('simon42-covers-group-card') as CoversGroupCardEl;
+  return document.createElement('dashboard-enhanced-covers-group-card') as CoversGroupCardEl;
 }
 
-describe('simon42-covers-group-card', () => {
+describe('dashboard-enhanced-covers-group-card', () => {
   describe('setConfig', () => {
     let el: CoversGroupCardEl;
     beforeEach(() => {
@@ -47,14 +47,14 @@ describe('simon42-covers-group-card', () => {
   describe('picker integration', () => {
     it('registers with window.customCards including preview:true', () => {
       const entry = (window.customCards || []).find(
-        (c: { type: string }) => c.type === 'simon42-covers-group-card',
+        (c: { type: string }) => c.type === 'dashboard-enhanced-covers-group-card',
       ) as { preview?: boolean } | undefined;
       expect(entry).toBeDefined();
       expect(entry?.preview).toBe(true);
     });
 
     it('getStubConfig returns group_type=open', () => {
-      const ctor = customElements.get('simon42-covers-group-card') as
+      const ctor = customElements.get('dashboard-enhanced-covers-group-card') as
         | (typeof HTMLElement & { getStubConfig?: () => { group_type: string } })
         | undefined;
       expect(ctor!.getStubConfig?.().group_type).toBe('open');

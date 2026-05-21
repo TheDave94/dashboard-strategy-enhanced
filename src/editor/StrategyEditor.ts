@@ -12,7 +12,7 @@ import yaml from 'js-yaml';
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type {
-  Simon42StrategyConfig,
+  DashboardEnhancedStrategyConfig,
   CustomView,
   CustomCard,
   CustomBadge,
@@ -80,8 +80,8 @@ declare global {
 // Editor Class
 // ====================================================================
 
-class Simon42DashboardStrategyEditor extends LitElement {
-  @state() accessor _config: Simon42StrategyConfig = {};
+class DashboardEnhancedDashboardStrategyEditor extends LitElement {
+  @state() accessor _config: DashboardEnhancedStrategyConfig = {};
   @state() accessor _expandedAreas = new Set<string>();
   @state() accessor _expandedGroups = new Map<string, Set<string>>();
   // Setup wizard expanded/collapsed UI state. Starts inverse of
@@ -142,7 +142,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (!oldHass) this.requestUpdate();
   }
 
-  setConfig(config: Simon42StrategyConfig): void {
+  setConfig(config: DashboardEnhancedStrategyConfig): void {
     if (this._isUpdatingConfig) return;
     this._config = config;
   }
@@ -1079,20 +1079,20 @@ class Simon42DashboardStrategyEditor extends LitElement {
     ${unsafeCSS(SETUP_TAB_CSS)}
 
     /* -- Migration banner (v3.4.3) ------------------------------------- */
-    .s42-migration-banner {
+    .de-migration-banner {
       background: color-mix(in srgb, var(--info-color, #2196f3) 12%, transparent);
       border: 1px solid var(--info-color, #2196f3);
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 16px;
     }
-    .s42-migration-title {
+    .de-migration-title {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
     }
-    .s42-migration-row {
+    .de-migration-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -1100,13 +1100,13 @@ class Simon42DashboardStrategyEditor extends LitElement {
       padding: 8px 0;
       border-top: 1px solid color-mix(in srgb, var(--info-color, #2196f3) 30%, transparent);
     }
-    .s42-migration-label { font-weight: 500; }
-    .s42-migration-desc {
+    .de-migration-label { font-weight: 500; }
+    .de-migration-desc {
       color: var(--secondary-text-color);
       font-size: 0.85rem;
       margin-top: 2px;
     }
-    .s42-migration-apply, .s42-migration-applyall {
+    .de-migration-apply, .de-migration-applyall {
       background: var(--primary-color);
       color: var(--text-primary-color, white);
       border: none;
@@ -1115,37 +1115,37 @@ class Simon42DashboardStrategyEditor extends LitElement {
       cursor: pointer;
       white-space: nowrap;
     }
-    .s42-migration-footer {
+    .de-migration-footer {
       margin-top: 10px;
       display: flex;
       justify-content: flex-end;
     }
 
     /* -- Usage suggestion banner (v3.5.1) ------------------------------ */
-    .s42-usage-banner {
+    .de-usage-banner {
       background: color-mix(in srgb, var(--accent-color, #ff9800) 12%, transparent);
       border: 1px solid var(--accent-color, #ff9800);
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 16px;
     }
-    .s42-usage-title { display: flex; align-items: center; gap: 8px; }
-    .s42-usage-stats { color: var(--secondary-text-color); font-size: 0.85rem; }
-    .s42-usage-body {
+    .de-usage-title { display: flex; align-items: center; gap: 8px; }
+    .de-usage-stats { color: var(--secondary-text-color); font-size: 0.85rem; }
+    .de-usage-body {
       margin: 8px 0;
       color: var(--secondary-text-color);
       font-size: 0.9rem;
     }
-    .s42-usage-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-    .s42-usage-chip {
+    .de-usage-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .de-usage-chip {
       background: var(--card-background-color);
       border: 1px solid var(--divider-color);
       border-radius: 4px;
       padding: 4px 8px;
       font-size: 0.85rem;
     }
-    .s42-usage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-    .s42-usage-apply {
+    .de-usage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .de-usage-apply {
       background: var(--primary-color);
       color: var(--text-primary-color, white);
       border: none;
@@ -1153,7 +1153,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       padding: 6px 14px;
       cursor: pointer;
     }
-    .s42-usage-dismiss {
+    .de-usage-dismiss {
       background: transparent;
       color: var(--secondary-text-color);
       border: 1px solid var(--divider-color);
@@ -1260,27 +1260,27 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (!recommendation) return html``;
     const totalTaps = getTotalTaps();
     return html`
-      <div class="s42-usage-banner">
-        <div class="s42-usage-title">
+      <div class="de-usage-banner">
+        <div class="de-usage-title">
           <ha-icon icon="mdi:lightbulb-on-outline"></ha-icon>
           <strong>Suggested layout from your usage</strong>
-          <span class="s42-usage-stats">(based on ${totalTaps} taps)</span>
+          <span class="de-usage-stats">(based on ${totalTaps} taps)</span>
         </div>
-        <div class="s42-usage-body">
+        <div class="de-usage-body">
           Your most-used sections aren't currently at the top. Apply the
           suggested order or dismiss to keep the current layout.
         </div>
-        <div class="s42-usage-order">
+        <div class="de-usage-order">
           ${recommendation.order.map(
-            (k, i) => html`<span class="s42-usage-chip">${i + 1}. ${k}</span>`,
+            (k, i) => html`<span class="de-usage-chip">${i + 1}. ${k}</span>`,
           )}
         </div>
-        <div class="s42-usage-actions">
-          <button class="s42-usage-apply"
+        <div class="de-usage-actions">
+          <button class="de-usage-apply"
                   @click=${() => this._applyUsageSuggestion(recommendation.order)}>
             Apply
           </button>
-          <button class="s42-usage-dismiss" @click=${this._dismissUsageSuggestion}>
+          <button class="de-usage-dismiss" @click=${this._dismissUsageSuggestion}>
             Dismiss
           </button>
         </div>
@@ -1295,7 +1295,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _dismissUsageSuggestion = (): void => {
-    const newConfig = { ...this._config, _usage_suggestion_dismissed: true } as Simon42StrategyConfig;
+    const newConfig = { ...this._config, _usage_suggestion_dismissed: true } as DashboardEnhancedStrategyConfig;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   };
@@ -1307,26 +1307,26 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const pending = detectMigrations(this._config);
     if (pending.length === 0) return html``;
     return html`
-      <div class="s42-migration-banner">
-        <div class="s42-migration-title">
+      <div class="de-migration-banner">
+        <div class="de-migration-title">
           <ha-icon icon="mdi:update"></ha-icon>
           <strong>${pending.length} config update${pending.length === 1 ? '' : 's'} available</strong>
         </div>
         ${pending.map(
           (m: Migration) => html`
-            <div class="s42-migration-row">
+            <div class="de-migration-row">
               <div>
-                <div class="s42-migration-label">${m.label}</div>
-                <div class="s42-migration-desc">${m.description}</div>
+                <div class="de-migration-label">${m.label}</div>
+                <div class="de-migration-desc">${m.description}</div>
               </div>
-              <button class="s42-migration-apply" @click=${() => this._applyMigration(m)}>
+              <button class="de-migration-apply" @click=${() => this._applyMigration(m)}>
                 Apply
               </button>
             </div>
           `,
         )}
-        <div class="s42-migration-footer">
-          <button class="s42-migration-applyall" @click=${this._applyAllMigrations}>
+        <div class="de-migration-footer">
+          <button class="de-migration-applyall" @click=${this._applyAllMigrations}>
             Apply all
           </button>
         </div>
@@ -1364,10 +1364,10 @@ class Simon42DashboardStrategyEditor extends LitElement {
         this.requestUpdate();
       },
       onDismiss: () => {
-        const newConfig: Simon42StrategyConfig = {
+        const newConfig: DashboardEnhancedStrategyConfig = {
           ...this._config,
           _onboarding_seen: true,
-        } as Simon42StrategyConfig;
+        } as DashboardEnhancedStrategyConfig;
         this._config = newConfig;
         this._setupCollapsedOverride = true;
         this._fireConfigChanged(newConfig);
@@ -1386,7 +1386,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const f = findFeature(id);
     if (!f || !f.toggle) return;
     const patch = f.toggle(enabled);
-    const newConfig: Simon42StrategyConfig = { ...this._config } as Simon42StrategyConfig;
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config } as DashboardEnhancedStrategyConfig;
     for (const [key, value] of Object.entries(patch)) {
       if (value === undefined) {
         delete (newConfig as Record<string, unknown>)[key];
@@ -1405,7 +1405,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _updateSectionsOrder(newOrder: SectionKey[]): void {
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       sections_order: newOrder,
     };
@@ -1484,7 +1484,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
    * `show_weather_forecast_card` field so the YAML reflects user intent.
    */
   private _setWeatherPresentation(presentation: WeatherPresentation): void {
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       weather_presentation: presentation,
     };
@@ -1502,7 +1502,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       hass: this._hass,
       config: this._config,
       order: this._getSectionsOrder(),
-      sectionMeta: Simon42DashboardStrategyEditor._sectionMeta,
+      sectionMeta: DashboardEnhancedDashboardStrategyEditor._sectionMeta,
       weatherEntities: this._getWeatherEntities(),
       powerSensorEntities: this._getPowerSensorEntities(),
       isSectionDisabled: (k) => this._isSectionDisabled(k),
@@ -1530,7 +1530,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       current.delete(key as any);
     }
     const next = [...current];
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (next.length === 0) {
       delete updated.hidden_section_headings;
     } else {
@@ -1540,7 +1540,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     const current = { ...(updated.section_visibility || {}) };
     const rule = { ...(current[sectionKey] || { entity: '', state: '' }) };
     rule[field] = value.trim();
@@ -1641,7 +1641,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
         hass: this._hass,
         config: this._config,
         onChange: (patch) => {
-          const newConfig: Simon42StrategyConfig = { ...this._config, ...patch };
+          const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
           for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
             if (patch[key] === undefined) {
               delete (newConfig as Record<string, unknown>)[key as string];
@@ -1660,7 +1660,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _searchCardVariantChanged(variant: 'custom' | 'tip'): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (variant === 'custom') {
       delete updated.search_card_variant;
     } else {
@@ -1680,7 +1680,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       config: this._config,
       securityExtraSlot: this._renderSecurityExtraEntitiesPicker(),
       onChange: (patch) => {
-        const newConfig: Simon42StrategyConfig = { ...this._config, ...patch };
+        const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
         for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
           if (patch[key] === undefined) {
             delete (newConfig as Record<string, unknown>)[key as string];
@@ -1748,14 +1748,14 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _addSecurityExtraEntity(entityId: string): void {
     const current = this._config.security_extra_entities || [];
     if (current.includes(entityId)) return;
-    const updated: Simon42StrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
     this._fireConfigChanged(updated);
   }
 
   private _removeSecurityExtraEntity(entityId: string): void {
     const current = this._config.security_extra_entities || [];
     const next = current.filter((e) => e !== entityId);
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (next.length === 0) delete updated.security_extra_entities;
     else updated.security_extra_entities = next;
     this._fireConfigChanged(updated);
@@ -1781,7 +1781,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     // 'good' is now the default → omit the key when matching default
     if (bucket === 'good') {
       delete updated.unavailable_batteries_bucket;
@@ -1792,7 +1792,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _lightsSortByChanged(sortBy: 'last_changed' | 'name'): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (sortBy === 'last_changed') {
       delete updated.lights_sort_by;
     } else {
@@ -1804,14 +1804,14 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _addLightFavorite(entityId: string): void {
     const current = this._config.light_favorite_entities || [];
     if (current.includes(entityId)) return;
-    const updated: Simon42StrategyConfig = { ...this._config, light_favorite_entities: [...current, entityId] };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config, light_favorite_entities: [...current, entityId] };
     this._fireConfigChanged(updated);
   }
 
   private _removeLightFavorite(entityId: string): void {
     const current = this._config.light_favorite_entities || [];
     const next = current.filter((e) => e !== entityId);
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (next.length === 0) delete updated.light_favorite_entities;
     else updated.light_favorite_entities = next;
     this._fireConfigChanged(updated);
@@ -1935,13 +1935,13 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     const deviceClass = typeof attrs.device_class === 'string' ? attrs.device_class : undefined;
     const classDefaults = deviceClass
-      ? Simon42DashboardStrategyEditor._DEVICE_CLASS_DEFAULTS[deviceClass]
+      ? DashboardEnhancedDashboardStrategyEditor._DEVICE_CLASS_DEFAULTS[deviceClass]
       : undefined;
 
     // Icon: prefer explicit entity icon → device_class map → omit
     const explicitIcon = typeof attrs.icon === 'string' ? attrs.icon : undefined;
     const icon = explicitIcon || classDefaults?.icon;
-    if (icon && Simon42DashboardStrategyEditor._ICON_RE.test(icon)) {
+    if (icon && DashboardEnhancedDashboardStrategyEditor._ICON_RE.test(icon)) {
       out.icon = icon;
     }
 
@@ -1965,7 +1965,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const defaults = this._inferWeatherSensorDefaults(entityId);
     const newEntry: WeatherSensorConfig = { entity: entityId, ...defaults };
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       weather_sensors: [...current, newEntry],
     };
@@ -1978,7 +1978,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (index < 0 || index >= current.length) return;
 
     const next = [...current.slice(0, index), ...current.slice(index + 1)];
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (next.length > 0) {
       newConfig.weather_sensors = next;
     } else {
@@ -2019,7 +2019,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     const next = [...current];
     next[index] = target;
-    const newConfig: Simon42StrategyConfig = { ...this._config, weather_sensors: next };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, weather_sensors: next };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2044,7 +2044,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _roomVisibilityChanged(areaId: string, field: 'entity' | 'state', value: string): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     const current = { ...(updated.room_visibility || {}) };
     const rule = { ...(current[areaId] || { entity: '', state: '' }) };
     rule[field] = value.trim();
@@ -2088,7 +2088,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _roomPinsPositionChanged(position: 'top' | 'bottom'): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     // 'top' is the default — omit the key when it matches default to keep YAML clean
     if (position === 'top') {
       delete updated.room_pins_position;
@@ -2107,7 +2107,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       hass: this._hass,
       config: this._config,
       onChange: (patch) => {
-        const newConfig: Simon42StrategyConfig = { ...this._config, ...patch };
+        const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
         // Strip default-equal keys so the saved config stays sparse —
         // matches _toggleChanged(key, value, false) semantics.
         for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
@@ -2125,7 +2125,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (!this._hass) return html``;
     return renderCustomCardsTab({
       config: this._config,
-      sectionMeta: Simon42DashboardStrategyEditor._sectionMeta,
+      sectionMeta: DashboardEnhancedDashboardStrategyEditor._sectionMeta,
       onHeadingChange: (value) => this._customCardsHeadingChanged({ target: { value } } as unknown as Event),
       onIconChange: (value) => this._customCardsIconChanged({ target: { value } } as unknown as Event),
       onAddCard: () => this._addCustomCard(),
@@ -2547,7 +2547,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _toggleChanged(key: string, value: boolean, defaultValue: boolean): void {
     if (!this._hass) return;
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       [key]: value,
     };
@@ -2564,7 +2564,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _summariesColumnsChanged(columns: 2 | 4): void {
     if (!this._hass) return;
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       summaries_columns: columns,
     };
@@ -2578,7 +2578,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
 
   private _personBadgeLayoutChanged(layout: 'minimal' | 'with_state' | 'with_state_and_time'): void {
-    const updated: Simon42StrategyConfig = { ...this._config };
+    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
     if (layout === 'with_state') {
       delete updated.person_badge_layout;
     } else {
@@ -2591,7 +2591,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (!this._hass) return;
 
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       alarm_entity: entityId,
     };
@@ -2608,7 +2608,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     if (!this._hass) return;
 
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       weather_entity: entityId,
     };
@@ -2622,7 +2622,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   }
   private _powerBadgeEntityChanged = (e: Event): void => {
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (entityId) {
       newConfig.power_badge_entity = entityId;
     } else {
@@ -2634,7 +2634,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _batteryCriticalChanged(e: Event): void {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (isNaN(value) || value < 1 || value > 99) return;
-    const newConfig: Simon42StrategyConfig = { ...this._config, battery_critical_threshold: value };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, battery_critical_threshold: value };
     if (value === 20) delete newConfig.battery_critical_threshold;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
@@ -2643,7 +2643,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _batteryLowChanged(e: Event): void {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (isNaN(value) || value < 1 || value > 99) return;
-    const newConfig: Simon42StrategyConfig = { ...this._config, battery_low_threshold: value };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, battery_low_threshold: value };
     if (value === 50) delete newConfig.battery_low_threshold;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
@@ -2666,7 +2666,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const currentFavorites: string[] = Array.isArray(existing) ? existing : [];
     if (currentFavorites.includes(entityId)) return;
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       favorite_entities: [...currentFavorites, entityId],
     };
@@ -2681,7 +2681,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const currentFavorites: string[] = Array.isArray(existing) ? existing : [];
     const newFavorites = currentFavorites.filter((id) => id !== entityId);
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       favorite_entities: newFavorites.length > 0 ? newFavorites : undefined,
     };
@@ -2708,7 +2708,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const currentPins = this._config.room_pin_entities || [];
     if (currentPins.includes(entityId)) return;
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       room_pin_entities: [...currentPins, entityId],
     };
@@ -2722,7 +2722,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const currentPins = this._config.room_pin_entities || [];
     const newPins = currentPins.filter((id) => id !== entityId);
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       room_pin_entities: newPins.length > 0 ? newPins : undefined,
     };
@@ -2747,7 +2747,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       parsed_config: undefined,
     } as CustomView);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2756,7 +2756,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const customViews: CustomView[] = [...(this._config.custom_views || [])];
     customViews.splice(index, 1);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (customViews.length === 0) {
       delete newConfig.custom_views;
     } else {
@@ -2773,7 +2773,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     customViews[index] = { ...customViews[index], [field]: value };
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2805,7 +2805,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     customViews[index] = updated;
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2814,7 +2814,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   private _customCardsHeadingChanged(e: Event): void {
     const value = (e.target as HTMLInputElement).value.trim();
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (value) {
       newConfig.custom_cards_heading = value;
     } else {
@@ -2826,7 +2826,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   private _customCardsIconChanged(e: Event): void {
     const value = (e.target as HTMLInputElement).value.trim();
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (value) {
       newConfig.custom_cards_icon = value;
     } else {
@@ -2840,7 +2840,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
     customCards.push({ title: '', yaml: '', parsed_config: undefined } as CustomCard);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2849,7 +2849,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
     customCards.splice(index, 1);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (customCards.length === 0) {
       delete newConfig.custom_cards;
     } else {
@@ -2866,7 +2866,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     customCards[index] = { ...customCards[index], [field]: value };
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2898,7 +2898,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     customCards[index] = updated;
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2908,7 +2908,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _addCustomSection(): void {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     sections.push({ key: '', heading: '', yaml: '', parsed_config: undefined });
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2916,7 +2916,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
   private _removeCustomSection(index: number): void {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     sections.splice(index, 1);
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (sections.length === 0) delete newConfig.custom_sections;
     else newConfig.custom_sections = sections;
     this._config = newConfig;
@@ -2927,7 +2927,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     if (!sections[index]) return;
     sections[index] = { ...sections[index], [field]: value };
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2958,7 +2958,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       updated.parsed_config = undefined;
     }
     sections[index] = updated;
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2969,7 +2969,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
     customBadges.push({ yaml: '', parsed_config: undefined } as CustomBadge);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_badges: customBadges };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_badges: customBadges };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2978,7 +2978,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
     customBadges.splice(index, 1);
 
-    const newConfig: Simon42StrategyConfig = { ...this._config };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
     if (customBadges.length === 0) {
       delete newConfig.custom_badges;
     } else {
@@ -3016,7 +3016,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
     customBadges[index] = updated;
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, custom_badges: customBadges };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_badges: customBadges };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -3042,7 +3042,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       this._areaEntitiesCache.delete(areaId);
     }
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       areas_display: {
         ...this._config.areas_display,
@@ -3190,7 +3190,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       delete newAreasOptions[areaId];
     }
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       areas_options: newAreasOptions,
     };
@@ -3257,7 +3257,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
       delete newAreasOptions[areaId];
     }
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       areas_options: newAreasOptions,
     };
@@ -3313,7 +3313,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     const newAreasOptions: Record<string, any> = { ...this._config.areas_options, [areaId]: newAreaOptions };
     if (Object.keys(newAreasOptions[areaId]).length === 0) delete newAreasOptions[areaId];
 
-    const newConfig: Simon42StrategyConfig = { ...this._config, areas_options: newAreasOptions };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, areas_options: newAreasOptions };
     if (newConfig.areas_options && Object.keys(newConfig.areas_options).length === 0) delete newConfig.areas_options;
 
     this._config = newConfig;
@@ -3424,7 +3424,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
 
   private _updateAreaOrder(newOrder: string[]): void {
 
-    const newConfig: Simon42StrategyConfig = {
+    const newConfig: DashboardEnhancedStrategyConfig = {
       ...this._config,
       areas_display: {
         ...this._config.areas_display,
@@ -3501,7 +3501,7 @@ class Simon42DashboardStrategyEditor extends LitElement {
     currentList.splice(dropIndex, 0, draggedId);
 
     const key = listType === 'favorites' ? 'favorite_entities' : 'room_pin_entities';
-    const newConfig: Simon42StrategyConfig = { ...this._config, [key]: currentList };
+    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, [key]: currentList };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   };
@@ -3510,11 +3510,11 @@ class Simon42DashboardStrategyEditor extends LitElement {
   // CONFIG DISPATCH
   // ====================================================================
 
-  private _fireConfigChanged(config: Simon42StrategyConfig): void {
+  private _fireConfigChanged(config: DashboardEnhancedStrategyConfig): void {
     this._isUpdatingConfig = true;
 
     // Strip internal fields before saving
-    const cleanConfig: Simon42StrategyConfig = { ...config };
+    const cleanConfig: DashboardEnhancedStrategyConfig = { ...config };
     if (cleanConfig.custom_views) {
       cleanConfig.custom_views = cleanConfig.custom_views.map((cv) => {
         const clean = { ...cv };
@@ -3683,7 +3683,7 @@ function getAreaBadgeCandidates(areaId: string, hass: HomeAssistant): string[] {
   return candidates;
 }
 
-function getAdditionalBadgesForArea(areaId: string, config: Simon42StrategyConfig): string[] {
+function getAdditionalBadgesForArea(areaId: string, config: DashboardEnhancedStrategyConfig): string[] {
   return config.areas_options?.[areaId]?.groups_options?.badges?.additional || [];
 }
 
@@ -3741,7 +3741,7 @@ function getDefaultShowNameEntities(badgeCandidates: string[], hass: HomeAssista
 
 function getBadgeNamesConfig(
   areaId: string,
-  config: Simon42StrategyConfig
+  config: DashboardEnhancedStrategyConfig
 ): { namesVisible: string[]; namesHidden: string[] } {
   const opts = config.areas_options?.[areaId]?.groups_options?.badges;
   return {
@@ -3750,7 +3750,7 @@ function getBadgeNamesConfig(
   };
 }
 
-function getHiddenEntitiesForArea(areaId: string, config: Simon42StrategyConfig): Record<string, string[]> {
+function getHiddenEntitiesForArea(areaId: string, config: DashboardEnhancedStrategyConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};
@@ -3766,7 +3766,7 @@ function getHiddenEntitiesForArea(areaId: string, config: Simon42StrategyConfig)
   return hidden;
 }
 
-function getEntityOrdersForArea(areaId: string, config: Simon42StrategyConfig): Record<string, string[]> {
+function getEntityOrdersForArea(areaId: string, config: DashboardEnhancedStrategyConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};
@@ -3783,4 +3783,4 @@ function getEntityOrdersForArea(areaId: string, config: Simon42StrategyConfig): 
 }
 
 // Register custom element
-customElements.define('simon42-dashboard-strategy-editor', Simon42DashboardStrategyEditor);
+customElements.define('dashboard-enhanced-strategy-editor', DashboardEnhancedDashboardStrategyEditor);

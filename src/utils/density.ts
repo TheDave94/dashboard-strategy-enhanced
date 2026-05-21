@@ -18,7 +18,7 @@
 // would surface a schema warning in the visual editor.
 // ====================================================================
 
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
 
 export type DensityValue = 'compact' | 'comfortable';
 
@@ -28,7 +28,7 @@ export type DensityValue = 'compact' | 'comfortable';
  * card's CSS container queries pick the right size automatically.
  */
 export function resolveDensity(
-  config: Simon42StrategyConfig | undefined,
+  config: DashboardEnhancedStrategyConfig | undefined,
 ): DensityValue | undefined {
   const v = config?.dashboard_density;
   if (v === 'compact' || v === 'comfortable') return v;
@@ -41,13 +41,13 @@ export function resolveDensity(
  * sites clean:
  *
  *     return {
- *       type: 'custom:simon42-zone-presence-card',
+ *       type: 'custom:dashboard-enhanced-zone-presence-card',
  *       entities,
  *       ...densityProp(config),
  *     };
  */
 export function densityProp(
-  config: Simon42StrategyConfig | undefined,
+  config: DashboardEnhancedStrategyConfig | undefined,
 ): { density?: DensityValue } {
   const v = resolveDensity(config);
   return v ? { density: v } : {};

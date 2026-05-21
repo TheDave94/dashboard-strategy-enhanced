@@ -4,22 +4,22 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig } from '../types/lovelace';
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
 import { resolveDensity } from '../utils/density';
 
 interface LightsViewStrategyParams {
   entities?: string[];
   /** Legacy field — strategy entrypoint passes `dashboardConfig`. */
-  config?: Simon42StrategyConfig;
-  dashboardConfig?: Simon42StrategyConfig;
+  config?: DashboardEnhancedStrategyConfig;
+  dashboardConfig?: DashboardEnhancedStrategyConfig;
 }
 
-class Simon42ViewLightsStrategy extends HTMLElement {
+class DashboardEnhancedViewLightsStrategy extends HTMLElement {
   static async generate(
     config: LightsViewStrategyParams,
     _hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
-    const dashboardConfig: Simon42StrategyConfig = config.dashboardConfig || config.config || {};
+    const dashboardConfig: DashboardEnhancedStrategyConfig = config.dashboardConfig || config.config || {};
     const groupByFloors = dashboardConfig.group_lights_by_floors === true;
     const nestedGroups = dashboardConfig.nested_light_groups === true;
     const sortBy = dashboardConfig.lights_sort_by === 'name' ? 'name' : 'last_changed';
@@ -32,7 +32,7 @@ class Simon42ViewLightsStrategy extends HTMLElement {
     const density = resolveDensity(dashboardConfig);
 
     const card = (group_type: 'on' | 'off') => ({
-      type: 'custom:simon42-lights-group-card',
+      type: 'custom:dashboard-enhanced-lights-group-card',
       entities: config.entities,
       config: config.config,
       group_type,
@@ -55,4 +55,4 @@ class Simon42ViewLightsStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-simon42-view-lights', Simon42ViewLightsStrategy);
+customElements.define('ll-strategy-view-dashboard-enhanced-view-lights', DashboardEnhancedViewLightsStrategy);

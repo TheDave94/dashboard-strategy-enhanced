@@ -103,9 +103,9 @@ jobs:
             fi
           }
           echo "Bundle-size budget (gzipped):"
-          check "simon42-dashboard-strategy.js.gz" 5
-          check "simon42-dashboard-strategy-core.*.js.gz" 50
-          check "simon42-dashboard-strategy-views.*.js.gz" 20
-          check "simon42-dashboard-strategy-editor.*.js.gz" 80
-          check "simon42-dashboard-strategy-lit.*.js.gz" 25
+          check "dashboard-enhanced-strategy.js.gz" 5
+          check "dashboard-enhanced-strategy-core.*.js.gz" 50
+          check "dashboard-enhanced-strategy-views.*.js.gz" 20
+          check "dashboard-enhanced-strategy-editor.*.js.gz" 80
+          check "dashboard-enhanced-strategy-lit.*.js.gz" 25
           exit $fail

@@ -19,7 +19,7 @@
 // ====================================================================
 
 import { html, type TemplateResult } from 'lit';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 import type { TabRenderContext } from './ViewsTab';
 
@@ -33,7 +33,7 @@ type OverviewData = {
 };
 
 /** Selector defaults applied when reading from a sparse config. */
-function readData(config: Simon42StrategyConfig): OverviewData {
+function readData(config: DashboardEnhancedStrategyConfig): OverviewData {
   return {
     show_clock_card: config.show_clock_card !== false,
     person_badge_layout: (config.person_badge_layout ?? 'with_state') as OverviewData['person_badge_layout'],
@@ -80,8 +80,8 @@ function computeSchema(data: OverviewData) {
  * legacy _toggleChanged() behaviour (deletes the key when value
  * matches the default).
  */
-function buildPatch(value: Partial<OverviewData>): Partial<Simon42StrategyConfig> {
-  const patch: Partial<Simon42StrategyConfig> = {};
+function buildPatch(value: Partial<OverviewData>): Partial<DashboardEnhancedStrategyConfig> {
+  const patch: Partial<DashboardEnhancedStrategyConfig> = {};
 
   // show_clock_card default = true; only persist when false.
   patch.show_clock_card = value.show_clock_card === false ? false : undefined;

@@ -72,7 +72,7 @@ const COLOR_MAP: Record<string, string> = {
   grey: 'var(--disabled-color, #bdbdbd)',
 };
 
-class Simon42SummaryCard extends LitElement {
+class DashboardEnhancedSummaryCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _count = 0;
   // Yesterday's count at the same time, when `show_delta: true`.
@@ -90,46 +90,46 @@ class Simon42SummaryCard extends LitElement {
       cursor: pointer;
       /* Container queries scale to the tile's actual rendered width. */
       container-type: inline-size;
-      container-name: s42-summary;
+      container-name: de-summary;
 
-      --s42-pad: var(--ha-space-3, 12px);
-      --s42-gap: var(--ha-space-2, 8px);
-      --s42-icon: 28px;
-      --s42-name: var(--ha-font-size-s, 13px);
+      --de-pad: var(--ha-space-3, 12px);
+      --de-gap: var(--ha-space-2, 8px);
+      --de-icon: 28px;
+      --de-name: var(--ha-font-size-s, 13px);
     }
     /* Narrow (< 160px wide cell): half-summary in a 4-col strip. */
-    @container s42-summary (max-width: 160px) {
+    @container de-summary (max-width: 160px) {
       :host {
-        --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
-        --s42-gap: var(--ha-space-3, 10px);
-        --s42-icon: 24px;
+        --de-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
+        --de-gap: var(--ha-space-3, 10px);
+        --de-icon: 24px;
       }
     }
     /* Wide (> 280px): summary card in a generous lane. */
-    @container s42-summary (min-width: 280px) {
+    @container de-summary (min-width: 280px) {
       :host {
-        --s42-icon: 32px;
+        --de-icon: 32px;
       }
     }
     /* Manual overrides win against the container queries. */
     :host([density="compact"]) {
-      --s42-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px) !important;
-      --s42-gap: var(--ha-space-3, 10px) !important;
-      --s42-icon: 26px !important;
+      --de-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px) !important;
+      --de-gap: var(--ha-space-3, 10px) !important;
+      --de-icon: 26px !important;
     }
     :host([density="comfortable"]) {
-      --s42-pad: var(--ha-space-3, 12px) !important;
-      --s42-gap: var(--ha-space-2, 8px) !important;
-      --s42-icon: 28px !important;
+      --de-pad: var(--ha-space-3, 12px) !important;
+      --de-gap: var(--ha-space-2, 8px) !important;
+      --de-icon: 28px !important;
     }
     ha-card {
-      padding: var(--s42-pad);
+      padding: var(--de-pad);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      gap: var(--s42-gap);
+      gap: var(--de-gap);
       height: 100%;
       box-sizing: border-box;
       --ha-card-border-width: 0;
@@ -149,14 +149,14 @@ class Simon42SummaryCard extends LitElement {
       transition: transform 0.1s;
     }
     .icon {
-      --mdc-icon-size: var(--s42-icon);
+      --mdc-icon-size: var(--de-icon);
       transition: color 0.3s;
     }
     :host([density="compact"]) .icon {
       flex: 0 0 auto;
     }
     .name {
-      font-size: var(--s42-name);
+      font-size: var(--de-name);
       font-weight: var(--ha-font-weight-medium, 500);
       line-height: var(--ha-line-height-condensed, 1.2);
       color: var(--primary-text-color);
@@ -189,13 +189,13 @@ class Simon42SummaryCard extends LitElement {
     // editor surfaces the error inline instead of silently rendering
     // an empty count.
     if (!config || typeof config !== 'object') {
-      throw new Error('simon42-summary-card: config object required');
+      throw new Error('dashboard-enhanced-summary-card: config object required');
     }
     if (
       !['lights', 'covers', 'security', 'batteries', 'climate'].includes(config.summary_type)
     ) {
       throw new Error(
-        "simon42-summary-card: summary_type must be one of 'lights' | 'covers' | 'security' | 'batteries' | 'climate'",
+        "dashboard-enhanced-summary-card: summary_type must be one of 'lights' | 'covers' | 'security' | 'batteries' | 'climate'",
       );
     }
     this._config = config;
@@ -527,7 +527,7 @@ class Simon42SummaryCard extends LitElement {
     // Bind HA's global <action-handler> custom element to the
     // ha-card once, so tap/hold/double-tap all dispatch a single
     // @action event with `detail.action` set. Same pattern as
-    // ZonePresenceCard — see /tmp/simon42_audit_2026.md §2.2 for
+    // ZonePresenceCard — see /tmp/dashboard_enhanced_audit_2026.md §2.2 for
     // the rationale (raw @click loses keyboard + hold).
     if (!changed.has('hass') && !changed.has('_config')) return;
     const card = this.shadowRoot?.querySelector<HTMLElement>('ha-card');
@@ -652,17 +652,17 @@ class Simon42SummaryCard extends LitElement {
           },
         },
       ],
-      'card.simon42-summary-card',
+      'card.dashboard-enhanced-summary-card',
     );
   }
 }
 
-customElements.define('simon42-summary-card', Simon42SummaryCard);
+customElements.define('dashboard-enhanced-summary-card', DashboardEnhancedSummaryCard);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'simon42-summary-card',
-  name: 'Simon42 Summary Card',
+  type: 'dashboard-enhanced-summary-card',
+  name: 'DashboardEnhanced Summary Card',
   description: 'Reactive summary tile that counts entities (lights / covers / security / batteries / climate)',
   preview: true,
 } as { type: string; name: string; description: string });

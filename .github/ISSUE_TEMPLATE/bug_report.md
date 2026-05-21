@@ -18,7 +18,7 @@ assignees: ""
 
 ## Versionen
 
-- **Strategy-Version:** <!-- Browser-Konsole (F12) → "Simon42 Dashboard Strategy vX.Y.Z loaded" -->
+- **Strategy-Version:** <!-- Browser-Konsole (F12) → "Dashboard Enhanced Strategy vX.Y.Z loaded" -->
 - **Home Assistant Version:**
 - **Browser:**
 

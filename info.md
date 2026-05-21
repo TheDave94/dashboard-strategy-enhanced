@@ -1,6 +1,6 @@
 # Dashboard Strategy — Enhanced Edition (v2.0+)
 
-A substantially improved fork of [simon42's dashboard strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy) for Home Assistant. Auto-generates views based on areas, entities, and their states — with significant additions in custom cards, configuration UI, and architectural quality.
+A substantially improved fork of [dashboard-enhanced's dashboard strategy](https://github.com/TheRealDashboardEnhanced/dashboard-enhanced-strategy) for Home Assistant. Auto-generates views based on areas, entities, and their states — with significant additions in custom cards, configuration UI, and architectural quality.
 
 ## What's in v2.0
 
@@ -19,9 +19,9 @@ Then create a dashboard with:
 
 ```yaml
 strategy:
-  type: custom:simon42-dashboard
+  type: custom:dashboard-enhanced
 ```
 
 See [README](README.MD) for detailed configuration.
 
-Original by [@TheRealSimon42](https://github.com/TheRealSimon42), enhanced by [@TheDave94](https://github.com/TheDave94).
+Original by [@TheRealDashboardEnhanced](https://github.com/TheRealDashboardEnhanced), enhanced by [@TheDave94](https://github.com/TheDave94).

@@ -27,7 +27,7 @@ interface HourlyStats {
   lastFetch: number;
 }
 
-const STORAGE_KEY = 'simon42_anomaly_v1';
+const STORAGE_KEY = 'dashboard_enhanced_anomaly_v1';
 const TTL_MS = 24 * 60 * 60 * 1000; // refetch daily
 const cache = new Map<string, HourlyStats>();
 

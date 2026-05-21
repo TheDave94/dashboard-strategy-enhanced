@@ -8,7 +8,7 @@
 // rest of the UI, ha-form handles i18n labels + helpers, focus
 // management, ARIA, and keyboard nav. Hand-rolled <input>/<select>
 // blocks bypassed every one of those. The audit at
-// /tmp/simon42_audit_2026.md §2.1 identified this migration as the
+// /tmp/dashboard_enhanced_audit_2026.md §2.1 identified this migration as the
 // single biggest tech-debt anchor in the repo (~4300 LOC monolith).
 //
 // Pattern (so future tabs follow the same shape):
@@ -23,18 +23,18 @@
 
 import { html, type TemplateResult } from 'lit';
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface TabRenderContext {
   hass: HomeAssistant;
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   /**
    * Apply a partial patch to the config. The parent editor merges,
    * strips default-equal keys (matching the old _toggleChanged
    * behavior), and fires `config-changed`.
    */
-  onChange: (patch: Partial<Simon42StrategyConfig>) => void;
+  onChange: (patch: Partial<DashboardEnhancedStrategyConfig>) => void;
 }
 
 /**
@@ -70,7 +70,7 @@ export function renderViewsTab(ctx: TabRenderContext): TemplateResult {
           // Strip false (the schema default) so the saved config stays
           // sparse — matches _toggleChanged(key, value, false) behavior
           // in the legacy editor.
-          const patch: Partial<Simon42StrategyConfig> = {};
+          const patch: Partial<DashboardEnhancedStrategyConfig> = {};
           for (const key of Object.keys(ev.detail.value) as Array<
             'show_summary_views' | 'show_room_views'
           >) {

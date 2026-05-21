@@ -21,7 +21,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { HomeAssistant } from '../../types/homeassistant';
 import type {
-  Simon42StrategyConfig,
+  DashboardEnhancedStrategyConfig,
   SectionKey,
   WeatherPresentation,
 } from '../../types/strategy';
@@ -39,7 +39,7 @@ export interface EntityOption {
 
 export interface SectionOrderTabContext {
   hass: HomeAssistant;
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   order: SectionKey[];
   sectionMeta: Map<SectionKey, SectionMeta>;
   weatherEntities: EntityOption[];

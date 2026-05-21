@@ -12,7 +12,7 @@
 //   - comfortable — HA's defaults. Default behaviour.
 // ====================================================================
 
-import type { Simon42StrategyConfig } from '../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
 
 export type DensityPreset = 'compact' | 'cozy' | 'comfortable';
 
@@ -51,7 +51,7 @@ export const DENSITY_PRESETS: Record<DensityPreset, DensityPresetSpec> = {
  * `comfortable` (HA defaults) when unset or invalid.
  */
 export function resolveDensityPreset(
-  config: Simon42StrategyConfig | undefined,
+  config: DashboardEnhancedStrategyConfig | undefined,
 ): DensityPreset {
   const v = config?.density;
   return v === 'compact' || v === 'cozy' || v === 'comfortable' ? v : 'comfortable';
@@ -61,7 +61,7 @@ export function resolveDensityPreset(
  * Get the spec block for the configured preset.
  */
 export function getDensityPresetSpec(
-  config: Simon42StrategyConfig | undefined,
+  config: DashboardEnhancedStrategyConfig | undefined,
 ): DensityPresetSpec {
   return DENSITY_PRESETS[resolveDensityPreset(config)];
 }

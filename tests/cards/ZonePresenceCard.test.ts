@@ -13,10 +13,10 @@ type ZonePresenceCardEl = HTMLElement & {
 };
 
 function mount(): ZonePresenceCardEl {
-  return document.createElement('simon42-zone-presence-card') as ZonePresenceCardEl;
+  return document.createElement('dashboard-enhanced-zone-presence-card') as ZonePresenceCardEl;
 }
 
-describe('simon42-zone-presence-card', () => {
+describe('dashboard-enhanced-zone-presence-card', () => {
   describe('setConfig', () => {
     let el: ZonePresenceCardEl;
     beforeEach(() => {
@@ -76,14 +76,14 @@ describe('simon42-zone-presence-card', () => {
   describe('picker integration', () => {
     it('registers with window.customCards including preview:true', () => {
       const entry = (window.customCards || []).find(
-        (c: { type: string }) => c.type === 'simon42-zone-presence-card',
+        (c: { type: string }) => c.type === 'dashboard-enhanced-zone-presence-card',
       ) as { preview?: boolean } | undefined;
       expect(entry).toBeDefined();
       expect(entry?.preview).toBe(true);
     });
 
     it('getStubConfig seeds with binary_sensor.* entities', () => {
-      const ctor = customElements.get('simon42-zone-presence-card') as
+      const ctor = customElements.get('dashboard-enhanced-zone-presence-card') as
         | (typeof HTMLElement & { getStubConfig?: (hass: unknown) => unknown })
         | undefined;
       expect(ctor).toBeDefined();

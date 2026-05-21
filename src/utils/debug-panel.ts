@@ -1,7 +1,7 @@
 // ====================================================================
 // Debug panel overlay (v3.4.2)
 // ====================================================================
-// When the URL contains `?s42_debug=1`, mount a small floating panel
+// When the URL contains `?de_debug=1`, mount a small floating panel
 // in document.body showing:
 //   - generate() execution time
 //   - section/area decisions logged via debugLog()
@@ -41,7 +41,7 @@ export function installDebugPanel(): void {
   if (installed || !isDebugActive() || typeof document === 'undefined') return;
   installed = true;
   const root = document.createElement('div');
-  root.id = 's42-debug-panel';
+  root.id = 'de-debug-panel';
   root.style.cssText = [
     'position: fixed',
     'bottom: 16px',
@@ -62,18 +62,18 @@ export function installDebugPanel(): void {
   root.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
       <strong style="color:#ffb74d;">s42 debug</strong>
-      <button id="s42-debug-clear" style="background:#333;color:#ddd;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:10px;">clear</button>
-      <button id="s42-debug-close" style="background:#333;color:#ddd;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:10px;">×</button>
+      <button id="de-debug-clear" style="background:#333;color:#ddd;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:10px;">clear</button>
+      <button id="de-debug-close" style="background:#333;color:#ddd;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:10px;">×</button>
     </div>
-    <div id="s42-debug-summary" style="margin-bottom:6px;color:#80cbc4;"></div>
-    <div id="s42-debug-log"></div>
+    <div id="de-debug-summary" style="margin-bottom:6px;color:#80cbc4;"></div>
+    <div id="de-debug-log"></div>
   `;
   document.body.appendChild(root);
-  root.querySelector('#s42-debug-clear')?.addEventListener('click', () => {
+  root.querySelector('#de-debug-clear')?.addEventListener('click', () => {
     buffer.length = 0;
     refresh();
   });
-  root.querySelector('#s42-debug-close')?.addEventListener('click', () => {
+  root.querySelector('#de-debug-close')?.addEventListener('click', () => {
     root.remove();
     installed = false;
   });
@@ -81,23 +81,23 @@ export function installDebugPanel(): void {
 }
 
 function refresh(): void {
-  const root = document.getElementById('s42-debug-panel');
+  const root = document.getElementById('de-debug-panel');
   if (!root) return;
-  // Summary: count s42-perf measures + show the slowest 3.
+  // Summary: count de-perf measures + show the slowest 3.
   const measures = performance.getEntriesByType('measure')
-    .filter((e) => e.name.startsWith('s42-'))
+    .filter((e) => e.name.startsWith('de-'))
     .sort((a, b) => b.duration - a.duration);
   const slowest = measures.slice(0, 3)
-    .map((m) => `${m.name.replace('s42-', '')}: ${m.duration.toFixed(1)}ms`)
+    .map((m) => `${m.name.replace('de-', '')}: ${m.duration.toFixed(1)}ms`)
     .join(' · ');
-  const summary = root.querySelector('#s42-debug-summary');
+  const summary = root.querySelector('#de-debug-summary');
   if (summary) {
     const total = measures.reduce((s, m) => s + m.duration, 0);
     summary.textContent = measures.length > 0
       ? `${measures.length} measures · total ${total.toFixed(1)}ms · slowest: ${slowest}`
       : 'no measures recorded yet';
   }
-  const logEl = root.querySelector('#s42-debug-log');
+  const logEl = root.querySelector('#de-debug-log');
   if (logEl) {
     logEl.innerHTML = buffer.slice().reverse().map((entry) => {
       const t = (entry.ts / 1000).toFixed(2);

@@ -27,7 +27,7 @@ interface ScreensaverCardConfig {
   show_date?: boolean;
 }
 
-class Simon42ScreensaverCard extends LitElement {
+class DashboardEnhancedScreensaverCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _active = false;
   @state() accessor _now = new Date();
@@ -84,7 +84,7 @@ class Simon42ScreensaverCard extends LitElement {
   `;
 
   public setConfig(config: ScreensaverCardConfig): void {
-    this._config = config ?? { type: 'custom:simon42-screensaver-card' };
+    this._config = config ?? { type: 'custom:dashboard-enhanced-screensaver-card' };
     this._resetIdle();
   }
 
@@ -176,7 +176,7 @@ class Simon42ScreensaverCard extends LitElement {
   };
 }
 
-customElements.define('simon42-screensaver-card', Simon42ScreensaverCard);
+customElements.define('dashboard-enhanced-screensaver-card', DashboardEnhancedScreensaverCard);
 
 declare global {
   interface Window {
@@ -185,10 +185,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-screensaver-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-screensaver-card')) {
   window.customCards.push({
-    type: 'simon42-screensaver-card',
-    name: 'Simon42 Screensaver',
+    type: 'dashboard-enhanced-screensaver-card',
+    name: 'DashboardEnhanced Screensaver',
     description: 'Full-screen clock+weather overlay after N minutes idle. For wall-mounted tablets.',
   });
 }

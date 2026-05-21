@@ -35,7 +35,7 @@ interface CoversGroupConfig {
   icon_closed?: string;
   icon_partial?: string;
   group_by_floors?: boolean;
-  /** Density variant — drives the --s42-* CSS tokens. */
+  /** Density variant — drives the --de-* CSS tokens. */
   density?: 'comfortable' | 'compact';
 }
 
@@ -82,7 +82,7 @@ interface CoverAttrs {
 const coverAttrs = (state: { attributes?: Record<string, unknown> } | undefined): CoverAttrs =>
   (state?.attributes ?? {}) as CoverAttrs;
 
-class Simon42CoversGroupCard extends LitElement {
+class DashboardEnhancedCoversGroupCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
 
   private _config!: CoversGroupConfig;
@@ -100,23 +100,23 @@ class Simon42CoversGroupCard extends LitElement {
     :host {
       display: block;
       container-type: inline-size;
-      container-name: s42-covers;
-      --s42-gap: var(--ha-space-2, 8px);
-      --s42-tile-min: 300px;
+      container-name: de-covers;
+      --de-gap: var(--ha-space-2, 8px);
+      --de-tile-min: 300px;
     }
-    @container s42-covers (max-width: 400px) {
+    @container de-covers (max-width: 400px) {
       :host {
-        --s42-gap: var(--ha-space-1, 6px);
-        --s42-tile-min: 260px;
+        --de-gap: var(--ha-space-1, 6px);
+        --de-tile-min: 260px;
       }
     }
     :host([density="compact"]) {
-      --s42-gap: var(--ha-space-1, 6px) !important;
-      --s42-tile-min: 280px !important;
+      --de-gap: var(--ha-space-1, 6px) !important;
+      --de-tile-min: 280px !important;
     }
     :host([density="comfortable"]) {
-      --s42-gap: var(--ha-space-2, 8px) !important;
-      --s42-tile-min: 300px !important;
+      --de-gap: var(--ha-space-2, 8px) !important;
+      --de-tile-min: 300px !important;
     }
     :host([hidden]) {
       display: none;
@@ -124,18 +124,18 @@ class Simon42CoversGroupCard extends LitElement {
     .covers-section {
       display: flex;
       flex-direction: column;
-      gap: var(--s42-gap);
+      gap: var(--de-gap);
       width: 100%;
     }
     .cover-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--s42-tile-min), 1fr));
-      gap: var(--s42-gap);
+      grid-template-columns: repeat(auto-fill, minmax(var(--de-tile-min), 1fr));
+      gap: var(--de-gap);
     }
     .floor-section {
       display: flex;
       flex-direction: column;
-      gap: var(--s42-gap);
+      gap: var(--de-gap);
     }
   `;
 
@@ -607,18 +607,18 @@ class Simon42CoversGroupCard extends LitElement {
         { name: 'show_partially_open', selector: { boolean: {} } },
         { name: 'group_by_floors', selector: { boolean: {} } },
       ],
-      'card.simon42-covers-group-card',
+      'card.dashboard-enhanced-covers-group-card',
     );
   }
 }
 
-customElements.define('simon42-covers-group-card', Simon42CoversGroupCard);
+customElements.define('dashboard-enhanced-covers-group-card', DashboardEnhancedCoversGroupCard);
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-covers-group-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-covers-group-card')) {
   window.customCards.push({
-    type: 'simon42-covers-group-card',
-    name: 'Simon42 Covers Group',
+    type: 'dashboard-enhanced-covers-group-card',
+    name: 'DashboardEnhanced Covers Group',
     description: 'Grouped open/closed cover tiles with optional partially-open bucket, awnings, and windows.',
     preview: true,
   } as { type: string; name: string; description: string });

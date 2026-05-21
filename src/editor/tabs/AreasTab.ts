@@ -11,13 +11,13 @@
 
 import { html, type TemplateResult } from 'lit';
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { Simon42StrategyConfig } from '../../types/strategy';
+import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
 import type { AreaRegistryEntry } from '../../types/registries';
 import { localize } from '../../utils/localize';
 
 export interface AreasTabContext {
   hass: HomeAssistant;
-  config: Simon42StrategyConfig;
+  config: DashboardEnhancedStrategyConfig;
   renderCheckbox: (
     id: string,
     label: string,

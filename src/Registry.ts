@@ -17,7 +17,7 @@ import type {
   AreaRegistryEntry,
   FloorRegistryEntry,
 } from './types/registries';
-import type { Simon42StrategyConfig } from './types/strategy';
+import type { DashboardEnhancedStrategyConfig } from './types/strategy';
 import { timeStart, timeEnd, debugLog } from './utils/debug';
 import { setupLocalize } from './utils/localize';
 
@@ -36,7 +36,7 @@ class Registry {
   // === Raw data references ===
 
   private static _hass: HomeAssistant;
-  private static _config: Simon42StrategyConfig;
+  private static _config: DashboardEnhancedStrategyConfig;
 
   // === Registry arrays (from hass object) ===
 
@@ -124,7 +124,7 @@ class Registry {
    * hass registries' identity changes (HA replaces the maps on
    * registry updates).
    */
-  static initialize(hass: HomeAssistant, config: Simon42StrategyConfig): void {
+  static initialize(hass: HomeAssistant, config: DashboardEnhancedStrategyConfig): void {
     if (
       Registry._initialized &&
       Registry._builtFromEntities === hass.entities &&
@@ -350,7 +350,7 @@ class Registry {
   }
 
   /** The strategy configuration. */
-  static get config(): Simon42StrategyConfig {
+  static get config(): DashboardEnhancedStrategyConfig {
     return Registry._config;
   }
 

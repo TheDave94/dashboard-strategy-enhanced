@@ -15,7 +15,7 @@
 //     (default tap → more-info)
 //
 // Config (YAML for custom_cards / custom_views):
-//   type: custom:simon42-zone-presence-card
+//   type: custom:dashboard-enhanced-zone-presence-card
 //   name: Anwesenheit            # optional header label
 //   icon: mdi:account-multiple   # optional header icon
 //   entities:
@@ -85,7 +85,7 @@ interface ZonePresenceCardConfig {
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
-  /** Density variant — drives the --s42-* CSS tokens. */
+  /** Density variant — drives the --de-* CSS tokens. */
   density?: 'comfortable' | 'compact';
 }
 
@@ -121,7 +121,7 @@ function resolveColor(color: string | undefined): string {
 // Card
 // --------------------------------------------------------------------
 
-class Simon42ZonePresenceCard extends LitElement {
+class DashboardEnhancedZonePresenceCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _config: ZonePresenceCardConfig | undefined;
 
@@ -131,68 +131,68 @@ class Simon42ZonePresenceCard extends LitElement {
       /* Enable inline-size container queries on the host so the card
          scales to its actual rendered width — narrow cells in a
          section, wide cells in a single-card layout, anything between.
-         Token-driven design: the CSS below reads only --s42-* so the
+         Token-driven design: the CSS below reads only --de-* so the
          container-query rules just rebind them per breakpoint. */
       container-type: inline-size;
-      container-name: s42-zone;
+      container-name: de-zone;
 
       /* Default / mid-size tokens (≈ comfortable). Used when no
          container-query breakpoint matches. */
-      --s42-pad-block: var(--ha-space-3, 12px);
-      --s42-pad-inline: var(--ha-space-4, 16px);
-      --s42-header-gap: var(--ha-space-2, 8px);
-      --s42-header-mb: var(--ha-space-3, 10px);
-      --s42-zone-gap-row: var(--ha-space-2, 6px);
-      --s42-zone-gap-col: var(--ha-space-3, 12px);
-      --s42-zone-pad: var(--ha-space-2, 8px) var(--ha-space-1, 4px);
-      --s42-zone-radius: var(--ha-border-radius-md, 10px);
-      --s42-zone-label-gap: var(--ha-space-1, 4px);
-      --s42-icon-wrap: 36px;
-      --s42-icon-size: 22px;
-      --s42-label: var(--ha-font-size-xs, 11px);
-      --s42-header-size: var(--ha-font-size-m, 14px);
+      --de-pad-block: var(--ha-space-3, 12px);
+      --de-pad-inline: var(--ha-space-4, 16px);
+      --de-header-gap: var(--ha-space-2, 8px);
+      --de-header-mb: var(--ha-space-3, 10px);
+      --de-zone-gap-row: var(--ha-space-2, 6px);
+      --de-zone-gap-col: var(--ha-space-3, 12px);
+      --de-zone-pad: var(--ha-space-2, 8px) var(--ha-space-1, 4px);
+      --de-zone-radius: var(--ha-border-radius-md, 10px);
+      --de-zone-label-gap: var(--ha-space-1, 4px);
+      --de-icon-wrap: 36px;
+      --de-icon-size: 22px;
+      --de-label: var(--ha-font-size-xs, 11px);
+      --de-header-size: var(--ha-font-size-m, 14px);
     }
     /* Narrow container (< 360px): cards on phones, half-section
        favorites pins. Tighten chrome, keep icons legible. */
-    @container s42-zone (max-width: 360px) {
+    @container de-zone (max-width: 360px) {
       :host {
-        --s42-pad-block: var(--ha-space-2, 10px);
-        --s42-pad-inline: var(--ha-space-3, 14px);
-        --s42-header-mb: var(--ha-space-2, 8px);
-        --s42-zone-gap-col: var(--ha-space-2, 10px);
-        --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
-        --s42-icon-wrap: 32px;
-        --s42-icon-size: 20px;
+        --de-pad-block: var(--ha-space-2, 10px);
+        --de-pad-inline: var(--ha-space-3, 14px);
+        --de-header-mb: var(--ha-space-2, 8px);
+        --de-zone-gap-col: var(--ha-space-2, 10px);
+        --de-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
+        --de-icon-wrap: 32px;
+        --de-icon-size: 20px;
       }
     }
     /* Wide container (> 600px): card has room to breathe. */
-    @container s42-zone (min-width: 600px) {
+    @container de-zone (min-width: 600px) {
       :host {
-        --s42-pad-block: var(--ha-space-4, 16px);
-        --s42-pad-inline: var(--ha-space-5, 20px);
-        --s42-icon-wrap: 40px;
-        --s42-icon-size: 24px;
+        --de-pad-block: var(--ha-space-4, 16px);
+        --de-pad-inline: var(--ha-space-5, 20px);
+        --de-icon-wrap: 40px;
+        --de-icon-size: 24px;
       }
     }
     /* Manual override — overrides any container-query result, used
        when the user explicitly forces a density regardless of size. */
     :host([density="compact"]) {
-      --s42-pad-block: var(--ha-space-2, 10px) !important;
-      --s42-pad-inline: var(--ha-space-3, 14px) !important;
-      --s42-header-mb: var(--ha-space-2, 8px) !important;
-      --s42-zone-gap-col: var(--ha-space-2, 10px) !important;
-      --s42-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px) !important;
-      --s42-icon-wrap: 32px !important;
-      --s42-icon-size: 20px !important;
+      --de-pad-block: var(--ha-space-2, 10px) !important;
+      --de-pad-inline: var(--ha-space-3, 14px) !important;
+      --de-header-mb: var(--ha-space-2, 8px) !important;
+      --de-zone-gap-col: var(--ha-space-2, 10px) !important;
+      --de-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px) !important;
+      --de-icon-wrap: 32px !important;
+      --de-icon-size: 20px !important;
     }
     :host([density="comfortable"]) {
-      --s42-pad-block: var(--ha-space-3, 12px) !important;
-      --s42-pad-inline: var(--ha-space-4, 16px) !important;
-      --s42-icon-wrap: 36px !important;
-      --s42-icon-size: 22px !important;
+      --de-pad-block: var(--ha-space-3, 12px) !important;
+      --de-pad-inline: var(--ha-space-4, 16px) !important;
+      --de-icon-wrap: 36px !important;
+      --de-icon-size: 22px !important;
     }
     ha-card {
-      padding: var(--s42-pad-block) var(--s42-pad-inline);
+      padding: var(--de-pad-block) var(--de-pad-inline);
       background: var(--ha-card-background, var(--card-background-color));
       border-radius: var(--ha-card-border-radius, var(--ha-border-radius-lg, 12px));
       box-sizing: border-box;
@@ -200,11 +200,11 @@ class Simon42ZonePresenceCard extends LitElement {
     .header {
       display: flex;
       align-items: center;
-      gap: var(--s42-header-gap);
-      margin-bottom: var(--s42-header-mb);
+      gap: var(--de-header-gap);
+      margin-bottom: var(--de-header-mb);
       color: var(--primary-text-color);
       font-weight: var(--ha-font-weight-medium, 500);
-      font-size: var(--s42-header-size);
+      font-size: var(--de-header-size);
       line-height: var(--ha-line-height-condensed, 1.2);
     }
     .header ha-icon {
@@ -214,7 +214,7 @@ class Simon42ZonePresenceCard extends LitElement {
     .zones {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--s42-zone-gap-row) var(--s42-zone-gap-col);
+      gap: var(--de-zone-gap-row) var(--de-zone-gap-col);
       align-items: flex-start;
     }
     .zone {
@@ -223,9 +223,9 @@ class Simon42ZonePresenceCard extends LitElement {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--s42-zone-label-gap);
-      padding: var(--s42-zone-pad);
-      border-radius: var(--s42-zone-radius);
+      gap: var(--de-zone-label-gap);
+      padding: var(--de-zone-pad);
+      border-radius: var(--de-zone-radius);
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -246,8 +246,8 @@ class Simon42ZonePresenceCard extends LitElement {
     .icon-wrap {
       --dot-color: var(--state-active-color, var(--primary-color));
       --dot-inactive: var(--state-inactive-color, var(--disabled-text-color));
-      width: var(--s42-icon-wrap);
-      height: var(--s42-icon-wrap);
+      width: var(--de-icon-wrap);
+      height: var(--de-icon-wrap);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -256,7 +256,7 @@ class Simon42ZonePresenceCard extends LitElement {
       transition: background-color 200ms ease, box-shadow 200ms ease, transform 180ms ease;
     }
     .icon-wrap ha-icon {
-      --mdc-icon-size: var(--s42-icon-size);
+      --mdc-icon-size: var(--de-icon-size);
       color: var(--dot-inactive);
       transition: color 200ms ease;
     }
@@ -273,7 +273,7 @@ class Simon42ZonePresenceCard extends LitElement {
       border: 1.5px dashed var(--dot-inactive);
     }
     .label {
-      font-size: var(--s42-label);
+      font-size: var(--de-label);
       line-height: 1.15;
       color: var(--secondary-text-color);
       text-align: center;
@@ -292,7 +292,7 @@ class Simon42ZonePresenceCard extends LitElement {
 
   public setConfig(config: ZonePresenceCardConfig): void {
     if (!config || !Array.isArray(config.entities) || config.entities.length === 0) {
-      throw new Error('simon42-zone-presence-card: `entities` (non-empty array) is required');
+      throw new Error('dashboard-enhanced-zone-presence-card: `entities` (non-empty array) is required');
     }
     // Apply defaults first, user config second — mirrors HA tile-card.
     this._config = {
@@ -330,7 +330,7 @@ class Simon42ZonePresenceCard extends LitElement {
       .filter((id) => id.startsWith('binary_sensor.'))
       .slice(0, 4);
     return {
-      type: 'custom:simon42-zone-presence-card',
+      type: 'custom:dashboard-enhanced-zone-presence-card',
       name: 'Zone Presence',
       entities: entityIds.length > 0 ? entityIds : ['binary_sensor.example'],
     };
@@ -350,7 +350,7 @@ class Simon42ZonePresenceCard extends LitElement {
           },
         },
       ],
-      'card.simon42-zone-presence-card',
+      'card.dashboard-enhanced-zone-presence-card',
     );
   }
 
@@ -389,7 +389,7 @@ class Simon42ZonePresenceCard extends LitElement {
    *   4. A generic presence fallback (mdi:motion-sensor).
    *
    * All hass.entities / hass.devices / hass.areas lookups stay
-   * defensive — the card is intended to be usable outside the simon42
+   * defensive — the card is intended to be usable outside the dashboard-enhanced
    * strategy too, so it can't assume Registry is initialised.
    */
   private _iconFor(z: ZoneEntry): string {
@@ -543,17 +543,17 @@ class Simon42ZonePresenceCard extends LitElement {
   }
 }
 
-customElements.define('simon42-zone-presence-card', Simon42ZonePresenceCard);
+customElements.define('dashboard-enhanced-zone-presence-card', DashboardEnhancedZonePresenceCard);
 
 // Register with HA's "Add card" picker so it surfaces in the editor UI.
 // The `preview: true` flag isn't part of the shared global interface
 // (other cards in this bundle declare a narrower shape), so we cast
 // the descriptor at push site rather than widen every card module.
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'simon42-zone-presence-card')) {
+if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-zone-presence-card')) {
   window.customCards.push({
-    type: 'simon42-zone-presence-card',
-    name: 'Simon42 Zone Presence',
+    type: 'dashboard-enhanced-zone-presence-card',
+    name: 'DashboardEnhanced Zone Presence',
     description:
       'Compact row of zone-presence dots, one per zone — for multi-zone presence sensors (Aqara FP1/FP2, mmWave, etc.).',
     preview: true,
