@@ -4,22 +4,22 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig } from '../types/lovelace';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 import { resolveDensity } from '../utils/density';
 
 interface LightsViewStrategyParams {
   entities?: string[];
   /** Legacy field — strategy entrypoint passes `dashboardConfig`. */
-  config?: DashboardEnhancedStrategyConfig;
-  dashboardConfig?: DashboardEnhancedStrategyConfig;
+  config?: OrielConfig;
+  dashboardConfig?: OrielConfig;
 }
 
-class DashboardEnhancedViewLightsStrategy extends HTMLElement {
+class OrielViewLights extends HTMLElement {
   static async generate(
     config: LightsViewStrategyParams,
     _hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
-    const dashboardConfig: DashboardEnhancedStrategyConfig = config.dashboardConfig || config.config || {};
+    const dashboardConfig: OrielConfig = config.dashboardConfig || config.config || {};
     const groupByFloors = dashboardConfig.group_lights_by_floors === true;
     const nestedGroups = dashboardConfig.nested_light_groups === true;
     const sortBy = dashboardConfig.lights_sort_by === 'name' ? 'name' : 'last_changed';
@@ -32,7 +32,7 @@ class DashboardEnhancedViewLightsStrategy extends HTMLElement {
     const density = resolveDensity(dashboardConfig);
 
     const card = (group_type: 'on' | 'off') => ({
-      type: 'custom:dashboard-enhanced-lights-group-card',
+      type: 'custom:oriel-lights-group-card',
       entities: config.entities,
       config: config.config,
       group_type,
@@ -55,4 +55,4 @@ class DashboardEnhancedViewLightsStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-lights', DashboardEnhancedViewLightsStrategy);
+customElements.define('ll-strategy-view-oriel-lights', OrielViewLights);

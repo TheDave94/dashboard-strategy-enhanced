@@ -1,7 +1,7 @@
 // ====================================================================
 // Badge Builder - Person Badges
 // ====================================================================
-// Ported from dist/utils/dashboard-enhanced-badge-builder.js with full TypeScript types.
+// Ported from dist/utils/oriel-badge-builder.js with full TypeScript types.
 // Creates entity badges for person presence (home / away).
 // ====================================================================
 

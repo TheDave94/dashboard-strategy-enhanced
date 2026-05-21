@@ -21,7 +21,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { HomeAssistant } from '../../types/homeassistant';
 import type {
-  DashboardEnhancedStrategyConfig,
+  OrielConfig,
   SectionKey,
   WeatherPresentation,
 } from '../../types/strategy';
@@ -39,7 +39,7 @@ export interface EntityOption {
 
 export interface SectionOrderTabContext {
   hass: HomeAssistant;
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   order: SectionKey[];
   sectionMeta: Map<SectionKey, SectionMeta>;
   weatherEntities: EntityOption[];
@@ -297,12 +297,12 @@ function renderHiddenHeadings(ctx: SectionOrderTabContext): TemplateResult {
             <div class="form-row">
               <input
                 type="checkbox"
-                id="hide-heading-${hk}"
+                id="hioriel-heading-${hk}"
                 ?checked=${hiddenHeadings.has(hk)}
                 @change=${(e: Event) =>
                   ctx.onToggleHiddenHeading(hk, (e.target as HTMLInputElement).checked)}
               />
-              <label for="hide-heading-${hk}">${localize(`editor.heading_label_${hk}`)}</label>
+              <label for="hioriel-heading-${hk}">${localize(`editor.heading_label_${hk}`)}</label>
             </div>
           `,
         )}

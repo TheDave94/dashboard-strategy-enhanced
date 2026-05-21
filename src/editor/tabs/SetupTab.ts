@@ -10,7 +10,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import {
   FEATURE_REGISTRY,
   type FeatureCategory,
@@ -19,7 +19,7 @@ import {
 
 interface SetupTabContext {
   hass: HomeAssistant;
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   onDismiss: () => void;

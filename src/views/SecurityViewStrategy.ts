@@ -4,16 +4,16 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 import { SECURITY_EXCLUDED_PLATFORMS } from '../utils/entity-filter';
 
 interface SecurityViewStrategyParams {
-  config?: DashboardEnhancedStrategyConfig;
+  config?: OrielConfig;
 }
 
-class DashboardEnhancedViewSecurityStrategy extends HTMLElement {
+class OrielViewSecurity extends HTMLElement {
   static async generate(
     config: SecurityViewStrategyParams,
     hass: HomeAssistant,
@@ -348,4 +348,4 @@ class DashboardEnhancedViewSecurityStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-security', DashboardEnhancedViewSecurityStrategy);
+customElements.define('ll-strategy-view-oriel-security', OrielViewSecurity);

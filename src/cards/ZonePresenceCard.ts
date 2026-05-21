@@ -15,7 +15,7 @@
 //     (default tap → more-info)
 //
 // Config (YAML for custom_cards / custom_views):
-//   type: custom:dashboard-enhanced-zone-presence-card
+//   type: custom:oriel-zone-presence-card
 //   name: Anwesenheit            # optional header label
 //   icon: mdi:account-multiple   # optional header icon
 //   entities:
@@ -85,7 +85,7 @@ interface ZonePresenceCardConfig {
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
-  /** Density variant — drives the --de-* CSS tokens. */
+  /** Density variant — drives the --oriel-* CSS tokens. */
   density?: 'comfortable' | 'compact';
 }
 
@@ -121,7 +121,7 @@ function resolveColor(color: string | undefined): string {
 // Card
 // --------------------------------------------------------------------
 
-class DashboardEnhancedZonePresenceCard extends LitElement {
+class OrielZonePresenceCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _config: ZonePresenceCardConfig | undefined;
 
@@ -131,68 +131,68 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
       /* Enable inline-size container queries on the host so the card
          scales to its actual rendered width — narrow cells in a
          section, wide cells in a single-card layout, anything between.
-         Token-driven design: the CSS below reads only --de-* so the
+         Token-driven design: the CSS below reads only --oriel-* so the
          container-query rules just rebind them per breakpoint. */
       container-type: inline-size;
-      container-name: de-zone;
+      container-name: oriel-zone;
 
       /* Default / mid-size tokens (≈ comfortable). Used when no
          container-query breakpoint matches. */
-      --de-pad-block: var(--ha-space-3, 12px);
-      --de-pad-inline: var(--ha-space-4, 16px);
-      --de-header-gap: var(--ha-space-2, 8px);
-      --de-header-mb: var(--ha-space-3, 10px);
-      --de-zone-gap-row: var(--ha-space-2, 6px);
-      --de-zone-gap-col: var(--ha-space-3, 12px);
-      --de-zone-pad: var(--ha-space-2, 8px) var(--ha-space-1, 4px);
-      --de-zone-radius: var(--ha-border-radius-md, 10px);
-      --de-zone-label-gap: var(--ha-space-1, 4px);
-      --de-icon-wrap: 36px;
-      --de-icon-size: 22px;
-      --de-label: var(--ha-font-size-xs, 11px);
-      --de-header-size: var(--ha-font-size-m, 14px);
+      --oriel-pad-block: var(--ha-space-3, 12px);
+      --oriel-pad-inline: var(--ha-space-4, 16px);
+      --oriel-header-gap: var(--ha-space-2, 8px);
+      --oriel-header-mb: var(--ha-space-3, 10px);
+      --oriel-zone-gap-row: var(--ha-space-2, 6px);
+      --oriel-zone-gap-col: var(--ha-space-3, 12px);
+      --oriel-zone-pad: var(--ha-space-2, 8px) var(--ha-space-1, 4px);
+      --oriel-zone-radius: var(--ha-border-radius-md, 10px);
+      --oriel-zone-label-gap: var(--ha-space-1, 4px);
+      --oriel-icon-wrap: 36px;
+      --oriel-icon-size: 22px;
+      --oriel-label: var(--ha-font-size-xs, 11px);
+      --oriel-header-size: var(--ha-font-size-m, 14px);
     }
     /* Narrow container (< 360px): cards on phones, half-section
        favorites pins. Tighten chrome, keep icons legible. */
-    @container de-zone (max-width: 360px) {
+    @container oriel-zone (max-width: 360px) {
       :host {
-        --de-pad-block: var(--ha-space-2, 10px);
-        --de-pad-inline: var(--ha-space-3, 14px);
-        --de-header-mb: var(--ha-space-2, 8px);
-        --de-zone-gap-col: var(--ha-space-2, 10px);
-        --de-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
-        --de-icon-wrap: 32px;
-        --de-icon-size: 20px;
+        --oriel-pad-block: var(--ha-space-2, 10px);
+        --oriel-pad-inline: var(--ha-space-3, 14px);
+        --oriel-header-mb: var(--ha-space-2, 8px);
+        --oriel-zone-gap-col: var(--ha-space-2, 10px);
+        --oriel-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px);
+        --oriel-icon-wrap: 32px;
+        --oriel-icon-size: 20px;
       }
     }
     /* Wide container (> 600px): card has room to breathe. */
-    @container de-zone (min-width: 600px) {
+    @container oriel-zone (min-width: 600px) {
       :host {
-        --de-pad-block: var(--ha-space-4, 16px);
-        --de-pad-inline: var(--ha-space-5, 20px);
-        --de-icon-wrap: 40px;
-        --de-icon-size: 24px;
+        --oriel-pad-block: var(--ha-space-4, 16px);
+        --oriel-pad-inline: var(--ha-space-5, 20px);
+        --oriel-icon-wrap: 40px;
+        --oriel-icon-size: 24px;
       }
     }
     /* Manual override — overrides any container-query result, used
        when the user explicitly forces a density regardless of size. */
     :host([density="compact"]) {
-      --de-pad-block: var(--ha-space-2, 10px) !important;
-      --de-pad-inline: var(--ha-space-3, 14px) !important;
-      --de-header-mb: var(--ha-space-2, 8px) !important;
-      --de-zone-gap-col: var(--ha-space-2, 10px) !important;
-      --de-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px) !important;
-      --de-icon-wrap: 32px !important;
-      --de-icon-size: 20px !important;
+      --oriel-pad-block: var(--ha-space-2, 10px) !important;
+      --oriel-pad-inline: var(--ha-space-3, 14px) !important;
+      --oriel-header-mb: var(--ha-space-2, 8px) !important;
+      --oriel-zone-gap-col: var(--ha-space-2, 10px) !important;
+      --oriel-zone-pad: var(--ha-space-1, 6px) var(--ha-space-1, 3px) !important;
+      --oriel-icon-wrap: 32px !important;
+      --oriel-icon-size: 20px !important;
     }
     :host([density="comfortable"]) {
-      --de-pad-block: var(--ha-space-3, 12px) !important;
-      --de-pad-inline: var(--ha-space-4, 16px) !important;
-      --de-icon-wrap: 36px !important;
-      --de-icon-size: 22px !important;
+      --oriel-pad-block: var(--ha-space-3, 12px) !important;
+      --oriel-pad-inline: var(--ha-space-4, 16px) !important;
+      --oriel-icon-wrap: 36px !important;
+      --oriel-icon-size: 22px !important;
     }
     ha-card {
-      padding: var(--de-pad-block) var(--de-pad-inline);
+      padding: var(--oriel-pad-block) var(--oriel-pad-inline);
       background: var(--ha-card-background, var(--card-background-color));
       border-radius: var(--ha-card-border-radius, var(--ha-border-radius-lg, 12px));
       box-sizing: border-box;
@@ -200,11 +200,11 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
     .header {
       display: flex;
       align-items: center;
-      gap: var(--de-header-gap);
-      margin-bottom: var(--de-header-mb);
+      gap: var(--oriel-header-gap);
+      margin-bottom: var(--oriel-header-mb);
       color: var(--primary-text-color);
       font-weight: var(--ha-font-weight-medium, 500);
-      font-size: var(--de-header-size);
+      font-size: var(--oriel-header-size);
       line-height: var(--ha-line-height-condensed, 1.2);
     }
     .header ha-icon {
@@ -214,7 +214,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
     .zones {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--de-zone-gap-row) var(--de-zone-gap-col);
+      gap: var(--oriel-zone-gap-row) var(--oriel-zone-gap-col);
       align-items: flex-start;
     }
     .zone {
@@ -223,9 +223,9 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--de-zone-label-gap);
-      padding: var(--de-zone-pad);
-      border-radius: var(--de-zone-radius);
+      gap: var(--oriel-zone-label-gap);
+      padding: var(--oriel-zone-pad);
+      border-radius: var(--oriel-zone-radius);
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -246,8 +246,8 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
     .icon-wrap {
       --dot-color: var(--state-active-color, var(--primary-color));
       --dot-inactive: var(--state-inactive-color, var(--disabled-text-color));
-      width: var(--de-icon-wrap);
-      height: var(--de-icon-wrap);
+      width: var(--oriel-icon-wrap);
+      height: var(--oriel-icon-wrap);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -256,7 +256,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
       transition: background-color 200ms ease, box-shadow 200ms ease, transform 180ms ease;
     }
     .icon-wrap ha-icon {
-      --mdc-icon-size: var(--de-icon-size);
+      --mdc-icon-size: var(--oriel-icon-size);
       color: var(--dot-inactive);
       transition: color 200ms ease;
     }
@@ -273,7 +273,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
       border: 1.5px dashed var(--dot-inactive);
     }
     .label {
-      font-size: var(--de-label);
+      font-size: var(--oriel-label);
       line-height: 1.15;
       color: var(--secondary-text-color);
       text-align: center;
@@ -292,7 +292,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
 
   public setConfig(config: ZonePresenceCardConfig): void {
     if (!config || !Array.isArray(config.entities) || config.entities.length === 0) {
-      throw new Error('dashboard-enhanced-zone-presence-card: `entities` (non-empty array) is required');
+      throw new Error('oriel-zone-presence-card: `entities` (non-empty array) is required');
     }
     // Apply defaults first, user config second — mirrors HA tile-card.
     this._config = {
@@ -330,7 +330,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
       .filter((id) => id.startsWith('binary_sensor.'))
       .slice(0, 4);
     return {
-      type: 'custom:dashboard-enhanced-zone-presence-card',
+      type: 'custom:oriel-zone-presence-card',
       name: 'Zone Presence',
       entities: entityIds.length > 0 ? entityIds : ['binary_sensor.example'],
     };
@@ -350,7 +350,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
           },
         },
       ],
-      'card.dashboard-enhanced-zone-presence-card',
+      'card.oriel-zone-presence-card',
     );
   }
 
@@ -389,7 +389,7 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
    *   4. A generic presence fallback (mdi:motion-sensor).
    *
    * All hass.entities / hass.devices / hass.areas lookups stay
-   * defensive — the card is intended to be usable outside the dashboard-enhanced
+   * defensive — the card is intended to be usable outside the oriel
    * strategy too, so it can't assume Registry is initialised.
    */
   private _iconFor(z: ZoneEntry): string {
@@ -543,17 +543,17 @@ class DashboardEnhancedZonePresenceCard extends LitElement {
   }
 }
 
-customElements.define('dashboard-enhanced-zone-presence-card', DashboardEnhancedZonePresenceCard);
+customElements.define('oriel-zone-presence-card', OrielZonePresenceCard);
 
 // Register with HA's "Add card" picker so it surfaces in the editor UI.
 // The `preview: true` flag isn't part of the shared global interface
 // (other cards in this bundle declare a narrower shape), so we cast
 // the descriptor at push site rather than widen every card module.
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-zone-presence-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-zone-presence-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-zone-presence-card',
-    name: 'DashboardEnhanced Zone Presence',
+    type: 'oriel-zone-presence-card',
+    name: 'Oriel Zone Presence',
     description:
       'Compact row of zone-presence dots, one per zone — for multi-zone presence sensors (Aqara FP1/FP2, mmWave, etc.).',
     preview: true,

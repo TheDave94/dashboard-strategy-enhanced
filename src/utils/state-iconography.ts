@@ -29,7 +29,7 @@ const STATE_ICONS: Record<string, IconMap> = {
   'cover.door': { open: 'mdi:door-open', closed: 'mdi:door-closed' },
   'cover.window': { open: 'mdi:window-open', closed: 'mdi:window-closed' },
   'cover.blind': { open: 'mdi:blinds-open', closed: 'mdi:blinds' },
-  'cover.shade': { open: 'mdi:roller-shade', closed: 'mdi:roller-shade-closed' },
+  'cover.shade': { open: 'mdi:roller-shade', closed: 'mdi:roller-shaoriel-closed' },
   'cover.curtain': { open: 'mdi:curtains', closed: 'mdi:curtains-closed' },
   'cover.shutter': { open: 'mdi:window-shutter-open', closed: 'mdi:window-shutter' },
   'cover.awning': { open: 'mdi:window-open-variant', closed: 'mdi:window-closed-variant' },

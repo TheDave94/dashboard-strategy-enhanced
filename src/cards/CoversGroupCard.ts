@@ -35,7 +35,7 @@ interface CoversGroupConfig {
   icon_closed?: string;
   icon_partial?: string;
   group_by_floors?: boolean;
-  /** Density variant — drives the --de-* CSS tokens. */
+  /** Density variant — drives the --oriel-* CSS tokens. */
   density?: 'comfortable' | 'compact';
 }
 
@@ -82,7 +82,7 @@ interface CoverAttrs {
 const coverAttrs = (state: { attributes?: Record<string, unknown> } | undefined): CoverAttrs =>
   (state?.attributes ?? {}) as CoverAttrs;
 
-class DashboardEnhancedCoversGroupCard extends LitElement {
+class OrielCoversGroupCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
 
   private _config!: CoversGroupConfig;
@@ -100,23 +100,23 @@ class DashboardEnhancedCoversGroupCard extends LitElement {
     :host {
       display: block;
       container-type: inline-size;
-      container-name: de-covers;
-      --de-gap: var(--ha-space-2, 8px);
-      --de-tile-min: 300px;
+      container-name: oriel-covers;
+      --oriel-gap: var(--ha-space-2, 8px);
+      --oriel-tile-min: 300px;
     }
-    @container de-covers (max-width: 400px) {
+    @container oriel-covers (max-width: 400px) {
       :host {
-        --de-gap: var(--ha-space-1, 6px);
-        --de-tile-min: 260px;
+        --oriel-gap: var(--ha-space-1, 6px);
+        --oriel-tile-min: 260px;
       }
     }
     :host([density="compact"]) {
-      --de-gap: var(--ha-space-1, 6px) !important;
-      --de-tile-min: 280px !important;
+      --oriel-gap: var(--ha-space-1, 6px) !important;
+      --oriel-tile-min: 280px !important;
     }
     :host([density="comfortable"]) {
-      --de-gap: var(--ha-space-2, 8px) !important;
-      --de-tile-min: 300px !important;
+      --oriel-gap: var(--ha-space-2, 8px) !important;
+      --oriel-tile-min: 300px !important;
     }
     :host([hidden]) {
       display: none;
@@ -124,18 +124,18 @@ class DashboardEnhancedCoversGroupCard extends LitElement {
     .covers-section {
       display: flex;
       flex-direction: column;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
       width: 100%;
     }
     .cover-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--de-tile-min), 1fr));
-      gap: var(--de-gap);
+      grid-template-columns: repeat(auto-fill, minmax(var(--oriel-tile-min), 1fr));
+      gap: var(--oriel-gap);
     }
     .floor-section {
       display: flex;
       flex-direction: column;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
     }
   `;
 
@@ -607,18 +607,18 @@ class DashboardEnhancedCoversGroupCard extends LitElement {
         { name: 'show_partially_open', selector: { boolean: {} } },
         { name: 'group_by_floors', selector: { boolean: {} } },
       ],
-      'card.dashboard-enhanced-covers-group-card',
+      'card.oriel-covers-group-card',
     );
   }
 }
 
-customElements.define('dashboard-enhanced-covers-group-card', DashboardEnhancedCoversGroupCard);
+customElements.define('oriel-covers-group-card', OrielCoversGroupCard);
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-covers-group-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-covers-group-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-covers-group-card',
-    name: 'DashboardEnhanced Covers Group',
+    type: 'oriel-covers-group-card',
+    name: 'Oriel Covers Group',
     description: 'Grouped open/closed cover tiles with optional partially-open bucket, awnings, and windows.',
     preview: true,
   } as { type: string; name: string; description: string });

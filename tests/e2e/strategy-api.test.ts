@@ -3,13 +3,13 @@
 // ====================================================================
 // Connects to a real Home Assistant instance and verifies the
 // dashboard's storage-mode lovelace config is reachable and uses
-// the dashboard-enhanced strategy. Skipped when HA_URL / HA_TOKEN env vars
+// the oriel strategy. Skipped when HA_URL / HA_TOKEN env vars
 // aren't set.
 //
 // What it validates (API-level only):
 //   - HA WebSocket auth works with the provided long-lived token
 //   - The dashboard exists at HA_DASHBOARD_URL_PATH
-//   - Its config has a `strategy` field pointing at the dashboard-enhanced strategy
+//   - Its config has a `strategy` field pointing at the oriel strategy
 //   - The strategy config carries the expected shape (areas_options,
 //     etc.) so we know it deserialized correctly
 //
@@ -22,7 +22,7 @@ import { describe, it, expect } from 'vitest';
 
 const HA_URL = process.env.HA_URL;
 const HA_TOKEN = process.env.HA_TOKEN;
-const DASHBOARD_URL_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-dashboard-enhanced';
+const DASHBOARD_URL_PATH = process.env.HA_DASHBOARD_URL_PATH || 'dashboard-oriel';
 
 const skipMessage =
   '[strategy-api] HA_URL / HA_TOKEN not set — skipping. Export them to run against a real HA.';
@@ -61,7 +61,7 @@ interface LovelaceConfigResponse {
 /**
  * Fetch lovelace config via WebSocket. Returns the resolved strategy
  * config (`mode: 'storage'` dashboards) — for `mode: 'yaml'` you'd
- * use a different endpoint, but the dashboard-enhanced strategy lives in storage.
+ * use a different endpoint, but the oriel strategy lives in storage.
  */
 async function fetchLovelaceConfig(): Promise<LovelaceConfigResponse> {
   if (!HA_URL || !HA_TOKEN) throw new Error('HA_URL / HA_TOKEN required');
@@ -138,9 +138,9 @@ describe.skipIf(skipIf)('strategy: API smoke (live HA)', () => {
     expect(config.strategy).toBeTruthy();
   });
 
-  it('the strategy is `custom:dashboard-enhanced`', async () => {
+  it('the strategy is `custom:oriel`', async () => {
     const config = await fetchLovelaceConfig();
-    expect(config.strategy?.type).toBe('custom:dashboard-enhanced');
+    expect(config.strategy?.type).toBe('custom:oriel');
   });
 
   it('strategy config carries the expected fields', async () => {

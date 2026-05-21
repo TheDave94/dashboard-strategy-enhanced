@@ -41,7 +41,7 @@ interface HistoryPoint {
   v: number; // numeric value
 }
 
-class DashboardEnhancedSparklineCard extends LitElement {
+class OrielSparklineCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _history: HistoryPoint[] = [];
 
@@ -53,7 +53,7 @@ class DashboardEnhancedSparklineCard extends LitElement {
     :host {
       display: block;
       container-type: inline-size;
-      container-name: de-spark;
+      container-name: oriel-spark;
     }
     ha-card {
       padding: var(--ha-space-3, 12px) var(--ha-space-4, 16px);
@@ -89,8 +89,8 @@ class DashboardEnhancedSparklineCard extends LitElement {
       height: 40px;
       display: block;
     }
-    .spark path.fill { fill: var(--de-spark-color, var(--state-active-color, var(--primary-color))); opacity: 0.18; }
-    .spark path.line { fill: none; stroke: var(--de-spark-color, var(--state-active-color, var(--primary-color))); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .spark path.fill { fill: var(--oriel-spark-color, var(--state-active-color, var(--primary-color))); opacity: 0.18; }
+    .spark path.line { fill: none; stroke: var(--oriel-spark-color, var(--state-active-color, var(--primary-color))); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
     .extrema {
       display: flex;
       justify-content: space-between;
@@ -98,14 +98,14 @@ class DashboardEnhancedSparklineCard extends LitElement {
       color: var(--secondary-text-color);
       font-variant-numeric: tabular-nums;
     }
-    @container de-spark (max-width: 200px) {
+    @container oriel-spark (max-width: 200px) {
       .spark { height: 28px; }
     }
   `;
 
   public setConfig(config: SparklineCardConfig): void {
     if (!config?.entity || typeof config.entity !== 'string') {
-      throw new Error('dashboard-enhanced-sparkline-card: `entity` (string) required');
+      throw new Error('oriel-sparkline-card: `entity` (string) required');
     }
     this._config = config;
   }
@@ -298,7 +298,7 @@ class DashboardEnhancedSparklineCard extends LitElement {
 
     const showValue = this._config.show_value !== false;
     const showExtrema = this._config.show_extrema === true;
-    const style = this._config.color ? `--de-spark-color: ${this._config.color}` : '';
+    const style = this._config.color ? `--oriel-spark-color: ${this._config.color}` : '';
 
     let extrema = html``;
     if (showExtrema && this._history.length > 0) {
@@ -324,11 +324,11 @@ class DashboardEnhancedSparklineCard extends LitElement {
   }
 
   public static getStubConfig(): SparklineCardConfig {
-    return { type: 'custom:dashboard-enhanced-sparkline-card', entity: 'sensor.example' };
+    return { type: 'custom:oriel-sparkline-card', entity: 'sensor.example' };
   }
 }
 
-customElements.define('dashboard-enhanced-sparkline-card', DashboardEnhancedSparklineCard);
+customElements.define('oriel-sparkline-card', OrielSparklineCard);
 
 declare global {
   interface Window {
@@ -337,10 +337,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-sparkline-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-sparkline-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-sparkline-card',
-    name: 'DashboardEnhanced Sparkline',
+    type: 'oriel-sparkline-card',
+    name: 'Oriel Sparkline',
     description: 'Compact tile with the entity value + a 24h history sparkline. SVG-only, no chart libraries.',
     preview: true,
   } as { type: string; name: string; description: string });

@@ -1,6 +1,6 @@
 # Dashboard Strategy — Enhanced Edition (v2.0+)
 
-A substantially improved fork of [dashboard-enhanced's dashboard strategy](https://github.com/TheRealDashboardEnhanced/dashboard-enhanced-strategy) for Home Assistant. Auto-generates views based on areas, entities, and their states — with significant additions in custom cards, configuration UI, and architectural quality.
+A substantially improved fork of [oriel's dashboard strategy](https://github.com/TheRealOriel/oriel) for Home Assistant. Auto-generates views based on areas, entities, and their states — with significant additions in custom cards, configuration UI, and architectural quality.
 
 ## What's in v2.0
 
@@ -19,9 +19,9 @@ Then create a dashboard with:
 
 ```yaml
 strategy:
-  type: custom:dashboard-enhanced
+  type: custom:oriel
 ```
 
 See [README](README.MD) for detailed configuration.
 
-Original by [@TheRealDashboardEnhanced](https://github.com/TheRealDashboardEnhanced), enhanced by [@TheDave94](https://github.com/TheDave94).
+Original by [@TheRealOriel](https://github.com/TheRealOriel), enhanced by [@TheDave94](https://github.com/TheDave94).

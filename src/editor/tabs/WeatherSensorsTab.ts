@@ -6,11 +6,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface WeatherSensorsTabContext {
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   search: string;
   entityNameMap: Map<string, string>;
   filteredEntities: Array<{ entity_id: string; name: string }>;

@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig, CustomCard, SectionKey } from '../../types/strategy';
+import type { OrielConfig, CustomCard, SectionKey } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomCardsTabContext {
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   sectionMeta: Map<SectionKey, { icon: string; labelKey: string }>;
   onHeadingChange: (value: string) => void;
   onIconChange: (value: string) => void;

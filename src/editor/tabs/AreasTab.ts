@@ -11,13 +11,13 @@
 
 import { html, type TemplateResult } from 'lit';
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import type { AreaRegistryEntry } from '../../types/registries';
 import { localize } from '../../utils/localize';
 
 export interface AreasTabContext {
   hass: HomeAssistant;
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   renderCheckbox: (
     id: string,
     label: string,
@@ -141,7 +141,7 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
       <div class="description">${localize('editor.show_door_contacts_in_rooms_desc')}</div>
 
       ${ctx.renderCheckbox(
-        'hide-unavailable-in-rooms',
+        'hioriel-unavailable-in-rooms',
         localize('editor.hide_unavailable_in_rooms'),
         c.hide_unavailable_in_rooms !== false,
         (checked) => ctx.onToggleChange('hide_unavailable_in_rooms', checked, true),

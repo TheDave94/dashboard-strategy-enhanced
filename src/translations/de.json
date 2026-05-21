@@ -3,11 +3,11 @@
     "title": "Dynamisches Dashboard"
   },
   "card": {
-    "dashboard-enhanced-summary-card": {
+    "oriel-summary-card": {
       "summary_type": "Zusammenfassungs-Typ",
       "density": "Dichte-Override"
     },
-    "dashboard-enhanced-lights-group-card": {
+    "oriel-lights-group-card": {
       "group_type": "Gruppentyp",
       "group_by_floors": "Nach Etagen gruppieren",
       "nested_groups": "Verschachtelte Lichtgruppen",
@@ -16,12 +16,12 @@
       "heading_label": "Überschrift",
       "heading_icon": "Überschrift-Icon"
     },
-    "dashboard-enhanced-covers-group-card": {
+    "oriel-covers-group-card": {
       "group_type": "Gruppentyp",
       "show_partially_open": "Teilweise-offen-Gruppe anzeigen",
       "group_by_floors": "Nach Etagen gruppieren"
     },
-    "dashboard-enhanced-zone-presence-card": {
+    "oriel-zone-presence-card": {
       "name": "Überschrift",
       "icon": "Überschrift-Icon",
       "entities": "Zonen-Entitäten"

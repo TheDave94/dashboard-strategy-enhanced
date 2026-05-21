@@ -37,7 +37,7 @@ interface Routine {
   lastUsedMs: number;
 }
 
-class DashboardEnhancedRoutinesCard extends LitElement {
+class OrielRoutinesCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   private _config!: RoutinesCardConfig;
 
@@ -106,7 +106,7 @@ class DashboardEnhancedRoutinesCard extends LitElement {
   `;
 
   public setConfig(config: RoutinesCardConfig): void {
-    this._config = config ?? { type: 'custom:dashboard-enhanced-routines-card' };
+    this._config = config ?? { type: 'custom:oriel-routines-card' };
   }
 
   public getCardSize(): number {
@@ -219,11 +219,11 @@ class DashboardEnhancedRoutinesCard extends LitElement {
   }
 
   public static getStubConfig(): RoutinesCardConfig {
-    return { type: 'custom:dashboard-enhanced-routines-card' };
+    return { type: 'custom:oriel-routines-card' };
   }
 }
 
-customElements.define('dashboard-enhanced-routines-card', DashboardEnhancedRoutinesCard);
+customElements.define('oriel-routines-card', OrielRoutinesCard);
 
 declare global {
   interface Window {
@@ -232,10 +232,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-routines-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-routines-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-routines-card',
-    name: 'DashboardEnhanced Routines',
+    type: 'oriel-routines-card',
+    name: 'Oriel Routines',
     description: 'Auto-collected scenes & scripts, ranked by last-used. One-tap trigger.',
     preview: true,
   } as { type: string; name: string; description: string });

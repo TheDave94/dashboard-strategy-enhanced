@@ -1,5 +1,5 @@
 // ====================================================================
-// dashboard-enhanced-voice-fab — floating voice-command button (v3.2.4)
+// oriel-voice-fab — floating voice-command button (v3.2.4)
 // ====================================================================
 // Wraps HA's built-in `<ha-voice-command-button>` (or an Assist API
 // trigger if the underlying element isn't registered) and anchors it
@@ -24,7 +24,7 @@ interface VoiceFabConfig {
   offset?: string;
 }
 
-class DashboardEnhancedVoiceFab extends LitElement {
+class OrielVoiceFab extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _config: VoiceFabConfig | undefined;
 
@@ -34,8 +34,8 @@ class DashboardEnhancedVoiceFab extends LitElement {
     }
     .fab {
       position: fixed;
-      bottom: var(--dashboard-enhanced-voice-fab-offset, 16px);
-      right: var(--dashboard-enhanced-voice-fab-offset, 16px);
+      bottom: var(--oriel-voice-fab-offset, 16px);
+      right: var(--oriel-voice-fab-offset, 16px);
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -66,7 +66,7 @@ class DashboardEnhancedVoiceFab extends LitElement {
   public setConfig(config: VoiceFabConfig): void {
     this._config = config;
     if (config.offset) {
-      this.style.setProperty('--dashboard-enhanced-voice-fab-offset', config.offset);
+      this.style.setProperty('--oriel-voice-fab-offset', config.offset);
     }
   }
 
@@ -117,11 +117,11 @@ class DashboardEnhancedVoiceFab extends LitElement {
   }
 
   public static getStubConfig(): VoiceFabConfig {
-    return { type: 'custom:dashboard-enhanced-voice-fab' };
+    return { type: 'custom:oriel-voice-fab' };
   }
 }
 
-customElements.define('dashboard-enhanced-voice-fab', DashboardEnhancedVoiceFab);
+customElements.define('oriel-voice-fab', OrielVoiceFab);
 
 declare global {
   interface Window {
@@ -130,10 +130,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-voice-fab')) {
+if (!window.customCards.some((c) => c.type === 'oriel-voice-fab')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-voice-fab',
-    name: 'DashboardEnhanced Voice FAB',
+    type: 'oriel-voice-fab',
+    name: 'Oriel Voice FAB',
     description: 'Floating voice-command button that calls HA Assist on tap.',
   });
 }

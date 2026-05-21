@@ -1,23 +1,23 @@
-# Dashboard Enhanced Strategy
+# Oriel
 
 Custom Lovelace Dashboard Strategy for Home Assistant. Generates dynamic dashboards from area/device/entity metadata with flexible user configuration. This project is actively used by Simons loved YouTube viewers — clean, stable code is top priority.
 
 ## Architecture
 
 **Language:** TypeScript (ES2020, strict mode)
-**Build:** Webpack → code-split chunks (main + lit + core + views + editor on-demand)
-**Distribution:** HACS-compatible (Custom Repository), deployed to `/config/www/community/dashboard-enhanced-strategy/`
+**Build:** Webpack → cooriel-split chunks (main + lit + core + views + editor on-demand)
+**Distribution:** HACS-compatible (Custom Repository), deployed to `/config/www/community/oriel/`
 
 ### Module Overview
 
 ```
 src/
-├── dashboard-enhanced-strategy.ts    # Entry point: generate(config, hass) → {title, views[]}
+├── oriel.ts    # Entry point: generate(config, hass) → {title, views[]}
 ├── Registry.ts                      # Singleton registry (synchronous init from hass object, pre-computed Maps)
 ├── types/                           # Type definitions
 │   ├── homeassistant.ts             #   HA interfaces (hass object, callWS, formatters)
 │   ├── registries.ts                #   Entity/device/area/floor registry types
-│   ├── strategy.ts                  #   DashboardEnhanced config types
+│   ├── strategy.ts                  #   Oriel config types
 │   └── lovelace.ts                  #   Lovelace card/view/section/badge types
 ├── utils/
 │   ├── entity-filter.ts             #   Entity collection (collectPersons, findWeatherEntity, findDummySensor)
@@ -49,11 +49,11 @@ src/
 Output:
 ```
 dist/
-├── dashboard-enhanced-strategy.js                        # Entry point (instant custom element registration)
-├── dashboard-enhanced-strategy-core.<hash>.js            # Registry, cards, utils
-├── dashboard-enhanced-strategy-lit.<hash>.js             # Lit framework (shared)
-├── dashboard-enhanced-strategy-views.<hash>.js           # All view strategies
-├── dashboard-enhanced-strategy-editor.<hash>.js          # Editor (lazy-loaded on demand)
+├── oriel.js                        # Entry point (instant custom element registration)
+├── oriel-core.<hash>.js            # Registry, cards, utils
+├── oriel-lit.<hash>.js             # Lit framework (shared)
+├── oriel-views.<hash>.js           # All view strategies
+├── oriel-editor.<hash>.js          # Editor (lazy-loaded on demand)
 ├── *.js.gz / *.js.br                                    # Pre-compressed variants
 └── *.LICENSE.txt                                        # License files
 ```
@@ -145,7 +145,7 @@ These files require extra care — changes here most likely cause regressions:
 
 1. Create a feature branch from `main` (e.g. `feature/climate-summary-view`)
 2. Build: `npm run build` (production) or `npm run build-dev` (with source maps)
-3. Deploy: copy `dist/` contents to `/Volumes/config/www/community/dashboard-enhanced-strategy/`
+3. Deploy: copy `dist/` contents to `/Volumes/config/www/community/oriel/`
 4. Delete stale `.gz` and `.br` files after copying (HA serves compressed over `.js` if present)
 5. Hard-refresh browser (Cmd+Shift+R). HA restart only needed for structural changes, not logic changes
 6. **Test on the live system** — always before pushing to GitHub!
@@ -185,7 +185,7 @@ The following locations must be updated for a new version:
 | File | Field | Example |
 |------|-------|---------|
 | `package.json` | `"version"` | `"1.3.0"` |
-| `src/dashboard-enhanced-strategy.ts` | `STRATEGY_VERSION` | `'1.3.0-beta.5'` |
+| `src/oriel.ts` | `STRATEGY_VERSION` | `'1.3.0-beta.5'` |
 | `package-lock.json` | updated automatically via `npm install` | — |
 | **Git tag** | create on release | `v1.3.0-beta.5` or `v1.3.0` |
 
@@ -202,7 +202,7 @@ When PRs were created against the old codebase and cannot be merged directly:
 
 Deliberate architecture decisions that should not be changed:
 
-### Code-Split Chunk Architecture (PERFORMANCE-CRITICAL)
+### Cooriel-Split Chunk Architecture (PERFORMANCE-CRITICAL)
 The bundle is deliberately split into 5 chunks:
 
 | Chunk | Contents | Size | Loads |
@@ -215,7 +215,7 @@ The bundle is deliberately split into 5 chunks:
 
 **Why:** Without code splitting, the entry point was a single large bundle. HA has a fixed 5-second timeout for custom element registration. On slow connections (Slow 4G), the JS file competes with all other HA chunks and custom cards for max. 6 browser connections. With the tiny entry point, the element registers instantly while the rest loads in the background.
 
-**Content-Hash Chunk Filenames:** Chunks include a `[contenthash:8]` in their filename (e.g. `dashboard-enhanced-strategy-core.c6a1e2e6.js`). HACS only sets its cache-busting `hacstag` on the entry file — without content hashes, browsers would serve stale cached chunks after a HACS update.
+**Content-Hash Chunk Filenames:** Chunks include a `[contenthash:8]` in their filename (e.g. `oriel-core.c6a1e2e6.js`). HACS only sets its cache-busting `hacstag` on the entry file — without content hashes, browsers would serve stale cached chunks after a HACS update.
 
 ### No Auto-Detection for Temperature/Humidity on Area Cards
 The overview area cards only show `sensor_classes` (temperature, humidity) when the user has explicitly assigned an entity in the **HA area settings** (`area.temperature_entity_id`, `area.humidity_entity_id`). No auto-detection because:
@@ -248,7 +248,7 @@ All custom cards (SummaryCard, LightsGroupCard, CoversGroupCard) use LitElement 
 Gradual alignment with the official HA Home Strategy. Reference: `../references/ha-strategies/`
 
 **Original problem:** With disabled cache + Slow 4G throttling:
-`Error: Timeout waiting for strategy element ll-strategy-dashboard-dashboard-enhanced to be registered`
+`Error: Timeout waiting for strategy element ll-strategy-dashboard-oriel to be registered`
 → HA has a fixed 5-second timeout for custom element registration. Official strategies are part of the frontend bundle (no HTTP request), custom strategies must be loaded as external JS files.
 
 **Analysis result:** The remaining timeout on Slow 4G is a browser connection limit issue (max. 6 concurrent HTTP connections per origin). HA's own frontend chunks + all installed custom cards compete for slots. The strategy JS must wait until a slot is free. We have no control over this — neither HACS nor HA offer prioritization for custom resources. On normal connections (Fast 4G+) everything works smoothly.

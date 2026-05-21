@@ -1,5 +1,5 @@
 // ====================================================================
-// DASHBOARD ENHANCED STRATEGY - EDITOR (LitElement)
+// ORIEL - EDITOR (LitElement)
 // ====================================================================
 // Single-file LitElement editor replacing the previous 4-file
 // vanilla HTMLElement + innerHTML pattern.
@@ -12,7 +12,7 @@ import yaml from 'js-yaml';
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type {
-  DashboardEnhancedStrategyConfig,
+  OrielConfig,
   CustomView,
   CustomCard,
   CustomBadge,
@@ -80,8 +80,8 @@ declare global {
 // Editor Class
 // ====================================================================
 
-class DashboardEnhancedStrategyEditor extends LitElement {
-  @state() accessor _config: DashboardEnhancedStrategyConfig = {};
+class OrielEditor extends LitElement {
+  @state() accessor _config: OrielConfig = {};
   @state() accessor _expandedAreas = new Set<string>();
   @state() accessor _expandedGroups = new Map<string, Set<string>>();
   // Setup wizard expanded/collapsed UI state. Starts inverse of
@@ -142,7 +142,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (!oldHass) this.requestUpdate();
   }
 
-  setConfig(config: DashboardEnhancedStrategyConfig): void {
+  setConfig(config: OrielConfig): void {
     if (this._isUpdatingConfig) return;
     this._config = config;
   }
@@ -1079,20 +1079,20 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     ${unsafeCSS(SETUP_TAB_CSS)}
 
     /* -- Migration banner (v3.4.3) ------------------------------------- */
-    .de-migration-banner {
+    .oriel-migration-banner {
       background: color-mix(in srgb, var(--info-color, #2196f3) 12%, transparent);
       border: 1px solid var(--info-color, #2196f3);
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 16px;
     }
-    .de-migration-title {
+    .oriel-migration-title {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
     }
-    .de-migration-row {
+    .oriel-migration-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -1100,13 +1100,13 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       padding: 8px 0;
       border-top: 1px solid color-mix(in srgb, var(--info-color, #2196f3) 30%, transparent);
     }
-    .de-migration-label { font-weight: 500; }
-    .de-migration-desc {
+    .oriel-migration-label { font-weight: 500; }
+    .oriel-migration-desc {
       color: var(--secondary-text-color);
       font-size: 0.85rem;
       margin-top: 2px;
     }
-    .de-migration-apply, .de-migration-applyall {
+    .oriel-migration-apply, .oriel-migration-applyall {
       background: var(--primary-color);
       color: var(--text-primary-color, white);
       border: none;
@@ -1115,37 +1115,37 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       cursor: pointer;
       white-space: nowrap;
     }
-    .de-migration-footer {
+    .oriel-migration-footer {
       margin-top: 10px;
       display: flex;
       justify-content: flex-end;
     }
 
     /* -- Usage suggestion banner (v3.5.1) ------------------------------ */
-    .de-usage-banner {
+    .oriel-usage-banner {
       background: color-mix(in srgb, var(--accent-color, #ff9800) 12%, transparent);
       border: 1px solid var(--accent-color, #ff9800);
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 16px;
     }
-    .de-usage-title { display: flex; align-items: center; gap: 8px; }
-    .de-usage-stats { color: var(--secondary-text-color); font-size: 0.85rem; }
-    .de-usage-body {
+    .oriel-usage-title { display: flex; align-items: center; gap: 8px; }
+    .oriel-usage-stats { color: var(--secondary-text-color); font-size: 0.85rem; }
+    .oriel-usage-body {
       margin: 8px 0;
       color: var(--secondary-text-color);
       font-size: 0.9rem;
     }
-    .de-usage-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-    .de-usage-chip {
+    .oriel-usage-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .oriel-usage-chip {
       background: var(--card-background-color);
       border: 1px solid var(--divider-color);
       border-radius: 4px;
       padding: 4px 8px;
       font-size: 0.85rem;
     }
-    .de-usage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-    .de-usage-apply {
+    .oriel-usage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .oriel-usage-apply {
       background: var(--primary-color);
       color: var(--text-primary-color, white);
       border: none;
@@ -1153,7 +1153,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       padding: 6px 14px;
       cursor: pointer;
     }
-    .de-usage-dismiss {
+    .oriel-usage-dismiss {
       background: transparent;
       color: var(--secondary-text-color);
       border: 1px solid var(--divider-color);
@@ -1260,27 +1260,27 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (!recommendation) return html``;
     const totalTaps = getTotalTaps();
     return html`
-      <div class="de-usage-banner">
-        <div class="de-usage-title">
+      <div class="oriel-usage-banner">
+        <div class="oriel-usage-title">
           <ha-icon icon="mdi:lightbulb-on-outline"></ha-icon>
           <strong>Suggested layout from your usage</strong>
-          <span class="de-usage-stats">(based on ${totalTaps} taps)</span>
+          <span class="oriel-usage-stats">(based on ${totalTaps} taps)</span>
         </div>
-        <div class="de-usage-body">
+        <div class="oriel-usage-body">
           Your most-used sections aren't currently at the top. Apply the
           suggested order or dismiss to keep the current layout.
         </div>
-        <div class="de-usage-order">
+        <div class="oriel-usage-order">
           ${recommendation.order.map(
-            (k, i) => html`<span class="de-usage-chip">${i + 1}. ${k}</span>`,
+            (k, i) => html`<span class="oriel-usage-chip">${i + 1}. ${k}</span>`,
           )}
         </div>
-        <div class="de-usage-actions">
-          <button class="de-usage-apply"
+        <div class="oriel-usage-actions">
+          <button class="oriel-usage-apply"
                   @click=${() => this._applyUsageSuggestion(recommendation.order)}>
             Apply
           </button>
-          <button class="de-usage-dismiss" @click=${this._dismissUsageSuggestion}>
+          <button class="oriel-usage-dismiss" @click=${this._dismissUsageSuggestion}>
             Dismiss
           </button>
         </div>
@@ -1295,7 +1295,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _dismissUsageSuggestion = (): void => {
-    const newConfig = { ...this._config, _usage_suggestion_dismissed: true } as DashboardEnhancedStrategyConfig;
+    const newConfig = { ...this._config, _usage_suggestion_dismissed: true } as OrielConfig;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   };
@@ -1307,26 +1307,26 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const pending = detectMigrations(this._config);
     if (pending.length === 0) return html``;
     return html`
-      <div class="de-migration-banner">
-        <div class="de-migration-title">
+      <div class="oriel-migration-banner">
+        <div class="oriel-migration-title">
           <ha-icon icon="mdi:update"></ha-icon>
           <strong>${pending.length} config update${pending.length === 1 ? '' : 's'} available</strong>
         </div>
         ${pending.map(
           (m: Migration) => html`
-            <div class="de-migration-row">
+            <div class="oriel-migration-row">
               <div>
-                <div class="de-migration-label">${m.label}</div>
-                <div class="de-migration-desc">${m.description}</div>
+                <div class="oriel-migration-label">${m.label}</div>
+                <div class="oriel-migration-desc">${m.description}</div>
               </div>
-              <button class="de-migration-apply" @click=${() => this._applyMigration(m)}>
+              <button class="oriel-migration-apply" @click=${() => this._applyMigration(m)}>
                 Apply
               </button>
             </div>
           `,
         )}
-        <div class="de-migration-footer">
-          <button class="de-migration-applyall" @click=${this._applyAllMigrations}>
+        <div class="oriel-migration-footer">
+          <button class="oriel-migration-applyall" @click=${this._applyAllMigrations}>
             Apply all
           </button>
         </div>
@@ -1364,10 +1364,10 @@ class DashboardEnhancedStrategyEditor extends LitElement {
         this.requestUpdate();
       },
       onDismiss: () => {
-        const newConfig: DashboardEnhancedStrategyConfig = {
+        const newConfig: OrielConfig = {
           ...this._config,
           _onboarding_seen: true,
-        } as DashboardEnhancedStrategyConfig;
+        } as OrielConfig;
         this._config = newConfig;
         this._setupCollapsedOverride = true;
         this._fireConfigChanged(newConfig);
@@ -1386,7 +1386,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const f = findFeature(id);
     if (!f || !f.toggle) return;
     const patch = f.toggle(enabled);
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config } as DashboardEnhancedStrategyConfig;
+    const newConfig: OrielConfig = { ...this._config } as OrielConfig;
     for (const [key, value] of Object.entries(patch)) {
       if (value === undefined) {
         delete (newConfig as Record<string, unknown>)[key];
@@ -1405,7 +1405,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _updateSectionsOrder(newOrder: SectionKey[]): void {
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       sections_order: newOrder,
     };
@@ -1484,7 +1484,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
    * `show_weather_forecast_card` field so the YAML reflects user intent.
    */
   private _setWeatherPresentation(presentation: WeatherPresentation): void {
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       weather_presentation: presentation,
     };
@@ -1502,7 +1502,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       hass: this._hass,
       config: this._config,
       order: this._getSectionsOrder(),
-      sectionMeta: DashboardEnhancedStrategyEditor._sectionMeta,
+      sectionMeta: OrielEditor._sectionMeta,
       weatherEntities: this._getWeatherEntities(),
       powerSensorEntities: this._getPowerSensorEntities(),
       isSectionDisabled: (k) => this._isSectionDisabled(k),
@@ -1530,7 +1530,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       current.delete(key as any);
     }
     const next = [...current];
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (next.length === 0) {
       delete updated.hidden_section_headings;
     } else {
@@ -1540,7 +1540,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     const current = { ...(updated.section_visibility || {}) };
     const rule = { ...(current[sectionKey] || { entity: '', state: '' }) };
     rule[field] = value.trim();
@@ -1641,7 +1641,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
         hass: this._hass,
         config: this._config,
         onChange: (patch) => {
-          const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
+          const newConfig: OrielConfig = { ...this._config, ...patch };
           for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
             if (patch[key] === undefined) {
               delete (newConfig as Record<string, unknown>)[key as string];
@@ -1660,7 +1660,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _searchCardVariantChanged(variant: 'custom' | 'tip'): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (variant === 'custom') {
       delete updated.search_card_variant;
     } else {
@@ -1680,7 +1680,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       config: this._config,
       securityExtraSlot: this._renderSecurityExtraEntitiesPicker(),
       onChange: (patch) => {
-        const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
+        const newConfig: OrielConfig = { ...this._config, ...patch };
         for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
           if (patch[key] === undefined) {
             delete (newConfig as Record<string, unknown>)[key as string];
@@ -1748,14 +1748,14 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _addSecurityExtraEntity(entityId: string): void {
     const current = this._config.security_extra_entities || [];
     if (current.includes(entityId)) return;
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config, security_extra_entities: [...current, entityId] };
+    const updated: OrielConfig = { ...this._config, security_extra_entities: [...current, entityId] };
     this._fireConfigChanged(updated);
   }
 
   private _removeSecurityExtraEntity(entityId: string): void {
     const current = this._config.security_extra_entities || [];
     const next = current.filter((e) => e !== entityId);
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (next.length === 0) delete updated.security_extra_entities;
     else updated.security_extra_entities = next;
     this._fireConfigChanged(updated);
@@ -1781,7 +1781,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _unavailableBatteriesBucketChanged(bucket: 'critical' | 'good'): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     // 'good' is now the default → omit the key when matching default
     if (bucket === 'good') {
       delete updated.unavailable_batteries_bucket;
@@ -1792,7 +1792,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _lightsSortByChanged(sortBy: 'last_changed' | 'name'): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (sortBy === 'last_changed') {
       delete updated.lights_sort_by;
     } else {
@@ -1804,14 +1804,14 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _addLightFavorite(entityId: string): void {
     const current = this._config.light_favorite_entities || [];
     if (current.includes(entityId)) return;
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config, light_favorite_entities: [...current, entityId] };
+    const updated: OrielConfig = { ...this._config, light_favorite_entities: [...current, entityId] };
     this._fireConfigChanged(updated);
   }
 
   private _removeLightFavorite(entityId: string): void {
     const current = this._config.light_favorite_entities || [];
     const next = current.filter((e) => e !== entityId);
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (next.length === 0) delete updated.light_favorite_entities;
     else updated.light_favorite_entities = next;
     this._fireConfigChanged(updated);
@@ -1935,13 +1935,13 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     const deviceClass = typeof attrs.device_class === 'string' ? attrs.device_class : undefined;
     const classDefaults = deviceClass
-      ? DashboardEnhancedStrategyEditor._DEVICE_CLASS_DEFAULTS[deviceClass]
+      ? OrielEditor._DEVICE_CLASS_DEFAULTS[deviceClass]
       : undefined;
 
     // Icon: prefer explicit entity icon → device_class map → omit
     const explicitIcon = typeof attrs.icon === 'string' ? attrs.icon : undefined;
     const icon = explicitIcon || classDefaults?.icon;
-    if (icon && DashboardEnhancedStrategyEditor._ICON_RE.test(icon)) {
+    if (icon && OrielEditor._ICON_RE.test(icon)) {
       out.icon = icon;
     }
 
@@ -1965,7 +1965,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const defaults = this._inferWeatherSensorDefaults(entityId);
     const newEntry: WeatherSensorConfig = { entity: entityId, ...defaults };
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       weather_sensors: [...current, newEntry],
     };
@@ -1978,7 +1978,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (index < 0 || index >= current.length) return;
 
     const next = [...current.slice(0, index), ...current.slice(index + 1)];
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (next.length > 0) {
       newConfig.weather_sensors = next;
     } else {
@@ -2019,7 +2019,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     const next = [...current];
     next[index] = target;
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, weather_sensors: next };
+    const newConfig: OrielConfig = { ...this._config, weather_sensors: next };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2044,7 +2044,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _roomVisibilityChanged(areaId: string, field: 'entity' | 'state', value: string): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     const current = { ...(updated.room_visibility || {}) };
     const rule = { ...(current[areaId] || { entity: '', state: '' }) };
     rule[field] = value.trim();
@@ -2088,7 +2088,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _roomPinsPositionChanged(position: 'top' | 'bottom'): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     // 'top' is the default — omit the key when it matches default to keep YAML clean
     if (position === 'top') {
       delete updated.room_pins_position;
@@ -2107,7 +2107,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       hass: this._hass,
       config: this._config,
       onChange: (patch) => {
-        const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, ...patch };
+        const newConfig: OrielConfig = { ...this._config, ...patch };
         // Strip default-equal keys so the saved config stays sparse —
         // matches _toggleChanged(key, value, false) semantics.
         for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
@@ -2125,7 +2125,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (!this._hass) return html``;
     return renderCustomCardsTab({
       config: this._config,
-      sectionMeta: DashboardEnhancedStrategyEditor._sectionMeta,
+      sectionMeta: OrielEditor._sectionMeta,
       onHeadingChange: (value) => this._customCardsHeadingChanged({ target: { value } } as unknown as Event),
       onIconChange: (value) => this._customCardsIconChanged({ target: { value } } as unknown as Event),
       onAddCard: () => this._addCustomCard(),
@@ -2547,7 +2547,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _toggleChanged(key: string, value: boolean, defaultValue: boolean): void {
     if (!this._hass) return;
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       [key]: value,
     };
@@ -2564,7 +2564,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _summariesColumnsChanged(columns: 2 | 4): void {
     if (!this._hass) return;
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       summaries_columns: columns,
     };
@@ -2578,7 +2578,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
 
   private _personBadgeLayoutChanged(layout: 'minimal' | 'with_state' | 'with_state_and_time'): void {
-    const updated: DashboardEnhancedStrategyConfig = { ...this._config };
+    const updated: OrielConfig = { ...this._config };
     if (layout === 'with_state') {
       delete updated.person_badge_layout;
     } else {
@@ -2591,7 +2591,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (!this._hass) return;
 
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       alarm_entity: entityId,
     };
@@ -2608,7 +2608,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     if (!this._hass) return;
 
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       weather_entity: entityId,
     };
@@ -2622,7 +2622,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   }
   private _powerBadgeEntityChanged = (e: Event): void => {
     const entityId = (e.target as HTMLSelectElement).value;
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (entityId) {
       newConfig.power_badge_entity = entityId;
     } else {
@@ -2634,7 +2634,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _batteryCriticalChanged(e: Event): void {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (isNaN(value) || value < 1 || value > 99) return;
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, battery_critical_threshold: value };
+    const newConfig: OrielConfig = { ...this._config, battery_critical_threshold: value };
     if (value === 20) delete newConfig.battery_critical_threshold;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
@@ -2643,7 +2643,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _batteryLowChanged(e: Event): void {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (isNaN(value) || value < 1 || value > 99) return;
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, battery_low_threshold: value };
+    const newConfig: OrielConfig = { ...this._config, battery_low_threshold: value };
     if (value === 50) delete newConfig.battery_low_threshold;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
@@ -2666,7 +2666,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const currentFavorites: string[] = Array.isArray(existing) ? existing : [];
     if (currentFavorites.includes(entityId)) return;
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       favorite_entities: [...currentFavorites, entityId],
     };
@@ -2681,7 +2681,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const currentFavorites: string[] = Array.isArray(existing) ? existing : [];
     const newFavorites = currentFavorites.filter((id) => id !== entityId);
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       favorite_entities: newFavorites.length > 0 ? newFavorites : undefined,
     };
@@ -2708,7 +2708,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const currentPins = this._config.room_pin_entities || [];
     if (currentPins.includes(entityId)) return;
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       room_pin_entities: [...currentPins, entityId],
     };
@@ -2722,7 +2722,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const currentPins = this._config.room_pin_entities || [];
     const newPins = currentPins.filter((id) => id !== entityId);
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       room_pin_entities: newPins.length > 0 ? newPins : undefined,
     };
@@ -2747,7 +2747,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       parsed_config: undefined,
     } as CustomView);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: OrielConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2756,7 +2756,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const customViews: CustomView[] = [...(this._config.custom_views || [])];
     customViews.splice(index, 1);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (customViews.length === 0) {
       delete newConfig.custom_views;
     } else {
@@ -2773,7 +2773,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     customViews[index] = { ...customViews[index], [field]: value };
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: OrielConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2805,7 +2805,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     customViews[index] = updated;
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_views: customViews };
+    const newConfig: OrielConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2814,7 +2814,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
   private _customCardsHeadingChanged(e: Event): void {
     const value = (e.target as HTMLInputElement).value.trim();
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (value) {
       newConfig.custom_cards_heading = value;
     } else {
@@ -2826,7 +2826,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
   private _customCardsIconChanged(e: Event): void {
     const value = (e.target as HTMLInputElement).value.trim();
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (value) {
       newConfig.custom_cards_icon = value;
     } else {
@@ -2840,7 +2840,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
     customCards.push({ title: '', yaml: '', parsed_config: undefined } as CustomCard);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: OrielConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2849,7 +2849,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const customCards: CustomCard[] = [...(this._config.custom_cards || [])];
     customCards.splice(index, 1);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (customCards.length === 0) {
       delete newConfig.custom_cards;
     } else {
@@ -2866,7 +2866,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     customCards[index] = { ...customCards[index], [field]: value };
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: OrielConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2898,7 +2898,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     customCards[index] = updated;
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_cards: customCards };
+    const newConfig: OrielConfig = { ...this._config, custom_cards: customCards };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2908,7 +2908,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _addCustomSection(): void {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     sections.push({ key: '', heading: '', yaml: '', parsed_config: undefined });
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: OrielConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2916,7 +2916,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   private _removeCustomSection(index: number): void {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     sections.splice(index, 1);
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (sections.length === 0) delete newConfig.custom_sections;
     else newConfig.custom_sections = sections;
     this._config = newConfig;
@@ -2927,7 +2927,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const sections: CustomSection[] = [...(this._config.custom_sections || [])];
     if (!sections[index]) return;
     sections[index] = { ...sections[index], [field]: value };
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: OrielConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2958,7 +2958,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       updated.parsed_config = undefined;
     }
     sections[index] = updated;
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_sections: sections };
+    const newConfig: OrielConfig = { ...this._config, custom_sections: sections };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2969,7 +2969,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
     customBadges.push({ yaml: '', parsed_config: undefined } as CustomBadge);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_badges: customBadges };
+    const newConfig: OrielConfig = { ...this._config, custom_badges: customBadges };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -2978,7 +2978,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const customBadges: CustomBadge[] = [...(this._config.custom_badges || [])];
     customBadges.splice(index, 1);
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config };
+    const newConfig: OrielConfig = { ...this._config };
     if (customBadges.length === 0) {
       delete newConfig.custom_badges;
     } else {
@@ -3016,7 +3016,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
     customBadges[index] = updated;
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, custom_badges: customBadges };
+    const newConfig: OrielConfig = { ...this._config, custom_badges: customBadges };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }
@@ -3042,7 +3042,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       this._areaEntitiesCache.delete(areaId);
     }
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       areas_display: {
         ...this._config.areas_display,
@@ -3190,7 +3190,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       delete newAreasOptions[areaId];
     }
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       areas_options: newAreasOptions,
     };
@@ -3257,7 +3257,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
       delete newAreasOptions[areaId];
     }
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       areas_options: newAreasOptions,
     };
@@ -3313,7 +3313,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     const newAreasOptions: Record<string, any> = { ...this._config.areas_options, [areaId]: newAreaOptions };
     if (Object.keys(newAreasOptions[areaId]).length === 0) delete newAreasOptions[areaId];
 
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, areas_options: newAreasOptions };
+    const newConfig: OrielConfig = { ...this._config, areas_options: newAreasOptions };
     if (newConfig.areas_options && Object.keys(newConfig.areas_options).length === 0) delete newConfig.areas_options;
 
     this._config = newConfig;
@@ -3424,7 +3424,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
 
   private _updateAreaOrder(newOrder: string[]): void {
 
-    const newConfig: DashboardEnhancedStrategyConfig = {
+    const newConfig: OrielConfig = {
       ...this._config,
       areas_display: {
         ...this._config.areas_display,
@@ -3501,7 +3501,7 @@ class DashboardEnhancedStrategyEditor extends LitElement {
     currentList.splice(dropIndex, 0, draggedId);
 
     const key = listType === 'favorites' ? 'favorite_entities' : 'room_pin_entities';
-    const newConfig: DashboardEnhancedStrategyConfig = { ...this._config, [key]: currentList };
+    const newConfig: OrielConfig = { ...this._config, [key]: currentList };
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   };
@@ -3510,11 +3510,11 @@ class DashboardEnhancedStrategyEditor extends LitElement {
   // CONFIG DISPATCH
   // ====================================================================
 
-  private _fireConfigChanged(config: DashboardEnhancedStrategyConfig): void {
+  private _fireConfigChanged(config: OrielConfig): void {
     this._isUpdatingConfig = true;
 
     // Strip internal fields before saving
-    const cleanConfig: DashboardEnhancedStrategyConfig = { ...config };
+    const cleanConfig: OrielConfig = { ...config };
     if (cleanConfig.custom_views) {
       cleanConfig.custom_views = cleanConfig.custom_views.map((cv) => {
         const clean = { ...cv };
@@ -3683,7 +3683,7 @@ function getAreaBadgeCandidates(areaId: string, hass: HomeAssistant): string[] {
   return candidates;
 }
 
-function getAdditionalBadgesForArea(areaId: string, config: DashboardEnhancedStrategyConfig): string[] {
+function getAdditionalBadgesForArea(areaId: string, config: OrielConfig): string[] {
   return config.areas_options?.[areaId]?.groups_options?.badges?.additional || [];
 }
 
@@ -3741,7 +3741,7 @@ function getDefaultShowNameEntities(badgeCandidates: string[], hass: HomeAssista
 
 function getBadgeNamesConfig(
   areaId: string,
-  config: DashboardEnhancedStrategyConfig
+  config: OrielConfig
 ): { namesVisible: string[]; namesHidden: string[] } {
   const opts = config.areas_options?.[areaId]?.groups_options?.badges;
   return {
@@ -3750,7 +3750,7 @@ function getBadgeNamesConfig(
   };
 }
 
-function getHiddenEntitiesForArea(areaId: string, config: DashboardEnhancedStrategyConfig): Record<string, string[]> {
+function getHiddenEntitiesForArea(areaId: string, config: OrielConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};
@@ -3766,7 +3766,7 @@ function getHiddenEntitiesForArea(areaId: string, config: DashboardEnhancedStrat
   return hidden;
 }
 
-function getEntityOrdersForArea(areaId: string, config: DashboardEnhancedStrategyConfig): Record<string, string[]> {
+function getEntityOrdersForArea(areaId: string, config: OrielConfig): Record<string, string[]> {
   const areaOptions = config.areas_options?.[areaId];
   if (!areaOptions || !areaOptions.groups_options) {
     return {};
@@ -3783,4 +3783,4 @@ function getEntityOrdersForArea(areaId: string, config: DashboardEnhancedStrateg
 }
 
 // Register custom element
-customElements.define('dashboard-enhanced-strategy-editor', DashboardEnhancedStrategyEditor);
+customElements.define('oriel-editor', OrielEditor);

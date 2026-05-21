@@ -1,7 +1,7 @@
 // ====================================================================
 // Areas Section Builder
 // ====================================================================
-// Ported from dist/utils/dashboard-enhanced-section-builder.js (createAreasSection)
+// Ported from dist/utils/oriel-section-builder.js (createAreasSection)
 // with full TypeScript types.
 // Creates area cards grouped by floor or as a single flat section.
 // ====================================================================

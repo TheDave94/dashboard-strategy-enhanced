@@ -72,7 +72,7 @@ const COLOR_MAP: Record<string, string> = {
   grey: 'var(--disabled-color, #bdbdbd)',
 };
 
-class DashboardEnhancedSummaryCard extends LitElement {
+class OrielSummaryCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _count = 0;
   // Yesterday's count at the same time, when `show_delta: true`.
@@ -90,46 +90,46 @@ class DashboardEnhancedSummaryCard extends LitElement {
       cursor: pointer;
       /* Container queries scale to the tile's actual rendered width. */
       container-type: inline-size;
-      container-name: de-summary;
+      container-name: oriel-summary;
 
-      --de-pad: var(--ha-space-3, 12px);
-      --de-gap: var(--ha-space-2, 8px);
-      --de-icon: 28px;
-      --de-name: var(--ha-font-size-s, 13px);
+      --oriel-pad: var(--ha-space-3, 12px);
+      --oriel-gap: var(--ha-space-2, 8px);
+      --oriel-icon: 28px;
+      --oriel-name: var(--ha-font-size-s, 13px);
     }
     /* Narrow (< 160px wide cell): half-summary in a 4-col strip. */
-    @container de-summary (max-width: 160px) {
+    @container oriel-summary (max-width: 160px) {
       :host {
-        --de-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
-        --de-gap: var(--ha-space-3, 10px);
-        --de-icon: 24px;
+        --oriel-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px);
+        --oriel-gap: var(--ha-space-3, 10px);
+        --oriel-icon: 24px;
       }
     }
     /* Wide (> 280px): summary card in a generous lane. */
-    @container de-summary (min-width: 280px) {
+    @container oriel-summary (min-width: 280px) {
       :host {
-        --de-icon: 32px;
+        --oriel-icon: 32px;
       }
     }
     /* Manual overrides win against the container queries. */
     :host([density="compact"]) {
-      --de-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px) !important;
-      --de-gap: var(--ha-space-3, 10px) !important;
-      --de-icon: 26px !important;
+      --oriel-pad: var(--ha-space-2, 10px) var(--ha-space-3, 14px) !important;
+      --oriel-gap: var(--ha-space-3, 10px) !important;
+      --oriel-icon: 26px !important;
     }
     :host([density="comfortable"]) {
-      --de-pad: var(--ha-space-3, 12px) !important;
-      --de-gap: var(--ha-space-2, 8px) !important;
-      --de-icon: 28px !important;
+      --oriel-pad: var(--ha-space-3, 12px) !important;
+      --oriel-gap: var(--ha-space-2, 8px) !important;
+      --oriel-icon: 28px !important;
     }
     ha-card {
-      padding: var(--de-pad);
+      padding: var(--oriel-pad);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
       height: 100%;
       box-sizing: border-box;
       --ha-card-border-width: 0;
@@ -149,14 +149,14 @@ class DashboardEnhancedSummaryCard extends LitElement {
       transition: transform 0.1s;
     }
     .icon {
-      --mdc-icon-size: var(--de-icon);
+      --mdc-icon-size: var(--oriel-icon);
       transition: color 0.3s;
     }
     :host([density="compact"]) .icon {
       flex: 0 0 auto;
     }
     .name {
-      font-size: var(--de-name);
+      font-size: var(--oriel-name);
       font-weight: var(--ha-font-weight-medium, 500);
       line-height: var(--ha-line-height-condensed, 1.2);
       color: var(--primary-text-color);
@@ -189,13 +189,13 @@ class DashboardEnhancedSummaryCard extends LitElement {
     // editor surfaces the error inline instead of silently rendering
     // an empty count.
     if (!config || typeof config !== 'object') {
-      throw new Error('dashboard-enhanced-summary-card: config object required');
+      throw new Error('oriel-summary-card: config object required');
     }
     if (
       !['lights', 'covers', 'security', 'batteries', 'climate'].includes(config.summary_type)
     ) {
       throw new Error(
-        "dashboard-enhanced-summary-card: summary_type must be one of 'lights' | 'covers' | 'security' | 'batteries' | 'climate'",
+        "oriel-summary-card: summary_type must be one of 'lights' | 'covers' | 'security' | 'batteries' | 'climate'",
       );
     }
     this._config = config;
@@ -527,7 +527,7 @@ class DashboardEnhancedSummaryCard extends LitElement {
     // Bind HA's global <action-handler> custom element to the
     // ha-card once, so tap/hold/double-tap all dispatch a single
     // @action event with `detail.action` set. Same pattern as
-    // ZonePresenceCard — see /tmp/dashboard_enhanced_audit_2026.md §2.2 for
+    // ZonePresenceCard — see /tmp/oriel_audit_2026.md §2.2 for
     // the rationale (raw @click loses keyboard + hold).
     if (!changed.has('hass') && !changed.has('_config')) return;
     const card = this.shadowRoot?.querySelector<HTMLElement>('ha-card');
@@ -652,17 +652,17 @@ class DashboardEnhancedSummaryCard extends LitElement {
           },
         },
       ],
-      'card.dashboard-enhanced-summary-card',
+      'card.oriel-summary-card',
     );
   }
 }
 
-customElements.define('dashboard-enhanced-summary-card', DashboardEnhancedSummaryCard);
+customElements.define('oriel-summary-card', OrielSummaryCard);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'dashboard-enhanced-summary-card',
-  name: 'DashboardEnhanced Summary Card',
+  type: 'oriel-summary-card',
+  name: 'Oriel Summary Card',
   description: 'Reactive summary tile that counts entities (lights / covers / security / batteries / climate)',
   preview: true,
 } as { type: string; name: string; description: string });

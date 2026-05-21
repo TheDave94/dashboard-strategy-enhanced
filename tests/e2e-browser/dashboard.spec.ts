@@ -60,7 +60,7 @@ test.describe('dashboard rendering', () => {
     // Give the strategy.generate() promise a chance to settle.
     await page.waitForTimeout(2_500);
 
-    // Snapshot rendered output and look for at least one dashboard-enhanced card.
+    // Snapshot rendered output and look for at least one oriel card.
     const root = page.locator('home-assistant');
     await expect(root).toBeAttached();
     // Drill into the shadow tree: home-assistant → ha-drawer →
@@ -81,7 +81,7 @@ test.describe('dashboard rendering', () => {
         walk(root);
         return out;
       }
-      const cards = findInShadow(document, 'dashboard-enhanced-zone-presence-card, dashboard-enhanced-summary-card, dashboard-enhanced-lights-group-card, dashboard-enhanced-covers-group-card');
+      const cards = findInShadow(document, 'oriel-zone-presence-card, oriel-summary-card, oriel-lights-group-card, oriel-covers-group-card');
       return cards.map((c) => c.tagName.toLowerCase());
     });
 
@@ -112,7 +112,7 @@ test.describe('dashboard rendering', () => {
     );
 
     // eslint-disable-next-line no-console
-    console.log(`[e2e] matched dashboard-enhanced cards: ${JSON.stringify(cardMatches)}`);
+    console.log(`[e2e] matched oriel cards: ${JSON.stringify(cardMatches)}`);
     // eslint-disable-next-line no-console
     console.log(`[e2e] console errors (filtered): ${realErrors.length}`);
 

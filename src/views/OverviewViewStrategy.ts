@@ -7,7 +7,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig, CustomCard, CustomSection } from '../types/strategy';
+import type { OrielConfig, CustomCard, CustomSection } from '../types/strategy';
 import { DEFAULT_SECTIONS_ORDER } from '../types/strategy';
 import type { LovelaceViewConfig, LovelaceSectionConfig, LovelaceBadgeConfig, LovelaceCardConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
@@ -129,16 +129,16 @@ function renderCustomCards(cards: CustomCard[]): LovelaceCardConfig[] {
 }
 
 interface OverviewViewStrategyParams {
-  dashboardConfig?: DashboardEnhancedStrategyConfig;
+  dashboardConfig?: OrielConfig;
 }
 
-class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
+class OrielViewOverview extends HTMLElement {
   static async generate(
     config: OverviewViewStrategyParams,
     hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
     timeStart('overview-generate');
-    const dashboardConfig: DashboardEnhancedStrategyConfig = config.dashboardConfig || {};
+    const dashboardConfig: OrielConfig = config.dashboardConfig || {};
 
     // Initialize Registry (idempotent — skips if already done by another view)
     Registry.initialize(hass, dashboardConfig);
@@ -266,7 +266,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
     // Per-section conditional visibility (e.g. show agenda only on workdays).
     const sectionVisibility = dashboardConfig.section_visibility || {};
 
-    // Mode-driven section ordering (roadmap C4). If
+    // Mooriel-driven section ordering (roadmap C4). If
     // `sections_order_by_mode` is configured AND the strategy's
     // house_mode_entity is set AND the entity's current state
     // matches a key (case- and underscore-insensitive), use that
@@ -326,7 +326,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
 
     // Lazy-mount sections beyond the initial viewport (Roadmap C7).
     // First N sections render eagerly; beyond N, each card is wrapped
-    // in a `dashboard-enhanced-lazy-card` that defers mounting until the
+    // in a `oriel-lazy-card` that defers mounting until the
     // IntersectionObserver fires. Threshold default 3 sections.
     // Opt-out via `dashboardConfig.lazy_sections: false`.
     const lazyEnabled = dashboardConfig.lazy_sections !== false;
@@ -340,7 +340,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
           // visible-but-deferred would create a "stub" effect.
           if (card.type === 'heading') return card;
           return {
-            type: 'custom:dashboard-enhanced-lazy-card',
+            type: 'custom:oriel-lazy-card',
             card,
           } as LovelaceCardConfig;
         });
@@ -348,7 +348,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
     }
 
     // Routines section — when `show_routines_section: true`, append
-    // a `dashboard-enhanced-routines-card` (auto-collects scene + script entities
+    // a `oriel-routines-card` (auto-collects scene + script entities
     // ranked by last_changed). Skipped silently if no routines exist.
     if (dashboardConfig.show_routines_section === true) {
       overviewSections.push({
@@ -361,7 +361,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
             icon: 'mdi:script-text-play',
           },
           {
-            type: 'custom:dashboard-enhanced-routines-card',
+            type: 'custom:oriel-routines-card',
             max: dashboardConfig.routines_max ?? 8,
             grid_options: { columns: 'full', rows: 'auto' },
           } as LovelaceCardConfig,
@@ -369,7 +369,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
       });
     }
 
-    // Notification banner — prepend a `dashboard-enhanced-notification-card` to
+    // Notification banner — prepend a `oriel-notification-card` to
     // the overview when notification_triggers are configured. The
     // card auto-hides when no trigger is active, sticky-positions
     // itself when something fires. Always emitted (cost is one tiny
@@ -382,7 +382,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:dashboard-enhanced-notification-card',
+            type: 'custom:oriel-notification-card',
             triggers: dashboardConfig.notification_triggers,
             grid_options: { columns: 'full', rows: 'auto' },
           } as LovelaceCardConfig,
@@ -439,7 +439,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:dashboard-enhanced-voice-fab',
+            type: 'custom:oriel-voice-fab',
             grid_options: { columns: 'full', rows: 0 },
           } as LovelaceCardConfig,
         ],
@@ -456,7 +456,7 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:dashboard-enhanced-screensaver-card',
+            type: 'custom:oriel-screensaver-card',
             idle_minutes: dashboardConfig.panel_screensaver_after_minutes ?? 5,
             ...(dashboardConfig.panel_screensaver_entity
               ? { entity: dashboardConfig.panel_screensaver_entity }
@@ -612,4 +612,4 @@ class DashboardEnhancedViewOverviewStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-overview', DashboardEnhancedViewOverviewStrategy);
+customElements.define('ll-strategy-view-oriel-overview', OrielViewOverview);

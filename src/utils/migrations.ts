@@ -7,7 +7,7 @@
 // once) so the banner can re-show after rejected migration.
 // ====================================================================
 
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 
 export interface Migration {
   /** Stable id; used to suppress already-applied migrations. */
@@ -17,9 +17,9 @@ export interface Migration {
   /** Human-readable description of what changes. */
   description: string;
   /** Return true if the config has the deprecated shape. */
-  detect: (config: DashboardEnhancedStrategyConfig) => boolean;
+  detect: (config: OrielConfig) => boolean;
   /** Return a new config with the migration applied. */
-  apply: (config: DashboardEnhancedStrategyConfig) => DashboardEnhancedStrategyConfig;
+  apply: (config: OrielConfig) => OrielConfig;
 }
 
 export const MIGRATIONS: Migration[] = [
@@ -31,7 +31,7 @@ export const MIGRATIONS: Migration[] = [
       'Equivalent meaning, clearer name, matches the field surfaced in the editor.',
     detect: (config) => 'show_weather_forecast_card' in config,
     apply: (config) => {
-      const out = { ...config } as DashboardEnhancedStrategyConfig & {
+      const out = { ...config } as OrielConfig & {
         show_weather_forecast_card?: boolean;
       };
       // Only set weather_presentation if not already explicit — explicit
@@ -58,12 +58,12 @@ export const MIGRATIONS: Migration[] = [
 ];
 
 /** Return migrations whose `detect` matches the current config. */
-export function detectMigrations(config: DashboardEnhancedStrategyConfig): Migration[] {
+export function detectMigrations(config: OrielConfig): Migration[] {
   return MIGRATIONS.filter((m) => m.detect(config));
 }
 
 /** Apply every detected migration in registry order. Returns new config. */
-export function applyAllMigrations(config: DashboardEnhancedStrategyConfig): DashboardEnhancedStrategyConfig {
+export function applyAllMigrations(config: OrielConfig): OrielConfig {
   let out = config;
   for (const m of MIGRATIONS) {
     if (m.detect(out)) out = m.apply(out);

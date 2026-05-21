@@ -1,93 +1,123 @@
-# Migration guide
+# Migrating from the Simon42 Dashboard Strategy → Oriel Dashboard
 
-Upgrade notes for users moving between major versions. Reverse-chronological — read top-down to skip ahead.
+This guide is for users coming from the **upstream [TheRealSimon42/simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy)** plugin who want to switch to Oriel Dashboard. The two share a common ancestor but have diverged: different feature set, different identifiers, different release cadence. Switching is a one-time YAML edit + a HACS swap.
 
-## v1.x → v2.0+
+> Migrating from a previous Oriel release? Versions before v4.1.0 used different brand names — see git history. Easiest path: uninstall the old version, reinstall, run the Setup wizard.
 
-The v2.0 release diverged substantially from the dashboard-enhanced upstream and introduced changes that aren't backward-compatible with v1.x. If you're coming from a v1.x install (HACS will offer the upgrade), here's what to expect.
+---
 
-### Home Assistant version
+## What Oriel adds on top of Simon42
 
-- **Minimum HA version is now 2026.5.0.** v1.x ran on 2024.7+. Upgrade HA first if you're on an older version; HACS will warn you.
+If you're weighing whether to switch, here are the headline features that aren't in the upstream:
 
-### Element name conventions (HA-internal, transparent to most users)
+- **Setup wizard** in the editor — auto-detects installed HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card) and surfaces every advanced feature with an install hint when missing.
+- **Per-user / per-role dashboards** — different layouts per HA user or label.
+- **Density / viewport presets** — `density: compact | cozy | comfortable` as a single config knob.
+- **Mode-driven section reorder** — `sections_order_by_mode` reshuffles sections based on `input_select.house_mode`.
+- **Composable visibility rules** — `role`, `time_after/before`, `mode_entity/mode_is`, `any[]`, `all[]` predicates per section.
+- **Wall-panel mode** — `panel_mode: wall` + screensaver, for tablet installs.
+- **Lazy-mounting** — sections below the fold defer state subscriptions until scrolled into view.
+- **Per-area room view overrides** — `areas_options.<area>.room_view_overrides` customises one room's layout while the rest stay auto-generated.
+- **Plugin extension API** — `window.oriel.registerSection(...)` for third-party plugins.
+- **Migration assistants** in the editor — a banner offers one-tap apply when deprecated fields are detected.
+- **Adaptive state-iconography** — locks, covers, garage doors emit state-distinct glyphs.
+- **History sparklines** — `oriel-sparkline-card` for inline 24h trends, optionally backed by ApexCharts.
+- **Routines section** — auto-collects scenes + scripts ranked by last-used.
+- **Notification banners** — sticky surface for smoke / leak / doorbell triggers.
+- **Today-vs-yesterday tile overlays** — delta indicators on summary tiles.
+- **Voice FAB** — floating voice-command button via HA Assist.
+- **Mobile swipe-gesture navigation** — opt-in via `swipe_nav: true`.
+- **Per-device-class favorites** — viewport-keyed favorite lists (`phone` / `tablet` / `wall`).
+- **Energy cost overlay feature** — per-tile €/h reading from power × tariff.
 
-- The legacy element registration `ll-strategy-dashboard-enhanced-dashboard` was removed. Only `ll-strategy-dashboard-dashboard-enhanced` remains (the canonical naming HA enforces in 2026.5+).
-- View strategies renamed from `ll-strategy-dashboard-enhanced-view-*` → `ll-strategy-view-dashboard-enhanced-view-*`.
+Mostly additive, but the identifier rename below is a hard break.
 
-**You don't need to update anything.** Existing dashboards using `type: custom:dashboard-enhanced` keep working — the strategy type name is unchanged for backwards compatibility.
+---
 
-### Config field renames
+## Step 1 — install Oriel Dashboard via HACS
 
-Two legacy field names were removed. If your YAML uses them, rename:
+1. HACS → Frontend → ⋮ menu → "Custom repositories"
+2. Add `https://github.com/TheDave94/dashboard-strategy-enhanced` as type "Lovelace"
+3. Install **Oriel Dashboard** (that's the display name)
+4. Reload HA after install (HACS prompts you)
 
-| Old (v1.x) | New (v2.0+) |
+You can keep the upstream Simon42 plugin installed alongside during the migration — they don't share custom element names, so there's no collision. Uninstall Simon42 once your dashboard works on Oriel.
+
+---
+
+## Step 2 — update your dashboard YAML
+
+The strategy type and every custom card tag changed. Edit your dashboard config (Settings → Dashboards → ⋮ → Edit raw configuration) and apply these replacements:
+
+### Strategy type
+
+```diff
+ strategy:
+-  type: custom:simon42-dashboard
++  type: custom:oriel
+   show_clock_card: true
+   …
+```
+
+### Custom card / feature tags
+
+If your dashboard config references any of these — most commonly inside `custom_cards`, `favorites_cards`, or hand-written `custom_views` — apply the same prefix swap:
+
+| Simon42 tag | Oriel tag |
 |---|---|
-| `areas_options.<area>.pin_zone_presence_to_favorites_entities` | `areas_options.<area>.presence_entities` |
-| `summary_card_density: 'compact'` | `dashboard_density: 'compact'` |
+| `custom:simon42-summary-card` | `custom:oriel-summary-card` |
+| `custom:simon42-zone-presence-card` | `custom:oriel-zone-presence-card` |
+| `custom:simon42-lights-group-card` | `custom:oriel-lights-group-card` |
+| `custom:simon42-covers-group-card` | `custom:oriel-covers-group-card` |
+| `custom:simon42-sticky-lock-feature` | `custom:oriel-sticky-lock-feature` |
 
-The new `presence_entities` field is now the single source of truth for both the favorites pin AND the Room view's zone-presence card. Set it once per area and both surfaces consume it.
+If you weren't using any of those by hand, you don't need to touch this — the strategy emits them itself.
 
-The new `dashboard_density` field is the manual override for all custom cards. By default cards now auto-scale via CSS container queries — most users can drop both old fields and let containers handle it.
+### Everything else stays the same
 
-### New configuration surface
+Every config field (`show_clock_card`, `areas_options`, `favorite_entities`, `custom_cards`, `weather_presentation`, …) has the same name and the same shape. The strategy reads them identically.
 
-v2.0 added several new optional fields. Everything defaults to off, so existing dashboards aren't affected.
+---
 
-- **`areas_options.<area>.presence_entities`** — curated zone list per area, with per-entry `{entity, icon, color}` overrides.
-- **`dashboard_density: 'compact' | 'comfortable'`** — global density override.
-- Various opt-in header badges (`show_unavailable_alert_badge`, `show_now_playing_badge`, `show_sun_badge`, `show_updates_badge`, `power_badge_entity`).
-- Six opt-in overview sections (`show_plants_section`, `show_agenda_section`, `show_todos_section`, `show_persons_section`, `show_vacuums_section`, `show_maintenance_section`).
-- Custom content collections (`custom_cards`, `custom_sections`, `custom_badges`, `custom_views`).
+## Step 3 — verify
 
-All of these are configurable via the visual editor — open Edit dashboard, no YAML required.
+Hard-refresh your browser (Cmd/Ctrl+Shift+R). You should see:
 
-### Custom cards now available standalone
+- The dashboard renders with the same sections.
+- The strategy editor (Edit dashboard → strategy options) now has a **Setup wizard** panel at the top showing every advanced feature, with HACS install hints where applicable.
+- The runtime version logs `Oriel Dashboard vX.Y.Z loaded` in the browser console.
 
-The five custom elements the strategy emits internally — `dashboard-enhanced-summary-card`, `dashboard-enhanced-zone-presence-card`, `dashboard-enhanced-lights-group-card`, `dashboard-enhanced-covers-group-card`, `dashboard-enhanced-sticky-lock-feature` — are now also pickable from HA's "Add card" picker. Each has a visual `<ha-form>` config editor.
+If the dashboard shows "Custom element doesn't exist" placeholders, you missed a `custom:simon42-*` reference somewhere in the YAML. Search the raw config for `simon42-` and replace each hit with `oriel-`.
 
-If you want one of these cards outside a strategy-managed dashboard, just pick it from the picker. Existing strategy dashboards keep using them automatically.
+---
 
-### Visual / behavioural
+## What if I want to roll back?
 
-- Container-query scaling means cards auto-size to their cell. The same card looks different in the favorites pin (compact) vs. a wide section (generous). This is intentional.
-- Custom cards now use HA's design tokens (`--ha-space-*`, `--ha-card-*`, `--ha-font-*`) so themes can re-skin them.
-- Lights / covers / presence groups now have configurable item icons + colors.
-- aria-labels are localized (en/de). No more English labels showing on German HAs.
+The migration is a YAML edit, not a destructive operation. To revert:
 
-### Repo URL
+1. Edit dashboard YAML, replace `custom:oriel*` back to `custom:simon42*` everywhere.
+2. HACS → Frontend → Oriel Dashboard → ⋮ → Remove.
+3. Hard-refresh.
 
-The repository was renamed `TheDave94/dashboard-enhanced-strategy` → `TheDave94/dashboard-strategy-enhanced`. GitHub keeps a redirect, so existing HACS installs and external links keep working. New installs should reference the new URL.
+Your existing Simon42 install (if you didn't uninstall it in step 1) picks back up.
 
-The package on HACS still ships as `dashboard-enhanced-strategy.js` — the filename is unchanged for backwards compat.
+---
 
-### Performance
+## Surface that changed — power-user reference
 
-Bundle sizes (gzipped) on v2.1.x:
+For YAML power users, card-mod users, plugin authors. Most users can skip this section.
 
-| Chunk | Size |
-|---|---|
-| main | 2 KB |
-| lit | 6 KB |
-| views | 5 KB |
-| core | 32 KB |
-| editor | 31 KB |
-
-The editor chunk lazy-loads only when you open the visual editor, so day-to-day dashboard rendering pulls ~45 KB.
-
-### Reporting bugs / requesting features
-
-[github.com/TheDave94/dashboard-strategy-enhanced/issues](https://github.com/TheDave94/dashboard-strategy-enhanced/issues). Mention your HA version + a screenshot of the issue.
-
-## Coming in v2.2
-
-- **Lit 4 readiness:** internal migration to stage-3 decorator syntax (`@property accessor`). No user-visible change; sets us up for Lit 4 when it ships (likely 2027+, gated on browser support for native decorators).
-- **`getCreateSuggestions`:** HA's "Add card" picker will surface curated starting configs.
-- **More test coverage:** render-output tests + container-query visual regression.
-
-## Coming in v3.0 (speculative)
-
-- Plugin extension API: let other HACS plugins register sections / badges into the strategy's overview.
-- Migration to ha-form for the remaining option-A editor tabs once we've nailed the per-row picker patterns in HA itself.
-
-No fixed timeline on either — driven by user feedback and HA's own roadmap.
+| Concept | Simon42 | Oriel |
+|---|---|---|
+| Strategy type | `custom:simon42-dashboard` | `custom:oriel` |
+| Custom card prefix | `simon42-*` | `oriel-*` |
+| Custom feature prefix | `simon42-*-feature` | `oriel-*-feature` |
+| HA strategy view registration | `ll-strategy-view-simon42-view-*` | `ll-strategy-view-oriel-*` |
+| HA strategy registration | `ll-strategy-dashboard-simon42-dashboard` | `ll-strategy-dashboard-oriel` |
+| Editor element | `simon42-dashboard-strategy-editor` | `oriel-editor` |
+| Plugin extension API | n/a | `window.oriel.registerSection / registerBadge` |
+| CSS custom properties (for card-mod) | `--s42-*` | `--oriel-*` |
+| Debug URL param | `?s42_debug=1` | `?oriel_debug=1` |
+| Console log prefix | `[simon42]`, `[s42-perf]` | `[oriel]`, `[oriel-perf]` |
+| localStorage keys | — | `oriel_usage_v1`, `oriel_anomaly_v1` |
+| TypeScript classes (plugin authors) | `Simon42*` | `Oriel*` (no `Strategy` suffix) |

@@ -22,12 +22,12 @@ interface HaFormSchemaItem {
 
 export interface SimpleConfigEditorConfig {
   schema: HaFormSchemaItem[];
-  /** Translation key prefix for labels (e.g. `card.dashboard-enhanced-summary-card`). */
+  /** Translation key prefix for labels (e.g. `card.oriel-summary-card`). */
   labelPrefix: string;
 }
 
 /**
- * Build a one-off `<dashboard-enhanced-simple-config-editor>` element configured
+ * Build a one-off `<oriel-simple-config-editor>` element configured
  * with the given schema + label prefix. Each custom card constructs
  * its own instance from `getConfigElement()`.
  */
@@ -35,7 +35,7 @@ export function createSimpleConfigEditor(
   schema: HaFormSchemaItem[],
   labelPrefix: string,
 ): HTMLElement {
-  const tag = 'dashboard-enhanced-simple-config-editor';
+  const tag = 'oriel-simple-config-editor';
   if (!customElements.get(tag)) {
     customElements.define(tag, SimpleConfigEditorElement);
   }

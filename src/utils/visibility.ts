@@ -12,7 +12,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 
 /**
  * One visibility predicate. Any subset of fields may be set; all
@@ -155,7 +155,7 @@ export function makeVisibilityChecker(
  * old shape (each entry was `{entity, state}` only) transparently.
  */
 export function getSectionVisibilityChecker(
-  config: DashboardEnhancedStrategyConfig,
+  config: OrielConfig,
   hass: HomeAssistant,
 ): (key: string) => boolean {
   return makeVisibilityChecker(
@@ -168,7 +168,7 @@ export function getSectionVisibilityChecker(
  * Same for per-room visibility.
  */
 export function getRoomVisibilityChecker(
-  config: DashboardEnhancedStrategyConfig,
+  config: OrielConfig,
   hass: HomeAssistant,
 ): (key: string) => boolean {
   return makeVisibilityChecker(

@@ -23,15 +23,15 @@ const pkg = require('./package.json');
 /** @type {import('webpack').Configuration} */
 const config = {
   mode: 'production',
-  entry: './src/dashboard-enhanced-strategy.ts',
+  entry: './src/oriel.ts',
   // Separate `.map` files alongside `.js`. Lets bug reports show real
   // source frames; doesn't reference them via `//# sourceMappingURL=`
   // so the HACS bundle itself stays tiny on first byte.
   devtool: 'hidden-source-map',
   output: {
     clean: true,
-    filename: 'dashboard-enhanced-strategy.js',
-    chunkFilename: 'dashboard-enhanced-strategy-[name].[contenthash:8].js',
+    filename: 'oriel.js',
+    chunkFilename: 'oriel-[name].[contenthash:8].js',
     path: path.resolve(__dirname, 'dist'),
     // publicPath must match the HA resource URL path for async chunk loading.
     // After the upstream → TheDave94/dashboard-strategy-enhanced repo rename,

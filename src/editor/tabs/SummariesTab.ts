@@ -31,7 +31,7 @@
 // ====================================================================
 
 import { html, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 import type { TabRenderContext } from './ViewsTab';
 
@@ -59,7 +59,7 @@ interface SummariesData {
   unavailable_batteries_bucket: BatteriesBucket;
 }
 
-function readData(c: DashboardEnhancedStrategyConfig): SummariesData {
+function readData(c: OrielConfig): SummariesData {
   const cols = c.summaries_columns;
   return {
     summaries_columns: cols === 4 ? 4 : 2,
@@ -141,8 +141,8 @@ const SCHEMA = [
   },
 ] as const;
 
-function buildPatch(v: Partial<SummariesData>): Partial<DashboardEnhancedStrategyConfig> {
-  const p: Partial<DashboardEnhancedStrategyConfig> = {};
+function buildPatch(v: Partial<SummariesData>): Partial<OrielConfig> {
+  const p: Partial<OrielConfig> = {};
 
   // 2-column is the default — only persist 4.
   p.summaries_columns = v.summaries_columns === 4 ? 4 : undefined;

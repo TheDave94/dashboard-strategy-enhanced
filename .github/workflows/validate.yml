@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: '22'
+          nooriel-version: '22'
           cache: 'npm'
       - run: npm ci
       - run: npm test
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: '22'
+          nooriel-version: '22'
           cache: 'npm'
       - run: npm ci
       - name: Run ESLint
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: '22'
+          nooriel-version: '22'
       - name: Lint translation files
         run: node scripts/lint-translations.mjs
 
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: '22'
+          nooriel-version: '22'
           cache: 'npm'
       - run: npm ci
       # Surfaces high + critical advisories. Non-prod deps are excluded
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: '22'
+          nooriel-version: '22'
           cache: 'npm'
       - run: npm ci
       - run: npm run build
@@ -103,9 +103,9 @@ jobs:
             fi
           }
           echo "Bundle-size budget (gzipped):"
-          check "dashboard-enhanced-strategy.js.gz" 5
-          check "dashboard-enhanced-strategy-core.*.js.gz" 50
-          check "dashboard-enhanced-strategy-views.*.js.gz" 20
-          check "dashboard-enhanced-strategy-editor.*.js.gz" 80
-          check "dashboard-enhanced-strategy-lit.*.js.gz" 25
+          check "oriel.js.gz" 5
+          check "oriel-core.*.js.gz" 50
+          check "oriel-views.*.js.gz" 20
+          check "oriel-editor.*.js.gz" 80
+          check "oriel-lit.*.js.gz" 25
           exit $fail

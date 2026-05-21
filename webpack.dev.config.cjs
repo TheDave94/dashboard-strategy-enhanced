@@ -16,10 +16,10 @@ const webpack = require('webpack');
 const config = {
   mode: 'development',
   devtool: 'source-map',
-  entry: './src/dashboard-enhanced-strategy.ts',
+  entry: './src/oriel.ts',
   output: {
     clean: true,
-    filename: 'dashboard-enhanced-strategy.js',
+    filename: 'oriel.js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {

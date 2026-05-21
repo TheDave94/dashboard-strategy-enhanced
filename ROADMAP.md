@@ -62,13 +62,13 @@ This is the prioritised list. Cross-referenced with the entries below — items 
 
 ---
 
-## 1. Plugin extension API — `de-strategy-extension`
+## 1. Plugin extension API — `oriel-extension`
 
 **Effort:** XL. **User impact:** high if other HACS plugins adopt; zero if nobody does.
 
 ### Problem
 
-Today, third-party HACS plugins can't add sections, badges, or card features to a `custom:dashboard-enhanced` view without monkey-patching the strategy. The closest a user can do is `custom_sections` with hand-written YAML, which is verbose and doesn't compose with plugin updates.
+Today, third-party HACS plugins can't add sections, badges, or card features to a `custom:oriel` view without monkey-patching the strategy. The closest a user can do is `custom_sections` with hand-written YAML, which is verbose and doesn't compose with plugin updates.
 
 ### Proposed solution
 
@@ -78,14 +78,14 @@ Define a small registration API that other plugins can call at load time:
 // In a third-party plugin's entry point:
 declare global {
   interface Window {
-    dashboardEnhanced?: {
+    oriel?: {
       registerSection(spec: SectionExtensionSpec): void;
       registerBadge(spec: BadgeExtensionSpec): void;
     };
   }
 }
 
-window.dashboardEnhanced?.registerSection({
+window.oriel?.registerSection({
   key: 'my-plugin-music',
   labelKey: 'sections.my_plugin_music',
   icon: 'mdi:music',
@@ -102,7 +102,7 @@ Strategy reads the registry during `generate()`, merges plugin sections alongsid
 ### Code shape
 
 - New `src/extension/registry.ts` — a typed singleton with `registerSection`, `registerBadge`, `list*` accessors.
-- `dashboard-enhanced-strategy.ts` exposes `window.dashboardEnhanced` on load (one-line addition).
+- `oriel.ts` exposes `window.oriel` on load (one-line addition).
 - `OverviewViewStrategy.generate()` iterates registered sections after built-ins.
 - Editor's section-order tab reads from the registry, shows plugin sections with a "plugin" badge to differentiate from built-ins.
 
@@ -133,9 +133,9 @@ HA's frontend itself is a PWA, but when the home connection drops, the strategy'
 Ship a service worker that pre-caches the dist chunks on first load. Strategy boot opportunistically registers it; users on browsers without SW support (rare) get the current behaviour.
 
 ```typescript
-// dashboard-enhanced-strategy.ts
+// oriel.ts
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register('/hacsfiles/dashboard-enhanced-strategy/sw.js')
+  navigator.serviceWorker.register('/hacsfiles/oriel/sw.js')
     .catch(() => { /* silent — non-critical */ });
 }
 ```
@@ -175,15 +175,15 @@ frontend:
 
 # Then in the strategy config:
 strategy:
-  type: custom:dashboard-enhanced
-  recommended_theme: dashboard-enhanced-compact   # editor surfaces this
+  type: custom:oriel
+  recommended_theme: oriel-compact   # editor surfaces this
 ```
 
 Reference themes:
-- `dashboard-enhanced-default` — current visual baseline.
-- `dashboard-enhanced-compact` — tight spacing, smaller icons; mobile-first.
-- `dashboard-enhanced-glass` — translucent surfaces, blur backdrops; modern aesthetic.
-- `dashboard-enhanced-warm` — earth tones, larger typography; older-user-friendly.
+- `oriel-default` — current visual baseline.
+- `oriel-compact` — tight spacing, smaller icons; mobile-first.
+- `oriel-glass` — translucent surfaces, blur backdrops; modern aesthetic.
+- `oriel-warm` — earth tones, larger typography; older-user-friendly.
 
 Editor's Overview tab gets a "theme" `<ha-form>` field (select) that previews the chosen theme.
 
@@ -196,7 +196,7 @@ Editor's Overview tab gets a "theme" `<ha-form>` field (select) that previews th
 ### Open questions
 
 - HA's theme system is dashboard-wide, not strategy-wide. We can recommend, not enforce.
-- Should themes ship as part of this HACS plugin or as a sibling `dashboard-enhanced-themes` plugin? Probably this plugin — theme + strategy stay in sync.
+- Should themes ship as part of this HACS plugin or as a sibling `oriel-themes` plugin? Probably this plugin — theme + strategy stay in sync.
 
 ### Acceptance criteria
 
@@ -283,14 +283,14 @@ HA's tile-card has `state_content: ['hvac_action', 'current_temperature']` to co
 Each custom card grows a `state_content` option mirroring HA's tile-card pattern:
 
 ```yaml
-type: custom:dashboard-enhanced-summary-card
+type: custom:oriel-summary-card
 summary_type: batteries
 state_content:
   - count
   - last_critical   # entity name of the lowest battery
 ```
 
-`dashboard-enhanced-zone-presence-card`:
+`oriel-zone-presence-card`:
 
 ```yaml
 entities:
@@ -341,7 +341,7 @@ When `append_default` is true (default), overrides extend the standard view. Whe
 
 ### Code shape
 
-- `DashboardEnhancedAreaOptions` gains `room_view_overrides: { sections: LovelaceSectionConfig[]; append_default?: boolean }`.
+- `OrielAreaOptions` gains `room_view_overrides: { sections: LovelaceSectionConfig[]; append_default?: boolean }`.
 - `RoomViewStrategy.generate()` reads it and merges/replaces accordingly.
 - Editor's Areas tab gets a "Customise room view" expansion per area.
 
@@ -371,11 +371,11 @@ Top-level `view_templates` defines reusable view shapes; `custom_views` can exte
 
 ```yaml
 strategy:
-  type: custom:dashboard-enhanced
+  type: custom:oriel
   view_templates:
     kids_room:
       sections:
-        - { type: grid, cards: [{ type: custom:dashboard-enhanced-zone-presence-card, entities: ['{{ presence_entity }}'] }] }
+        - { type: grid, cards: [{ type: custom:oriel-zone-presence-card, entities: ['{{ presence_entity }}'] }] }
 
   custom_views:
     - title: Floor 1 Kids' Rooms
@@ -409,7 +409,7 @@ Lightweight Jinja-style `{{ var }}` interpolation, no full Jinja runtime.
 
 **Effort:** S. **User impact:** small — niche.
 
-A standalone `dashboard-enhanced-weather-glance-card` that summarises current weather + 3-day forecast in a single tile. The current `weather_sensors` config covers the related row above the weather card; this would complement it as a compact tile users can pin in favorites.
+A standalone `oriel-weather-glance-card` that summarises current weather + 3-day forecast in a single tile. The current `weather_sensors` config covers the related row above the weather card; this would complement it as a compact tile users can pin in favorites.
 
 Not in any other request stream; lower priority. Listed here for completeness.
 
@@ -419,7 +419,7 @@ Not in any other request stream; lower priority. Listed here for completeness.
 
 **Effort:** S. **User impact:** small — cover users.
 
-A `dashboard-enhanced-cover-position-slider` tile feature (analogous to `dashboard-enhanced-sticky-lock-feature`) that slots a horizontal position slider into the cover tile's feature row. HA's built-in `cover-position` feature does this; this would add finer-grain control + the strategy's design-token styling.
+A `oriel-cover-position-slider` tile feature (analogous to `oriel-sticky-lock-feature`) that slots a horizontal position slider into the cover tile's feature row. HA's built-in `cover-position` feature does this; this would add finer-grain control + the strategy's design-token styling.
 
 Probably duplicates HA core too much to justify. Listed for completeness.
 
@@ -474,8 +474,8 @@ HA's Conversation integration ships LLM-backed agents (OpenAI, Anthropic, local 
 async function editStrategyWithAssist(
   userPrompt: string,
   hass: HomeAssistant,
-  currentConfig: DashboardEnhancedStrategyConfig,
-): Promise<DashboardEnhancedStrategyConfig> {
+  currentConfig: OrielConfig,
+): Promise<OrielConfig> {
   // HA Conversation API: hass.callApi('POST', 'conversation/process', {...})
   // with tools=[addSection, removeSection, reorderSections, ...]
   // Each tool call is validated against the schema before mutation.
@@ -583,7 +583,7 @@ HA stores history out of the box. The data's right there. Adding sparklines make
 
 ### Sketch
 
-- New `dashboard-enhanced-sparkline` mini-card or feature. Pulls history via `hass.callApi('GET', 'history/period/...')` once on mount, caches.
+- New `oriel-sparkline` mini-card or feature. Pulls history via `hass.callApi('GET', 'history/period/...')` once on mount, caches.
 - Renders inline SVG (no Chart.js dependency — too heavy).
 - Opt-in via `state_content: [..., 'sparkline_24h']`.
 
@@ -668,7 +668,7 @@ When a smoke detector triggers, a water leak fires, a doorbell rings — surface
 
 ### Sketch
 
-- New `dashboard-enhanced-notification-card` component, conditionally inserted at the top of the overview when matching entities are in alarm state.
+- New `oriel-notification-card` component, conditionally inserted at the top of the overview when matching entities are in alarm state.
 - Configurable triggers in strategy config: `notification_triggers: ['smoke', 'gas', 'water_leak', 'doorbell']`.
 - Renders with `position: sticky` to stay visible on scroll.
 
@@ -735,7 +735,7 @@ Every summary tile gets an optional "today vs yesterday" delta indicator:
 ### Sketch
 
 - Re-uses the history API (same fetch as #A5 sparklines — coalesce).
-- `dashboard-enhanced-summary-card` config gains `show_delta: true`.
+- `oriel-summary-card` config gains `show_delta: true`.
 
 ---
 
@@ -771,8 +771,8 @@ Pull HA's Energy dashboard data + the user's tariff schedule. Surface "what each
 
 ### Sketch
 
-- New `dashboard-enhanced-cost-overlay-feature` (custom tile feature). Reads tariff config + entity power.
-- Per-entity opt-in: `features: [{ type: 'custom:dashboard-enhanced-cost-overlay-feature', ... }]`.
+- New `oriel-cost-overlay-feature` (custom tile feature). Reads tariff config + entity power.
+- Per-entity opt-in: `features: [{ type: 'custom:oriel-cost-overlay-feature', ... }]`.
 
 ### Open questions
 
@@ -812,7 +812,7 @@ Top-down floorplan rendering of the home with live entity overlays — sparkline
 ### Sketch
 
 - User provides a floorplan SVG via config (`floorplan_url: /local/myhouse.svg`).
-- Strategy emits a new overview section: `<dashboard-enhanced-floorplan-card>` that anchors area dots to SVG path coordinates.
+- Strategy emits a new overview section: `<oriel-floorplan-card>` that anchors area dots to SVG path coordinates.
 - Alternative: auto-generate a floorplan from HA's areas (no positional data — would be a fake grid).
 
 ### Open questions
@@ -828,7 +828,7 @@ Top-down floorplan rendering of the home with live entity overlays — sparkline
 
 ### Idea
 
-Users share their `DashboardEnhancedStrategyConfig` as presets on a public registry. Other users browse, preview, and one-click install.
+Users share their `OrielConfig` as presets on a public registry. Other users browse, preview, and one-click install.
 
 ### Sketch
 
@@ -849,7 +849,7 @@ Users share their `DashboardEnhancedStrategyConfig` as presets on a public regis
 
 ### Idea
 
-A hidden debug panel (`?de_debug=1` URL parameter) that overlays the dashboard showing:
+A hidden debug panel (`?oriel_debug=1` URL parameter) that overlays the dashboard showing:
 - `generate()` execution time
 - Which areas were considered / hidden and why
 - Which sections rendered vs auto-hid and why
@@ -857,7 +857,7 @@ A hidden debug panel (`?de_debug=1` URL parameter) that overlays the dashboard s
 
 ### Sketch
 
-- Build on the existing `[de-timing]` console log infrastructure.
+- Build on the existing `[oriel-timing]` console log infrastructure.
 - New `src/debug/strategy-panel.ts` reads timing + decision logs, renders an overlay.
 - Always available behind the URL param; never in production rendering.
 
@@ -888,7 +888,7 @@ For users with hundreds of thousands of history data points (eg. solar panel arr
 
 ### Sketch
 
-- Not a strategy concern strictly — but the strategy could emit `dashboard-enhanced-perf-chart-card` for users who opt in.
+- Not a strategy concern strictly — but the strategy could emit `oriel-perf-chart-card` for users who opt in.
 - Probably a sibling plugin, not part of this strategy.
 
 ### Open questions
@@ -917,7 +917,7 @@ Top-level strategy config gains a `density` field:
 
 ```yaml
 strategy:
-  type: custom:dashboard-enhanced
+  type: custom:oriel
   density: cozy   # 'compact' | 'cozy' | 'comfortable' (default)
 ```
 
@@ -961,11 +961,11 @@ Strategy gains a `panel_mode: 'wall'` variant that emits:
 - Tap-anywhere-to-wake.
 - Hide unwanted nav elements (top bar, settings link).
 - Optional "screensaver" view that replaces the dashboard after N minutes — clock + weather only.
-- A `dashboard-enhanced-wall-panel` view variant that's full-screen, sticky on scroll.
+- A `oriel-wall-panel` view variant that's full-screen, sticky on scroll.
 
 ```yaml
 strategy:
-  type: custom:dashboard-enhanced
+  type: custom:oriel
   panel_mode: wall
   panel_dim_after_seconds: 60
   panel_screensaver_after_minutes: 5
@@ -975,7 +975,7 @@ strategy:
 ### Sketch
 
 - New `src/views/WallPanelView.ts` — alternative top-level view emission when `panel_mode === 'wall'`.
-- New `dashboard-enhanced-screensaver-card` — minimal Lit element that listens for interaction events and toggles a full-screen clock+weather.
+- New `oriel-screensaver-card` — minimal Lit element that listens for interaction events and toggles a full-screen clock+weather.
 - Bottom-nav: emit a `type: tile` strip pinned to `position: sticky; bottom: 0`.
 
 ### Why it's a win
@@ -1030,7 +1030,7 @@ Per-mode section-order overrides:
 
 ```yaml
 strategy:
-  type: custom:dashboard-enhanced
+  type: custom:oriel
   sections_order_by_mode:
     morning:    [overview, weather, energy, summaries, areas]
     evening:    [overview, summaries, areas, favorites, weather]
@@ -1057,7 +1057,7 @@ Already-existing data (`room_mode` / `house_mode`) gets surfaced as visible dash
 
 ### Problem
 
-The current `section_visibility` and `room_visibility` take a single `{entity, state}` predicate. Users with families want role-based visibility (kids see fewer sections), time-of-day visibility (energy section only during day), and mode-based (security section only when armed).
+The current `section_visibility` and `room_visibility` take a single `{entity, state}` predicate. Users with families want role-based visibility (kids see fewer sections), time-of-day visibility (energy section only during day), and mooriel-based (security section only when armed).
 
 ### Idea
 
@@ -1099,7 +1099,7 @@ To configure a light from a card today, user taps → more-info dialog opens →
 
 ### Idea
 
-A `dashboard-enhanced-detail-drawer` primitive. Each strategy-emitted tile gains a `drawer_action` config that opens an inline drawer instead of navigating / modal-dialog.
+A `oriel-detail-drawer` primitive. Each strategy-emitted tile gains a `drawer_action` config that opens an inline drawer instead of navigating / modal-dialog.
 
 ```yaml
 # Internal config the strategy emits — user usually doesn't touch directly:
@@ -1245,7 +1245,7 @@ Expose strategy primitives as HA service calls:
 
 ### Idea
 
-A `dashboard-enhanced-glass` theme that uses CSS backdrop-filter + layered translucent surfaces, inspired by visionOS. Auto-activates on tablets ≥1024px when `panel_mode: 'wall'` is set.
+A `oriel-glass` theme that uses CSS backdrop-filter + layered translucent surfaces, inspired by visionOS. Auto-activates on tablets ≥1024px when `panel_mode: 'wall'` is set.
 
 ### Sketch
 

@@ -1,14 +1,14 @@
 // ====================================================================
 // Overview Section Builder
 // ====================================================================
-// Ported from dist/utils/dashboard-enhanced-section-builder.js (createOverviewSection)
+// Ported from dist/utils/oriel-section-builder.js (createOverviewSection)
 // with full TypeScript types.
 // Creates the "Übersicht" section with clock, alarm, search, summaries,
 // and favorites.
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig, CustomCard } from '../types/strategy';
+import type { OrielConfig, CustomCard } from '../types/strategy';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
@@ -41,7 +41,7 @@ const ZONE_DEVICE_CLASSES = new Set(['occupancy', 'motion', 'presence']);
  */
 function buildRoomModeCard(
   areaId: string,
-  config: DashboardEnhancedStrategyConfig,
+  config: OrielConfig,
   hass: HomeAssistant,
 ): LovelaceCardConfig | null {
   const areaOpts = (config.areas_options || {})[areaId] || {};
@@ -61,7 +61,7 @@ function buildRoomModeCard(
   const stickyEntity = areaOpts.room_mode_sticky_entity;
   if (stickyEntity && hass.states[stickyEntity]) {
     features.push({
-      type: 'custom:dashboard-enhanced-sticky-lock-feature',
+      type: 'custom:oriel-sticky-lock-feature',
       sticky_entity: stickyEntity,
     });
   }
@@ -97,7 +97,7 @@ function buildRoomModeCard(
  */
 function buildZonePresenceCard(
   areaId: string,
-  config: DashboardEnhancedStrategyConfig,
+  config: OrielConfig,
   hass: HomeAssistant,
 ): LovelaceCardConfig | null {
   const areaOpts = (config.areas_options || {})[areaId] || {};
@@ -129,7 +129,7 @@ function buildZonePresenceCard(
   }
 
   return {
-    type: 'custom:dashboard-enhanced-zone-presence-card',
+    type: 'custom:oriel-zone-presence-card',
     entities,
     ...densityProp(config),
     grid_options: { columns: 6, rows: 'auto' },
@@ -139,7 +139,7 @@ function buildZonePresenceCard(
 export interface OverviewSectionParams {
   someSensorId: string | null;
   showSearchCard: boolean;
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   hass: HomeAssistant;
 }
 
@@ -169,7 +169,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showClockCard) {
     if (alarmEntity) {
-      // Clock and alarm panel side-by-side
+      // Clock and alarm panel sioriel-by-side
       cards.push({
         type: 'clock',
         clock_size: 'small',
@@ -240,7 +240,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showLightSummary) {
     summaryCards.push({
-      type: 'custom:dashboard-enhanced-summary-card',
+      type: 'custom:oriel-summary-card',
       summary_type: 'lights',
       areas_options: config.areas_options || {},
       density,
@@ -249,7 +249,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showCoversSummary) {
     summaryCards.push({
-      type: 'custom:dashboard-enhanced-summary-card',
+      type: 'custom:oriel-summary-card',
       summary_type: 'covers',
       areas_options: config.areas_options || {},
       density,
@@ -258,7 +258,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showSecuritySummary) {
     summaryCards.push({
-      type: 'custom:dashboard-enhanced-summary-card',
+      type: 'custom:oriel-summary-card',
       summary_type: 'security',
       areas_options: config.areas_options || {},
       density,
@@ -267,7 +267,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showBatterySummary) {
     summaryCards.push({
-      type: 'custom:dashboard-enhanced-summary-card',
+      type: 'custom:oriel-summary-card',
       summary_type: 'batteries',
       areas_options: config.areas_options || {},
       hide_mobile_app_batteries: config.hide_mobile_app_batteries,
@@ -279,7 +279,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showClimateSummary) {
     summaryCards.push({
-      type: 'custom:dashboard-enhanced-summary-card',
+      type: 'custom:oriel-summary-card',
       summary_type: 'climate',
       areas_options: config.areas_options || {},
       density,

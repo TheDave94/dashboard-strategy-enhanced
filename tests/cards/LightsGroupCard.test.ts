@@ -16,10 +16,10 @@ type LightsGroupCardEl = HTMLElement & {
 };
 
 function mount(): LightsGroupCardEl {
-  return document.createElement('dashboard-enhanced-lights-group-card') as LightsGroupCardEl;
+  return document.createElement('oriel-lights-group-card') as LightsGroupCardEl;
 }
 
-describe('dashboard-enhanced-lights-group-card', () => {
+describe('oriel-lights-group-card', () => {
   describe('setConfig', () => {
     let el: LightsGroupCardEl;
     beforeEach(() => {
@@ -60,14 +60,14 @@ describe('dashboard-enhanced-lights-group-card', () => {
   describe('picker integration', () => {
     it('registers with window.customCards including preview:true', () => {
       const entry = (window.customCards || []).find(
-        (c: { type: string }) => c.type === 'dashboard-enhanced-lights-group-card',
+        (c: { type: string }) => c.type === 'oriel-lights-group-card',
       ) as { preview?: boolean } | undefined;
       expect(entry).toBeDefined();
       expect(entry?.preview).toBe(true);
     });
 
     it('getStubConfig returns group_type=all', () => {
-      const ctor = customElements.get('dashboard-enhanced-lights-group-card') as
+      const ctor = customElements.get('oriel-lights-group-card') as
         | (typeof HTMLElement & { getStubConfig?: () => { group_type: string } })
         | undefined;
       expect(ctor!.getStubConfig?.().group_type).toBe('all');

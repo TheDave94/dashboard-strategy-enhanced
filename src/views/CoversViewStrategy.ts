@@ -4,22 +4,22 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig } from '../types/lovelace';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
 import { resolveDensity } from '../utils/density';
 
 interface CoversViewStrategyParams {
   entities?: string[];
   device_classes?: string[];
-  config?: DashboardEnhancedStrategyConfig;
+  config?: OrielConfig;
 }
 
-class DashboardEnhancedViewCoversStrategy extends HTMLElement {
+class OrielViewCovers extends HTMLElement {
   static async generate(
     config: CoversViewStrategyParams,
     _hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
-    const strategyConfig: DashboardEnhancedStrategyConfig = config.config || {};
+    const strategyConfig: OrielConfig = config.config || {};
     const showPartiallyOpen = strategyConfig.show_partially_open_covers === true;
     const groupByFloors = strategyConfig.group_covers_by_floors === true;
 
@@ -39,7 +39,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
     // Rollos & Vorhänge
     const cards: any[] = [
       {
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...baseConfig,
         device_classes: coverClasses,
         group_type: 'open',
@@ -50,7 +50,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
 
     if (showPartiallyOpen) {
       cards.push({
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...baseConfig,
         device_classes: coverClasses,
         group_type: 'partially_open',
@@ -60,7 +60,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
     }
 
     cards.push({
-      type: 'custom:dashboard-enhanced-covers-group-card',
+      type: 'custom:oriel-covers-group-card',
       ...baseConfig,
       device_classes: coverClasses,
       group_type: 'closed',
@@ -84,7 +84,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
       };
 
       cards.push({
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...awningConfig,
         group_type: 'open',
         show_partially_open: showPartiallyOpen,
@@ -92,7 +92,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
 
       if (showPartiallyOpen) {
         cards.push({
-          type: 'custom:dashboard-enhanced-covers-group-card',
+          type: 'custom:oriel-covers-group-card',
           ...awningConfig,
           group_type: 'partially_open',
           show_partially_open: true,
@@ -100,7 +100,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
       }
 
       cards.push({
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...awningConfig,
         group_type: 'closed',
         show_partially_open: showPartiallyOpen,
@@ -120,7 +120,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
       };
 
       cards.push({
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...windowConfig,
         group_type: 'open',
         show_partially_open: showPartiallyOpen,
@@ -128,7 +128,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
 
       if (showPartiallyOpen) {
         cards.push({
-          type: 'custom:dashboard-enhanced-covers-group-card',
+          type: 'custom:oriel-covers-group-card',
           ...windowConfig,
           group_type: 'partially_open',
           show_partially_open: true,
@@ -136,7 +136,7 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
       }
 
       cards.push({
-        type: 'custom:dashboard-enhanced-covers-group-card',
+        type: 'custom:oriel-covers-group-card',
         ...windowConfig,
         group_type: 'closed',
         show_partially_open: showPartiallyOpen,
@@ -150,4 +150,4 @@ class DashboardEnhancedViewCoversStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-covers', DashboardEnhancedViewCoversStrategy);
+customElements.define('ll-strategy-view-oriel-covers', OrielViewCovers);

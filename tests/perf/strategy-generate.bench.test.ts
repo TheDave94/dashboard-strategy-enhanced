@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Registry } from '../../src/Registry';
 import type { HomeAssistant } from '../../src/types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../../src/types/strategy';
+import type { OrielConfig } from '../../src/types/strategy';
 import { makeHass } from '../fixtures/hass';
 
 /** Build a 10-area / 30-entities-per-area fixture for the perf test. */
@@ -43,7 +43,7 @@ const MEASURED_ITERATIONS = 5;
 
 describe('strategy.generate() performance', () => {
   let hass: HomeAssistant;
-  let config: DashboardEnhancedStrategyConfig;
+  let config: OrielConfig;
 
   beforeAll(() => {
     Registry.resetForTesting();
@@ -61,13 +61,13 @@ describe('strategy.generate() performance', () => {
   it('generate() stays under the perf budget', async () => {
     // Lazy import inside the test so module init time isn't measured.
     const { default: strategyModule } = await import(
-      '../../src/dashboard-enhanced-strategy'
+      '../../src/oriel'
     );
     void strategyModule;
-    const strategyClass = customElements.get('ll-strategy-dashboard-dashboard-enhanced') as
+    const strategyClass = customElements.get('ll-strategy-dashboard-oriel') as
       | {
           generate: (
-            cfg: DashboardEnhancedStrategyConfig,
+            cfg: OrielConfig,
             hass: HomeAssistant,
           ) => Promise<unknown>;
         }

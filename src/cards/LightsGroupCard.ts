@@ -29,7 +29,7 @@ interface LightsGroupConfig {
   heading_icon?: string;
   area?: AreaRegistryEntry;
   default_expanded?: boolean;
-  /** Density variant — drives the --de-* CSS tokens. */
+  /** Density variant — drives the --oriel-* CSS tokens. */
   density?: 'comfortable' | 'compact';
 }
 
@@ -52,7 +52,7 @@ interface LovelaceCardElement extends HTMLElement {
 
 const LIGHT_BRIGHTNESS_MODES = ['brightness', 'color_temp', 'hs', 'xy', 'rgb', 'rgbw', 'rgbww', 'white'];
 
-class DashboardEnhancedLightsGroupCard extends LitElement {
+class OrielLightsGroupCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
 
   private _config!: LightsGroupConfig;
@@ -76,80 +76,80 @@ class DashboardEnhancedLightsGroupCard extends LitElement {
     }
     :host {
       container-type: inline-size;
-      container-name: de-lights;
+      container-name: oriel-lights;
 
-      --de-gap: var(--ha-space-2, 8px);
-      --de-block-pad: var(--ha-space-3, 12px);
-      --de-block-radius: var(--ha-border-radius-lg, 16px);
-      --de-toggle-size: 36px;
-      --de-tile-min: 300px;
-      --de-child-min: 260px;
+      --oriel-gap: var(--ha-space-2, 8px);
+      --oriel-block-pad: var(--ha-space-3, 12px);
+      --oriel-block-radius: var(--ha-border-radius-lg, 16px);
+      --oriel-toggle-size: 36px;
+      --oriel-tile-min: 300px;
+      --oriel-child-min: 260px;
     }
     /* Narrow lanes (< 400px): tighter gaps, narrower tile-min so the
        cards still fit one-per-row instead of overflowing. */
-    @container de-lights (max-width: 400px) {
+    @container oriel-lights (max-width: 400px) {
       :host {
-        --de-gap: var(--ha-space-1, 6px);
-        --de-block-pad: var(--ha-space-2, 10px);
-        --de-block-radius: var(--ha-border-radius-md, 14px);
-        --de-toggle-size: 32px;
-        --de-tile-min: 260px;
-        --de-child-min: 220px;
+        --oriel-gap: var(--ha-space-1, 6px);
+        --oriel-block-pad: var(--ha-space-2, 10px);
+        --oriel-block-radius: var(--ha-border-radius-md, 14px);
+        --oriel-toggle-size: 32px;
+        --oriel-tile-min: 260px;
+        --oriel-child-min: 220px;
       }
     }
     /* Wide lanes (> 800px): comfortable defaults are already right;
        no override needed. */
     :host([density="compact"]) {
-      --de-gap: var(--ha-space-1, 6px) !important;
-      --de-block-pad: var(--ha-space-2, 10px) !important;
-      --de-block-radius: var(--ha-border-radius-md, 14px) !important;
-      --de-toggle-size: 32px !important;
-      --de-tile-min: 280px !important;
-      --de-child-min: 240px !important;
+      --oriel-gap: var(--ha-space-1, 6px) !important;
+      --oriel-block-pad: var(--ha-space-2, 10px) !important;
+      --oriel-block-radius: var(--ha-border-radius-md, 14px) !important;
+      --oriel-toggle-size: 32px !important;
+      --oriel-tile-min: 280px !important;
+      --oriel-child-min: 240px !important;
     }
     :host([density="comfortable"]) {
-      --de-gap: var(--ha-space-2, 8px) !important;
-      --de-block-pad: var(--ha-space-3, 12px) !important;
-      --de-tile-min: 300px !important;
+      --oriel-gap: var(--ha-space-2, 8px) !important;
+      --oriel-block-pad: var(--ha-space-3, 12px) !important;
+      --oriel-tile-min: 300px !important;
     }
     .lights-section {
       display: flex;
       flex-direction: column;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
       width: 100%;
     }
     .light-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--de-tile-min), 1fr));
-      gap: var(--de-gap);
+      grid-template-columns: repeat(auto-fill, minmax(var(--oriel-tile-min), 1fr));
+      gap: var(--oriel-gap);
     }
     .floor-section {
       display: flex;
       flex-direction: column;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
     }
     .group-block {
       grid-column: 1 / -1;
       display: flex;
       flex-direction: column;
-      gap: var(--de-gap);
-      padding: var(--de-block-pad);
+      gap: var(--oriel-gap);
+      padding: var(--oriel-block-pad);
       border: 1px solid var(--divider-color);
-      border-radius: var(--de-block-radius);
+      border-radius: var(--oriel-block-radius);
       background: color-mix(in srgb, var(--card-background-color) 92%, var(--primary-color) 8%);
     }
     .group-header {
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: var(--de-gap);
+      gap: var(--oriel-gap);
       align-items: start;
     }
     .group-toggle {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: var(--de-toggle-size);
-      height: var(--de-toggle-size);
+      width: var(--oriel-toggle-size);
+      height: var(--oriel-toggle-size);
       margin-top: 6px;
       border: none;
       border-radius: var(--ha-border-radius-pill, 999px);
@@ -170,11 +170,11 @@ class DashboardEnhancedLightsGroupCard extends LitElement {
     }
     .group-children {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--de-child-min), 1fr));
-      gap: var(--de-gap);
+      grid-template-columns: repeat(auto-fill, minmax(var(--oriel-child-min), 1fr));
+      gap: var(--oriel-gap);
       /* Logical inline-start: matches the toggle's left side in LTR,
          right side in RTL — inherits HA's parent dir. */
-      padding-inline-start: calc(var(--de-toggle-size) + var(--de-gap));
+      padding-inline-start: calc(var(--oriel-toggle-size) + var(--oriel-gap));
     }
     .group-children[hidden] {
       display: none;
@@ -815,18 +815,18 @@ class DashboardEnhancedLightsGroupCard extends LitElement {
         { name: 'heading_label', selector: { text: {} } },
         { name: 'heading_icon', selector: { icon: {} } },
       ],
-      'card.dashboard-enhanced-lights-group-card',
+      'card.oriel-lights-group-card',
     );
   }
 }
 
-customElements.define('dashboard-enhanced-lights-group-card', DashboardEnhancedLightsGroupCard);
+customElements.define('oriel-lights-group-card', OrielLightsGroupCard);
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-lights-group-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-lights-group-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-lights-group-card',
-    name: 'DashboardEnhanced Lights Group',
+    type: 'oriel-lights-group-card',
+    name: 'Oriel Lights Group',
     description: 'Grouped on/off light tiles with nested-group support, floor grouping, and inline batch controls.',
     preview: true,
   } as { type: string; name: string; description: string });

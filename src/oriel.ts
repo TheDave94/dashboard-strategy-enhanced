@@ -1,5 +1,5 @@
 // ====================================================================
-// DASHBOARD ENHANCED STRATEGY — Main Entry Point
+// ORIEL — Main Entry Point
 // ====================================================================
 // Minimal entry point for fast custom element registration.
 // Cards, views, and heavy dependencies are lazy-loaded in generate().
@@ -7,7 +7,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from './types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from './types/strategy';
+import type { OrielConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 
 // Injected at build time by webpack DefinePlugin from package.json#version.
@@ -15,7 +15,7 @@ import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 // in any .d.ts (an alternative is a global.d.ts; this is cheaper).
 // Install the plugin extension entry point (v3.5.0). Runs at module
 // load, before any HA strategy lifecycle method — so plugins can call
-// `window.dashboardEnhanced.registerSection(...)` from their own
+// `window.oriel.registerSection(...)` from their own
 // `customElements.define()`-time modules.
 import { installExtensionEntryPoint } from './extension/registry';
 installExtensionEntryPoint();
@@ -44,10 +44,10 @@ const STRATEGY_VERSION =
     ? __STRATEGY_VERSION__
     : 'dev';
 
-const DEBUG = new URLSearchParams(window.location.search).has('de_debug');
+const DEBUG = new URLSearchParams(window.location.search).has('oriel_debug');
 const T0 = performance.now();
 const t = (label: string) => {
-  if (DEBUG) console.log(`[de-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`);
+  if (DEBUG) console.log(`[oriel-timing] ${label}: ${(performance.now() - T0).toFixed(0)}ms`);
 };
 let generateCallCount = 0;
 
@@ -76,8 +76,8 @@ const modulesPromise = Promise.all([
 
 void modulesPromise.then(() => { t('all chunks loaded'); });
 
-class DashboardEnhancedStrategy extends HTMLElement {
-  static async generate(rawConfig: DashboardEnhancedStrategyConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
+class Oriel extends HTMLElement {
+  static async generate(rawConfig: OrielConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
     generateCallCount++;
     t(`generate() called (#${generateCallCount})`);
 
@@ -135,7 +135,7 @@ class DashboardEnhancedStrategy extends HTMLElement {
     const showClimate = config.show_climate_summary === true;
 
     // Pre-resolve ALL views upfront (like HA's Home Panel does)
-    const overviewConfig = await getStrategy('ll-strategy-view-dashboard-enhanced-view-overview').generate(
+    const overviewConfig = await getStrategy('ll-strategy-view-oriel-overview').generate(
       { dashboardConfig: config },
       hass
     );
@@ -144,23 +144,23 @@ class DashboardEnhancedStrategy extends HTMLElement {
     // Only resolve utility views for enabled summaries
     const utilityViewDefs = [
       { enabled: showLights, title: localize('views.lights'), path: 'lights', icon: 'mdi:lamps',
-        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-lights').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-oriel-lights').generate({ config }, hass) },
       { enabled: showCovers, title: localize('views.covers'), path: 'covers', icon: 'mdi:blinds-horizontal',
-        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-covers').generate(
+        resolve: () => getStrategy('ll-strategy-view-oriel-covers').generate(
           { device_classes: ['awning', 'blind', 'curtain', 'shade', 'shutter', 'window'], config }, hass) },
       { enabled: showSecurity, title: localize('views.security'), path: 'security', icon: 'mdi:security',
-        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-security').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-oriel-security').generate({ config }, hass) },
       { enabled: showBatteries, title: localize('views.batteries'), path: 'batteries', icon: 'mdi:battery-alert',
-        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-batteries').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-oriel-batteries').generate({ config }, hass) },
       { enabled: showClimate, title: localize('views.climate'), path: 'climate', icon: 'mdi:thermostat',
-        resolve: () => getStrategy('ll-strategy-view-dashboard-enhanced-view-climate').generate({ config }, hass) },
+        resolve: () => getStrategy('ll-strategy-view-oriel-climate').generate({ config }, hass) },
     ];
 
     const enabledDefs = utilityViewDefs.filter((d) => d.enabled);
     const utilityConfigs = await Promise.all(enabledDefs.map((d) => d.resolve()));
     t('utility views resolved');
 
-    const roomStrategy = getStrategy('ll-strategy-view-dashboard-enhanced-view-room');
+    const roomStrategy = getStrategy('ll-strategy-view-oriel-room');
     const roomConfigs = await Promise.all(
       visibleAreas.map((area) => {
         const areaOptions = config.areas_options?.[area.area_id];
@@ -271,8 +271,8 @@ class DashboardEnhancedStrategy extends HTMLElement {
 
   static async getConfigElement(): Promise<HTMLElement> {
     await import('./editor/StrategyEditor');
-    await customElements.whenDefined('dashboard-enhanced-strategy-editor');
-    return document.createElement('dashboard-enhanced-strategy-editor');
+    await customElements.whenDefined('oriel-editor');
+    return document.createElement('oriel-editor');
   }
 
   /**
@@ -302,14 +302,14 @@ class DashboardEnhancedStrategy extends HTMLElement {
         title: 'Standard',
         description: 'Defaults for most homes — overview, summaries, areas, weather, energy.',
         icon: 'mdi:home-outline',
-        strategy_config: { type: 'custom:dashboard-enhanced' },
+        strategy_config: { type: 'custom:oriel' },
       },
       {
         title: 'Minimal',
         description: 'Just clock + area cards. No summaries, no extra sections.',
         icon: 'mdi:home-minus-outline',
         strategy_config: {
-          type: 'custom:dashboard-enhanced',
+          type: 'custom:oriel',
           show_light_summary: false,
           show_covers_summary: false,
           show_security_summary: false,
@@ -323,7 +323,7 @@ class DashboardEnhancedStrategy extends HTMLElement {
         description: 'All sections + all header badges enabled. Easy to disable later.',
         icon: 'mdi:home-lightning-bolt',
         strategy_config: {
-          type: 'custom:dashboard-enhanced',
+          type: 'custom:oriel',
           show_climate_summary: true,
           show_plants_section: true,
           show_agenda_section: true,
@@ -344,6 +344,6 @@ class DashboardEnhancedStrategy extends HTMLElement {
 // Register the strategy custom element under HA's current naming
 // convention (`ll-strategy-<type>-<name>`). HA 2026.5+ enforces this
 // strictly and the fork no longer carries a pre-2025 fallback.
-customElements.define('ll-strategy-dashboard-dashboard-enhanced', DashboardEnhancedStrategy);
+customElements.define('ll-strategy-dashboard-oriel', Oriel);
 
-console.log(`Dashboard Enhanced Strategy v${STRATEGY_VERSION} loaded`);
+console.log(`Oriel Dashboard v${STRATEGY_VERSION} loaded`);

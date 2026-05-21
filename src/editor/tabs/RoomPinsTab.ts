@@ -10,12 +10,12 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { HomeAssistant } from '../../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface RoomPinsTabContext {
   hass: HomeAssistant;
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   search: string;
   allEntitiesForSelect: Array<{
     entity_id: string;
@@ -135,7 +135,7 @@ export function renderRoomPinsTab(ctx: RoomPinsTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('room_pins_show_state', checked, false),
       )}
       ${ctx.renderCheckbox(
-        'room-pins-hide-last-changed',
+        'room-pins-hioriel-last-changed',
         localize('editor.hide_last_changed'),
         roomPinsHideLastChanged,
         (checked) => ctx.onToggleChange('room_pins_hide_last_changed', checked, false),

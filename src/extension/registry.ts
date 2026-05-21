@@ -2,7 +2,7 @@
 // Plugin extension API (v3.5.0)
 // ====================================================================
 // Third-party HACS plugins can extend the strategy at load time by
-// calling `window.dashboardEnhanced.registerSection(spec)` or
+// calling `window.oriel.registerSection(spec)` or
 // `registerBadge(spec)`. The strategy reads both registries at
 // generate() and merges plugin contributions alongside built-ins.
 //
@@ -15,14 +15,14 @@ import type {
   LovelaceSectionConfig,
   LovelaceBadgeConfig,
 } from '../types/lovelace';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 
 /** Highest API version this strategy understands. */
 export const EXTENSION_API_VERSION = 1;
 
 export interface ExtensionContext {
   hass: HomeAssistant;
-  dashboardConfig: DashboardEnhancedStrategyConfig;
+  dashboardConfig: OrielConfig;
 }
 
 export interface SectionExtensionSpec {
@@ -55,7 +55,7 @@ const badgeRegistry = new Map<string, BadgeExtensionSpec>();
 function isCompatible(apiVersion: number, key: string): boolean {
   if (apiVersion > EXTENSION_API_VERSION) {
     console.warn(
-      `[dashboard-enhanced] extension "${key}" requires apiVersion ${apiVersion} but strategy supports max ${EXTENSION_API_VERSION}. Skipping.`,
+      `[oriel] extension "${key}" requires apiVersion ${apiVersion} but strategy supports max ${EXTENSION_API_VERSION}. Skipping.`,
     );
     return false;
   }
@@ -64,13 +64,13 @@ function isCompatible(apiVersion: number, key: string): boolean {
 
 function registerSection(spec: SectionExtensionSpec): void {
   if (!spec || !spec.key || typeof spec.build !== 'function') {
-    console.warn('[dashboard-enhanced] registerSection: invalid spec', spec);
+    console.warn('[oriel] registerSection: invalid spec', spec);
     return;
   }
   if (!isCompatible(spec.apiVersion, spec.key)) return;
   if (sectionRegistry.has(spec.key)) {
     console.warn(
-      `[dashboard-enhanced] extension section "${spec.key}" is already registered; ignoring duplicate.`,
+      `[oriel] extension section "${spec.key}" is already registered; ignoring duplicate.`,
     );
     return;
   }
@@ -79,13 +79,13 @@ function registerSection(spec: SectionExtensionSpec): void {
 
 function registerBadge(spec: BadgeExtensionSpec): void {
   if (!spec || !spec.key || typeof spec.build !== 'function') {
-    console.warn('[dashboard-enhanced] registerBadge: invalid spec', spec);
+    console.warn('[oriel] registerBadge: invalid spec', spec);
     return;
   }
   if (!isCompatible(spec.apiVersion, spec.key)) return;
   if (badgeRegistry.has(spec.key)) {
     console.warn(
-      `[dashboard-enhanced] extension badge "${spec.key}" is already registered; ignoring duplicate.`,
+      `[oriel] extension badge "${spec.key}" is already registered; ignoring duplicate.`,
     );
     return;
   }
@@ -114,7 +114,7 @@ export async function buildExtensionSections(
       const result = await spec.build(ctx);
       if (result) out.push(result);
     } catch (err) {
-      console.warn(`[dashboard-enhanced] extension section "${spec.key}" failed:`, err);
+      console.warn(`[oriel] extension section "${spec.key}" failed:`, err);
     }
   }
   return out;
@@ -129,7 +129,7 @@ export async function buildExtensionBadges(
       const result = await spec.build(ctx);
       if (result) out.push(result);
     } catch (err) {
-      console.warn(`[dashboard-enhanced] extension badge "${spec.key}" failed:`, err);
+      console.warn(`[oriel] extension badge "${spec.key}" failed:`, err);
     }
   }
   return out;
@@ -137,18 +137,18 @@ export async function buildExtensionBadges(
 
 /**
  * Install the global registration entry point. Called once at strategy
- * module load. After this, plugins can call `window.dashboardEnhanced.*`
+ * module load. After this, plugins can call `window.oriel.*`
  * from their own scripts.
  */
 export function installExtensionEntryPoint(): void {
   if (typeof window === 'undefined') return;
   (window as unknown as {
-    dashboardEnhanced?: {
+    oriel?: {
       apiVersion: number;
       registerSection: (spec: SectionExtensionSpec) => void;
       registerBadge: (spec: BadgeExtensionSpec) => void;
     };
-  }).dashboardEnhanced = {
+  }).oriel = {
     apiVersion: EXTENSION_API_VERSION,
     registerSection,
     registerBadge,

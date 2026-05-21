@@ -6,11 +6,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig } from '../../types/strategy';
+import type { OrielConfig } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface FavoritesTabContext {
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   search: string;
   entityNameMap: Map<string, string>;
   filteredEntities: Array<{ entity_id: string; name: string }>;
@@ -118,7 +118,7 @@ export function renderFavoritesTab(ctx: FavoritesTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('favorites_show_state', checked, false),
       )}
       ${ctx.renderCheckbox(
-        'favorites-hide-last-changed',
+        'favorites-hioriel-last-changed',
         localize('editor.hide_last_changed'),
         favoritesHideLastChanged,
         (checked) => ctx.onToggleChange('favorites_hide_last_changed', checked, false),

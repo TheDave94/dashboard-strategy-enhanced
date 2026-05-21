@@ -3,11 +3,11 @@
     "title": "Dynamic Dashboard"
   },
   "card": {
-    "dashboard-enhanced-summary-card": {
+    "oriel-summary-card": {
       "summary_type": "Summary type",
       "density": "Density override"
     },
-    "dashboard-enhanced-lights-group-card": {
+    "oriel-lights-group-card": {
       "group_type": "Group type",
       "group_by_floors": "Group by floors",
       "nested_groups": "Nested light groups",
@@ -16,12 +16,12 @@
       "heading_label": "Heading label",
       "heading_icon": "Heading icon"
     },
-    "dashboard-enhanced-covers-group-card": {
+    "oriel-covers-group-card": {
       "group_type": "Group type",
       "show_partially_open": "Show partially-open bucket",
       "group_by_floors": "Group by floors"
     },
-    "dashboard-enhanced-zone-presence-card": {
+    "oriel-zone-presence-card": {
       "name": "Header name",
       "icon": "Header icon",
       "entities": "Zone entities"

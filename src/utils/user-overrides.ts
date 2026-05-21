@@ -15,7 +15,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 
 /**
  * Deep-merge two plain objects. Arrays are REPLACED (not concatenated)
@@ -68,26 +68,26 @@ interface HassUser {
  * dashboards aren't affected.
  */
 export function resolveUserConfig(
-  config: DashboardEnhancedStrategyConfig,
+  config: OrielConfig,
   hass: HomeAssistant,
-): DashboardEnhancedStrategyConfig {
-  const users = (config as { users?: Record<string, { override?: DashboardEnhancedStrategyConfig }> }).users;
+): OrielConfig {
+  const users = (config as { users?: Record<string, { override?: OrielConfig }> }).users;
   const usersByRole = (config as {
-    users_by_role?: Record<string, { override?: DashboardEnhancedStrategyConfig }>;
+    users_by_role?: Record<string, { override?: OrielConfig }>;
   }).users_by_role;
   if (!users && !usersByRole) return config;
 
   // Strip the user-config keys so they don't leak into resolved
   // generated views.
   const { users: _u, users_by_role: _r, ...base } =
-    config as DashboardEnhancedStrategyConfig & {
+    config as OrielConfig & {
       users?: unknown;
       users_by_role?: unknown;
     };
   void _u;
   void _r;
 
-  let resolved: DashboardEnhancedStrategyConfig = base as DashboardEnhancedStrategyConfig;
+  let resolved: OrielConfig = base as OrielConfig;
 
   const user = (hass as unknown as { user?: HassUser }).user;
   if (!user) return resolved;
@@ -98,7 +98,7 @@ export function resolveUserConfig(
       resolved = deepMerge(
         resolved as Record<string, unknown>,
         usersByRole.admin.override as Record<string, unknown>,
-      ) as DashboardEnhancedStrategyConfig;
+      ) as OrielConfig;
     }
     const labels = (user.labels ?? []).map((l) => l.toLowerCase());
     for (const label of labels) {
@@ -107,7 +107,7 @@ export function resolveUserConfig(
         resolved = deepMerge(
           resolved as Record<string, unknown>,
           entry.override as Record<string, unknown>,
-        ) as DashboardEnhancedStrategyConfig;
+        ) as OrielConfig;
       }
     }
   }
@@ -119,7 +119,7 @@ export function resolveUserConfig(
       resolved = deepMerge(
         resolved as Record<string, unknown>,
         entry.override as Record<string, unknown>,
-      ) as DashboardEnhancedStrategyConfig;
+      ) as OrielConfig;
     }
   }
 

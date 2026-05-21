@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig, CustomBadge } from '../../types/strategy';
+import type { OrielConfig, CustomBadge } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomBadgesTabContext {
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onUpdateYaml: (index: number, yamlString: string) => void;

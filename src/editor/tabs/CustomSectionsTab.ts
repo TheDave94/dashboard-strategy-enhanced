@@ -3,11 +3,11 @@
 // ====================================================================
 
 import { html, type TemplateResult } from 'lit';
-import type { DashboardEnhancedStrategyConfig, CustomSection } from '../../types/strategy';
+import type { OrielConfig, CustomSection } from '../../types/strategy';
 import { localize } from '../../utils/localize';
 
 export interface CustomSectionsTabContext {
-  config: DashboardEnhancedStrategyConfig;
+  config: OrielConfig;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onUpdateField: (index: number, field: 'key' | 'heading' | 'icon', value: string) => void;

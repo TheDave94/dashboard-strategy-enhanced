@@ -7,7 +7,7 @@ name: Release Build
 # Why individual assets (not a zip): HACS's `zip_release: true` flow
 # only works for integrations or single-file plugins — it downloads the
 # zip filename literally and never extracts it for plugin category.
-# For a code-split plugin like ours (multiple chunked .js files), the
+# For a cooriel-split plugin like ours (multiple chunked .js files), the
 # correct HACS pattern is to upload each dist file as an individual
 # release asset. HACS plugin install then fetches all of them by
 # iterating release assets and resolves the entry-point via hacs.json
@@ -49,7 +49,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          nooriel-version: '22'
           cache: 'npm'
 
       - name: Install dependencies

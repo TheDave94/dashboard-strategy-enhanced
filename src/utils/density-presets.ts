@@ -12,7 +12,7 @@
 //   - comfortable — HA's defaults. Default behaviour.
 // ====================================================================
 
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 
 export type DensityPreset = 'compact' | 'cozy' | 'comfortable';
 
@@ -51,7 +51,7 @@ export const DENSITY_PRESETS: Record<DensityPreset, DensityPresetSpec> = {
  * `comfortable` (HA defaults) when unset or invalid.
  */
 export function resolveDensityPreset(
-  config: DashboardEnhancedStrategyConfig | undefined,
+  config: OrielConfig | undefined,
 ): DensityPreset {
   const v = config?.density;
   return v === 'compact' || v === 'cozy' || v === 'comfortable' ? v : 'comfortable';
@@ -61,7 +61,7 @@ export function resolveDensityPreset(
  * Get the spec block for the configured preset.
  */
 export function getDensityPresetSpec(
-  config: DashboardEnhancedStrategyConfig | undefined,
+  config: OrielConfig | undefined,
 ): DensityPresetSpec {
   return DENSITY_PRESETS[resolveDensityPreset(config)];
 }

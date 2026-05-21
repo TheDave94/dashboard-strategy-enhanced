@@ -1,5 +1,5 @@
 // ====================================================================
-// DASHBOARD ENHANCED STRATEGY - Registry (Singleton)
+// ORIEL - Registry (Singleton)
 // ====================================================================
 // Central data access layer. Replaces scattered entity filtering across
 // multiple JS files with pre-computed Maps and Sets for O(1) lookups.
@@ -17,7 +17,7 @@ import type {
   AreaRegistryEntry,
   FloorRegistryEntry,
 } from './types/registries';
-import type { DashboardEnhancedStrategyConfig } from './types/strategy';
+import type { OrielConfig } from './types/strategy';
 import { timeStart, timeEnd, debugLog } from './utils/debug';
 import { setupLocalize } from './utils/localize';
 
@@ -36,7 +36,7 @@ class Registry {
   // === Raw data references ===
 
   private static _hass: HomeAssistant;
-  private static _config: DashboardEnhancedStrategyConfig;
+  private static _config: OrielConfig;
 
   // === Registry arrays (from hass object) ===
 
@@ -124,7 +124,7 @@ class Registry {
    * hass registries' identity changes (HA replaces the maps on
    * registry updates).
    */
-  static initialize(hass: HomeAssistant, config: DashboardEnhancedStrategyConfig): void {
+  static initialize(hass: HomeAssistant, config: OrielConfig): void {
     if (
       Registry._initialized &&
       Registry._builtFromEntities === hass.entities &&
@@ -350,7 +350,7 @@ class Registry {
   }
 
   /** The strategy configuration. */
-  static get config(): DashboardEnhancedStrategyConfig {
+  static get config(): OrielConfig {
     return Registry._config;
   }
 

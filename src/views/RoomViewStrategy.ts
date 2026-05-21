@@ -36,7 +36,7 @@ function mediaPlayerSupportsPlayback(state: HassEntity): boolean {
   return (f & (MEDIA_PAUSE | MEDIA_PLAY | MEDIA_STOP)) !== 0;
 }
 
-class DashboardEnhancedViewRoomStrategy extends HTMLElement {
+class OrielViewRoom extends HTMLElement {
   static async generate(config: any, hass: HomeAssistant): Promise<LovelaceViewConfig> {
     const area: AreaRegistryEntry = config.area;
     debugLog(`room-generate-${area.area_id}: called at ${performance.now().toFixed(1)}ms after page load`);
@@ -538,7 +538,7 @@ class DashboardEnhancedViewRoomStrategy extends HTMLElement {
         type: 'grid',
         cards: [
           {
-            type: 'custom:dashboard-enhanced-lights-group-card',
+            type: 'custom:oriel-lights-group-card',
             entities: roomEntities.lights,
             group_type: 'all',
             heading_label: localize('room.lighting'),
@@ -830,7 +830,7 @@ class DashboardEnhancedViewRoomStrategy extends HTMLElement {
         Reflect.get(hass.states as Record<string, unknown>, stickyEntity)
       ) {
         features.push({
-          type: 'custom:dashboard-enhanced-sticky-lock-feature',
+          type: 'custom:oriel-sticky-lock-feature',
           sticky_entity: stickyEntity,
         });
       }
@@ -896,7 +896,7 @@ class DashboardEnhancedViewRoomStrategy extends HTMLElement {
           type: 'grid',
           cards: [
             {
-              type: 'custom:dashboard-enhanced-zone-presence-card',
+              type: 'custom:oriel-zone-presence-card',
               entities: zoneEntities,
             } as LovelaceCardConfig,
           ],
@@ -932,4 +932,4 @@ class DashboardEnhancedViewRoomStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-room', DashboardEnhancedViewRoomStrategy);
+customElements.define('ll-strategy-view-oriel-room', OrielViewRoom);

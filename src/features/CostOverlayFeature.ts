@@ -1,5 +1,5 @@
 // ====================================================================
-// dashboard-enhanced-cost-overlay-feature — energy cost per device (v3.5.3)
+// oriel-cost-overlay-feature — energy cost per device (v3.5.3)
 // ====================================================================
 // Custom tile feature that renders `0.40 €/h` inline based on:
 //   - a power reading (W or kW), from `power_entity` or the tile's
@@ -42,7 +42,7 @@ interface CardFeatureContext {
   entity_id?: string;
 }
 
-class DashboardEnhancedCostOverlayFeature extends LitElement {
+class OrielCostOverlayFeature extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @property({ attribute: false }) accessor context: CardFeatureContext | undefined;
   @state() accessor _config: CostOverlayConfig | undefined;
@@ -61,12 +61,12 @@ class DashboardEnhancedCostOverlayFeature extends LitElement {
   `;
 
   public setConfig(config: CostOverlayConfig): void {
-    if (!config) throw new Error('dashboard-enhanced-cost-overlay-feature: config required');
+    if (!config) throw new Error('oriel-cost-overlay-feature: config required');
     this._config = config;
   }
 
   public static getStubConfig(): CostOverlayConfig {
-    return { type: 'custom:dashboard-enhanced-cost-overlay-feature', tariff_value: 0.30 };
+    return { type: 'custom:oriel-cost-overlay-feature', tariff_value: 0.30 };
   }
 
   /** Resolve power in kW from config + tile context. Returns null when missing. */
@@ -111,12 +111,12 @@ class DashboardEnhancedCostOverlayFeature extends LitElement {
   }
 }
 
-customElements.define('dashboard-enhanced-cost-overlay-feature', DashboardEnhancedCostOverlayFeature);
+customElements.define('oriel-cost-overlay-feature', OrielCostOverlayFeature);
 
 window.customCardFeatures = window.customCardFeatures || [];
-if (!window.customCardFeatures.some((c) => c.type === 'dashboard-enhanced-cost-overlay-feature')) {
+if (!window.customCardFeatures.some((c) => c.type === 'oriel-cost-overlay-feature')) {
   window.customCardFeatures.push({
-    type: 'dashboard-enhanced-cost-overlay-feature',
+    type: 'oriel-cost-overlay-feature',
     name: 'Energy cost overlay',
     // Allowed on any tile — the feature itself decides whether to render.
     supported: () => true,

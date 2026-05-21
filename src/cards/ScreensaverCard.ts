@@ -27,7 +27,7 @@ interface ScreensaverCardConfig {
   show_date?: boolean;
 }
 
-class DashboardEnhancedScreensaverCard extends LitElement {
+class OrielScreensaverCard extends LitElement {
   @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
   @state() accessor _active = false;
   @state() accessor _now = new Date();
@@ -84,7 +84,7 @@ class DashboardEnhancedScreensaverCard extends LitElement {
   `;
 
   public setConfig(config: ScreensaverCardConfig): void {
-    this._config = config ?? { type: 'custom:dashboard-enhanced-screensaver-card' };
+    this._config = config ?? { type: 'custom:oriel-screensaver-card' };
     this._resetIdle();
   }
 
@@ -176,7 +176,7 @@ class DashboardEnhancedScreensaverCard extends LitElement {
   };
 }
 
-customElements.define('dashboard-enhanced-screensaver-card', DashboardEnhancedScreensaverCard);
+customElements.define('oriel-screensaver-card', OrielScreensaverCard);
 
 declare global {
   interface Window {
@@ -185,10 +185,10 @@ declare global {
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === 'dashboard-enhanced-screensaver-card')) {
+if (!window.customCards.some((c) => c.type === 'oriel-screensaver-card')) {
   window.customCards.push({
-    type: 'dashboard-enhanced-screensaver-card',
-    name: 'DashboardEnhanced Screensaver',
+    type: 'oriel-screensaver-card',
+    name: 'Oriel Screensaver',
     description: 'Full-screen clock+weather overlay after N minutes idle. For wall-mounted tablets.',
   });
 }

@@ -4,15 +4,15 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelace';
-import type { DashboardEnhancedStrategyConfig } from '../types/strategy';
+import type { OrielConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 
 interface ClimateViewStrategyParams {
-  config?: DashboardEnhancedStrategyConfig;
+  config?: OrielConfig;
 }
 
-class DashboardEnhancedViewClimateStrategy extends HTMLElement {
+class OrielViewClimate extends HTMLElement {
   static async generate(
     config: ClimateViewStrategyParams,
     hass: HomeAssistant,
@@ -86,4 +86,4 @@ class DashboardEnhancedViewClimateStrategy extends HTMLElement {
   }
 }
 
-customElements.define('ll-strategy-view-dashboard-enhanced-view-climate', DashboardEnhancedViewClimateStrategy);
+customElements.define('ll-strategy-view-oriel-climate', OrielViewClimate);

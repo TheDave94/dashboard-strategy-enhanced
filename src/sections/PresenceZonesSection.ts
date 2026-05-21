@@ -2,7 +2,7 @@
 // Presence Zones Section Builder
 // ====================================================================
 // Renders the curated `presence_zones` list as one
-// `dashboard-enhanced-zone-presence-card` in its own section on the overview.
+// `oriel-zone-presence-card` in its own section on the overview.
 // Auto-hides when the list is empty / unset. The list is forwarded to
 // the card as-is, so all per-entry overrides (name, icon, color,
 // tap_action, …) accepted by the card work here too.
@@ -28,7 +28,7 @@ export function createPresenceZonesSection(
   if (cleaned.length === 0) return null;
 
   const card: LovelaceCardConfig = {
-    type: 'custom:dashboard-enhanced-zone-presence-card',
+    type: 'custom:oriel-zone-presence-card',
     entities: cleaned,
     ...(name !== undefined ? { name } : {}),
     ...(icon !== undefined ? { icon } : {}),

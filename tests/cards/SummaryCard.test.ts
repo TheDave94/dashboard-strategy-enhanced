@@ -18,10 +18,10 @@ type SummaryCardEl = HTMLElement & {
 };
 
 function mount(): SummaryCardEl {
-  return document.createElement('dashboard-enhanced-summary-card') as SummaryCardEl;
+  return document.createElement('oriel-summary-card') as SummaryCardEl;
 }
 
-describe('dashboard-enhanced-summary-card', () => {
+describe('oriel-summary-card', () => {
   describe('setConfig', () => {
     let el: SummaryCardEl;
     beforeEach(() => {
@@ -84,14 +84,14 @@ describe('dashboard-enhanced-summary-card', () => {
   describe('picker integration', () => {
     it('publishes itself to window.customCards with preview:true', () => {
       const entry = (window.customCards || []).find(
-        (c: { type: string }) => c.type === 'dashboard-enhanced-summary-card',
+        (c: { type: string }) => c.type === 'oriel-summary-card',
       ) as { type: string; preview?: boolean } | undefined;
       expect(entry).toBeDefined();
       expect(entry?.preview).toBe(true);
     });
 
     it('getStubConfig returns a valid summary_type', () => {
-      const ctor = customElements.get('dashboard-enhanced-summary-card') as
+      const ctor = customElements.get('oriel-summary-card') as
         | (typeof HTMLElement & { getStubConfig?: () => { summary_type: string } })
         | undefined;
       expect(ctor).toBeDefined();

@@ -10,7 +10,7 @@
 //   - querySelector('ha-card') finding a node our cards mounted
 //   - <action-handler>.bind(node, opts) being callable from utils/
 //
-// Cards' own custom elements (`dashboard-enhanced-summary-card`, etc.) are
+// Cards' own custom elements (`oriel-summary-card`, etc.) are
 // registered when each card module is imported by its test file.
 // ====================================================================
 

@@ -1,7 +1,7 @@
 // ====================================================================
-// Dashboard Enhanced Strategy Types
+// Oriel Types
 // ====================================================================
-// All configuration and data types specific to the dashboard-enhanced strategy.
+// All configuration and data types specific to the oriel strategy.
 // These types cover the YAML config schema and internal data structures
 // used throughout the strategy codebase.
 // ====================================================================
@@ -69,7 +69,7 @@ export const ALL_HEADING_KEYS: HeadingKey[] = [
 
 // -- Main Strategy Config ---------------------------------------------
 
-export interface DashboardEnhancedStrategyConfig {
+export interface OrielConfig {
   // Global toggles
   show_weather?: boolean; // default: true
   show_weather_forecast_card?: boolean; // (legacy) default: true — set false
@@ -207,7 +207,7 @@ export interface DashboardEnhancedStrategyConfig {
    * Combine with `lazy_sections_threshold` to tune which sections
    * are deferred — sections 0 through threshold-1 stay eager,
    * sections at index >= threshold get wrapped in
-   * `dashboard-enhanced-lazy-card`.
+   * `oriel-lazy-card`.
    */
   lazy_sections?: boolean;
   lazy_sections_threshold?: number;
@@ -257,7 +257,7 @@ export interface DashboardEnhancedStrategyConfig {
     string,
     {
       name?: string;
-      override?: DashboardEnhancedStrategyConfig;
+      override?: OrielConfig;
     }
   >;
   /**
@@ -273,7 +273,7 @@ export interface DashboardEnhancedStrategyConfig {
   users_by_role?: Record<
     string,
     {
-      override?: DashboardEnhancedStrategyConfig;
+      override?: OrielConfig;
     }
   >;
   /**
@@ -295,7 +295,7 @@ export interface DashboardEnhancedStrategyConfig {
   use_bubble_drawers?: boolean;
   /**
    * Opt-in: when apexcharts-card (HACS) is installed, replace built-in
-   * dashboard-enhanced-sparkline-card emissions with apexcharts-card configs.
+   * oriel-sparkline-card emissions with apexcharts-card configs.
    *
    * Available since v3.2.
    */
@@ -379,7 +379,7 @@ export interface DashboardEnhancedStrategyConfig {
    * Globally enable / disable the auto-rendered zone-presence card in
    * room views. Default true: each room view picks up its
    * binary_sensors with device_class ∈ {occupancy, motion, presence}
-   * and renders them as one compact `dashboard-enhanced-zone-presence-card`
+   * and renders them as one compact `oriel-zone-presence-card`
    * (only when ≥2 such sensors are present in the area — a single
    * sensor reads fine as a normal tile). Set false to suppress
    * across the whole dashboard.
@@ -387,7 +387,7 @@ export interface DashboardEnhancedStrategyConfig {
   show_zone_presence_in_rooms?: boolean;
   /**
    * Optional curated zone-presence card for the overview. When set,
-   * the strategy renders a `dashboard-enhanced-zone-presence-card` in its own
+   * the strategy renders a `oriel-zone-presence-card` in its own
    * 'presence' section on the overview with the listed entities.
    * The list is opaque to the strategy — each entry is forwarded to
    * the card as-is, so all per-entry overrides (name, icon, color,
@@ -499,7 +499,7 @@ export interface AreasDisplay {
 
 /**
  * Single entry in `presence_zones[]`. Mirrors the shape the
- * dashboard-enhanced-zone-presence-card accepts so the strategy can forward
+ * oriel-zone-presence-card accepts so the strategy can forward
  * values verbatim. All fields besides `entity` are optional.
  */
 export interface PresenceZoneEntry {
@@ -524,7 +524,7 @@ export interface AreaOptions {
   /**
    * Optional sticky-lock companion rendered next to the room-mode
    * tile in the room view. Typically `input_boolean.<area>_sticky` —
-   * when on, your room automation suppresses auto-mode-changes. The
+   * when on, your room automation suppresses auto-mooriel-changes. The
    * companion tile is only rendered when this is set AND the
    * room-mode tile itself rendered.
    */

@@ -1,6 +1,6 @@
 {
-  "name": "Dashboard Enhanced Strategy",
-  "filename": "dashboard-enhanced-strategy.js",
+  "name": "Oriel Dashboard",
+  "filename": "oriel.js",
   "content_in_root": false,
   "render_readme": true,
   "homeassistant": "2026.5.0"

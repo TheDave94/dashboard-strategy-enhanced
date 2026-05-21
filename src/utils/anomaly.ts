@@ -6,7 +6,7 @@
 // (the most-common state for this entity at this hour-of-day).
 //
 // Not a full statistical model — Z-scores against tiny sample sizes
-// produce more false positives than signal. The mode-deviation
+// produce more false positives than signal. The mooriel-deviation
 // heuristic is good enough to be useful and cheap enough to run on
 // every dashboard load.
 //
@@ -27,7 +27,7 @@ interface HourlyStats {
   lastFetch: number;
 }
 
-const STORAGE_KEY = 'dashboard_enhanced_anomaly_v1';
+const STORAGE_KEY = 'oriel_anomaly_v1';
 const TTL_MS = 24 * 60 * 60 * 1000; // refetch daily
 const cache = new Map<string, HourlyStats>();
 

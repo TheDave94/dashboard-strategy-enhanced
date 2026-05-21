@@ -2,8 +2,8 @@ PERFORMANCE-AUDIT.md
 Session-Summary.md
 node_modules/
 .idea/
-dist/dashboard-enhanced-strategy.js
-dist/dashboard-enhanced-strategy.js.map
+dist/oriel.js
+dist/oriel.js.map
 .DS_Store
 .codacy/
 coverage/
