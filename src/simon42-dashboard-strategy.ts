@@ -174,6 +174,71 @@ class Simon42DashboardStrategy extends HTMLElement {
     await customElements.whenDefined('simon42-dashboard-strategy-editor');
     return document.createElement('simon42-dashboard-strategy-editor');
   }
+
+  /**
+   * Surfaces curated "starting points" in HA's New Dashboard wizard
+   * (added in HA 2025.5+ as `LovelaceDashboardStrategyGetCreateSuggestions`).
+   * Each suggestion becomes a one-click preset; the user picks one and HA
+   * seeds the dashboard config with the returned `strategy_config`.
+   *
+   * Three presets surface today:
+   *   - Standard      — sensible defaults for most homes (HA built-ins on)
+   *   - Minimal       — just clock + areas, no summaries or extras
+   *   - Power-user    — everything on (all sections, all badges)
+   *
+   * Returning an empty array hides the suggestions UI; HA falls back to
+   * the manual YAML editor flow that's always existed.
+   */
+  static async getCreateSuggestions(): Promise<
+    Array<{
+      title: string;
+      description?: string;
+      icon?: string;
+      strategy_config: Record<string, unknown>;
+    }>
+  > {
+    return [
+      {
+        title: 'Standard',
+        description: 'Defaults for most homes — overview, summaries, areas, weather, energy.',
+        icon: 'mdi:home-outline',
+        strategy_config: { type: 'custom:simon42-dashboard' },
+      },
+      {
+        title: 'Minimal',
+        description: 'Just clock + area cards. No summaries, no extra sections.',
+        icon: 'mdi:home-minus-outline',
+        strategy_config: {
+          type: 'custom:simon42-dashboard',
+          show_light_summary: false,
+          show_covers_summary: false,
+          show_security_summary: false,
+          show_battery_summary: false,
+          show_weather: false,
+          show_energy: false,
+        },
+      },
+      {
+        title: 'Power-user',
+        description: 'All sections + all header badges enabled. Easy to disable later.',
+        icon: 'mdi:home-lightning-bolt',
+        strategy_config: {
+          type: 'custom:simon42-dashboard',
+          show_climate_summary: true,
+          show_plants_section: true,
+          show_agenda_section: true,
+          show_todos_section: true,
+          show_persons_section: true,
+          show_vacuums_section: true,
+          show_maintenance_section: true,
+          show_unavailable_alert_badge: true,
+          show_now_playing_badge: true,
+          show_sun_badge: true,
+          show_updates_badge: true,
+        },
+      },
+    ];
+  }
 }
 
 // Register the strategy custom element under HA's current naming

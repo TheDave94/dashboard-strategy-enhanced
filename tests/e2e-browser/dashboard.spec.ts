@@ -90,6 +90,13 @@ test.describe('dashboard rendering', () => {
       /\/local\//,
       /browser_mod\.js/,
       /card-tools/,
+      // HACS post-rename artifact: after a repo rename, HACS leaves
+      // a stale lovelace resource entry pointing at the new repo's
+      // hacsfiles path while serving from the old one. The 404 is
+      // cosmetic — the plugin loads via the other resource entry.
+      // Delete the stale entry via the HA WS API to clear it:
+      //   lovelace/resources/delete with the matching resource_id
+      /\/hacsfiles\/dashboard-strategy-enhanced\//,
       // HA bootstrap races + chunk preloads.
       /No matching state/i,
       /^Failed to load resource/i,
