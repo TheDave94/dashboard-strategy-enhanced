@@ -180,9 +180,14 @@ export class LivePreviewRunner {
     this.onBusy(true);
     const t0 = performance.now();
     try {
-      // Resolve the strategy via customElements registry — the editor
-      // is always loaded alongside the strategy, so the element is
-      // already defined by the time the preview runs.
+      // Resolve the strategy via the customElements registry. An earlier
+      // version of this file used `await import('../oriel')` for the
+      // appeal of lazy-loading the strategy chunk, but that path was
+      // abandoned: the strategy is the entry point that defines the
+      // editor's own custom element, so by the time any editor code
+      // (including this preview) runs, the strategy class is already
+      // registered. The customElements path is synchronous, dependency-
+      // free, and pins the right contract — both sides ship together.
       const StrategyClass = customElements.get('ll-strategy-dashboard-oriel') as
         | { generate(config: OrielConfig, hass: HomeAssistant): Promise<LovelaceConfig> }
         | undefined;
