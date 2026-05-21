@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.8.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.7.0...v4.8.0) (2026-05-21)
+
+
+### Features
+
+* v4.8 follow-up [#3](https://github.com/TheDave94/oriel-dashboard/issues/3) — editor audit, axe-core sweep, camera generalization, strict-CSP harness ([#28](https://github.com/TheDave94/oriel-dashboard/issues/28)) ([f0601c0](https://github.com/TheDave94/oriel-dashboard/commit/f0601c07cad6d9d0a1a5dff7f4966dcee6a5c71a))
+
 ## [4.7.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.6.0...v4.7.0) (2026-05-21)
 
 
