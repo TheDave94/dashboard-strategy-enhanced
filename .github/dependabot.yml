@@ -1,13 +1,31 @@
 # ============================================================================
-# Dependabot — GitHub Actions version updates
+# Dependabot configuration
 # ============================================================================
+# This file covers *version-update* PRs — the regular weekly bumps of
+# pinned deps. Dependabot also has a separate channel for security
+# advisory PRs (i.e. "your installed @foo/bar version is vulnerable to
+# CVE-…, here's a patch"), which is NOT controlled from this file.
+#
+# Security advisory PRs require two repo-level toggles, BOTH enabled
+# on this repo as of v4.6:
+#   - Settings → Code security → "Dependabot alerts" = enabled
+#   - Settings → Code security → "Dependabot security updates" = enabled
+#
+# Enable via API if ever disabled again:
+#   gh api -X PUT repos/<owner>/<repo>/vulnerability-alerts
+#   gh api -X PUT repos/<owner>/<repo>/automated-security-fixes
+#
+# Verify:
+#   gh api repos/<owner>/<repo> --jq '.security_and_analysis.dependabot_security_updates'
+#
+# Why both: vulnerability alerts SURFACE the CVE; security updates OPEN
+# the PR. Without both, you'd see a red dot in the Security tab but no
+# automatic patch PR. See review §B-2.
+#
 # Watches every `uses:` in .github/workflows/ and opens a PR whenever an
 # upstream action publishes a newer release. Required for sustainable
 # SHA-pinning: dependabot updates the SHA + comment (e.g. `# v4`) together
 # so the workflow stays both pinned and current.
-#
-# To extend coverage: add `package-ecosystem: npm` for dependency updates,
-# or schedule changes to `daily` / `weekly` per maintainer preference.
 # ============================================================================
 
 version: 2
