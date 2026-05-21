@@ -265,9 +265,31 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
     // Per-section conditional visibility (e.g. show agenda only on workdays).
     const sectionVisibility = dashboardConfig.section_visibility || {};
 
+    // Mode-driven section ordering (roadmap C4). If
+    // `sections_order_by_mode` is configured AND the strategy's
+    // house_mode_entity is set AND the entity's current state
+    // matches a key (case- and underscore-insensitive), use that
+    // override. Otherwise fall back to `sections_order`.
+    const modeMap = dashboardConfig.sections_order_by_mode;
+    const houseModeEnt = dashboardConfig.house_mode_entity;
+    let baseOrder: string[] | undefined = dashboardConfig.sections_order;
+    if (modeMap && houseModeEnt) {
+      const state = hass.states[houseModeEnt]?.state;
+      if (typeof state === 'string') {
+        const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]+/g, '_');
+        const stateKey = normalize(state);
+        for (const [key, order] of Object.entries(modeMap)) {
+          if (normalize(key) === stateKey) {
+            baseOrder = order;
+            break;
+          }
+        }
+      }
+    }
+
     // Assemble in configured order, appending assigned custom cards to each section
     const sectionsOrder = normalizeSectionsOrder(
-      (dashboardConfig.sections_order as string[] | undefined) ?? DEFAULT_SECTIONS_ORDER,
+      baseOrder ?? DEFAULT_SECTIONS_ORDER,
       customSectionKeys,
     );
     const overviewSections: LovelaceSectionConfig[] = [];
