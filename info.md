@@ -1,19 +1,21 @@
-# Dashboard Strategy — Enhanced Edition (v2.0+)
+# Oriel Dashboard
 
-A substantially improved fork of [oriel's dashboard strategy](https://github.com/TheRealOriel/oriel) for Home Assistant. Auto-generates views based on areas, entities, and their states — with significant additions in custom cards, configuration UI, and architectural quality.
+A Home Assistant Lovelace strategy that **auto-generates a complete dashboard** from your areas, devices, and entities. No per-card YAML, no manual layout.
 
-## What's in v2.0
+## Highlights
 
-- **Five custom cards / features**: zone-presence, summary tiles, lights group, covers group, sticky-lock feature. All with `<ha-form>` config editors, "Add card" picker integration, and container-query scaling.
-- **Six optional overview sections**: plants, agenda, todos, persons, vacuums, maintenance.
-- **Five opt-in header badges**: power, unavailable alerts, now-playing, sun, updates.
-- **Per-section + per-room conditional visibility** (entity/state predicates).
-- **`presence_entities` per-area config**: single source of truth for favorites pin + Room view zone-presence.
-- **Modern HA baseline**: 2026.5+, design tokens, CSS container queries, source maps in production, ESLint + npm audit + happy-dom card tests gated in CI.
+- **Setup wizard** in the editor — auto-detects installed HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card) and surfaces each advanced feature with an install hint when missing.
+- **Per-user / per-role dashboards** — different layouts per HA user or label.
+- **Ten custom cards / features** — summary, zone-presence, lights group, covers group, sparkline, notification banners, routines, screensaver, voice FAB, sticky-lock + cost-overlay features.
+- **Mode-driven section reorder** and **composable visibility rules** (role / time-of-day / mode).
+- **Wall-panel mode** with screensaver, **lazy-mounting** for large installs, **per-area room view overrides**.
+- **Plugin extension API** — third-party plugins can `window.oriel.registerSection(...)` to add sections.
+- **Visual `<ha-form>` editor** for every config option, with migration assistants and usage-aware layout suggestions.
+- **HA 2026.5+** baseline with modern design tokens, container queries, and code-split bundles.
 
 ## Installation
 
-HACS custom repository → `TheDave94/oriel-dashboard`, category Lovelace.
+HACS custom repository → `TheDave94/oriel-dashboard`, category Dashboard.
 
 Then create a dashboard with:
 
@@ -22,6 +24,10 @@ strategy:
   type: custom:oriel
 ```
 
-See [README](README.MD) for detailed configuration.
+See [README](README.MD) for the full configuration surface.
 
-Original by [@TheRealOriel](https://github.com/TheRealOriel), enhanced by [@TheDave94](https://github.com/TheDave94).
+## Acknowledgments
+
+Started as a fork of [@TheRealSimon42](https://github.com/TheRealSimon42)'s dashboard strategy. See [MIGRATION.md](MIGRATION.md) for the upstream-to-Oriel migration guide.
+
+Enhanced by [@TheDave94](https://github.com/TheDave94).

@@ -40,4 +40,4 @@ A list of unreleased changes can be found [here]({{ .Info.RepositoryURL }}/compa
 {{ end -}}
 {{ end -}}
 {{ end -}}
-[0.1]: https://github.com/TheRealOriel/oriel/releases/tag/0.1
+[0.1]: https://github.com/TheDave94/oriel-dashboard/releases/tag/0.1
