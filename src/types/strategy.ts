@@ -212,6 +212,17 @@ export interface Simon42StrategyConfig {
   lazy_sections?: boolean;
   lazy_sections_threshold?: number;
   /**
+   * Wall-panel / kiosk mode. When 'wall', the strategy emits a
+   * full-screen screensaver overlay card after N minutes idle, and
+   * loosens density-spacing for thumb-reach on tablets.
+   */
+  panel_mode?: 'normal' | 'wall';
+  /** Minutes of idle before the screensaver activates. Default 5. */
+  panel_screensaver_after_minutes?: number;
+  /** Optional entity rendered on the screensaver below the clock
+   *  (typically a weather.* or temperature sensor). */
+  panel_screensaver_entity?: string;
+  /**
    * Per-mode section-order overrides. The strategy reads the current
    * value of `house_mode_entity` (or `input_select.house_mode` by
    * convention) at generate() time and picks the matching override.

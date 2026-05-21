@@ -346,6 +346,27 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       }
     }
 
+    // Wall-panel screensaver — when `panel_mode: 'wall'`, append a
+    // single full-screen screensaver card to the overview. The card
+    // itself is `position: fixed` so it sits above everything; the
+    // section is just a container so HA mounts it. Idle minutes +
+    // optional entity come from the strategy config.
+    if (dashboardConfig.panel_mode === 'wall') {
+      overviewSections.push({
+        type: 'grid',
+        cards: [
+          {
+            type: 'custom:simon42-screensaver-card',
+            idle_minutes: dashboardConfig.panel_screensaver_after_minutes ?? 5,
+            ...(dashboardConfig.panel_screensaver_entity
+              ? { entity: dashboardConfig.panel_screensaver_entity }
+              : {}),
+            grid_options: { columns: 'full', rows: 0 },
+          } as LovelaceCardConfig,
+        ],
+      });
+    }
+
     const totalCards = overviewSections.reduce((sum, s) => sum + (s.cards?.length || 0), 0);
     timeEnd('overview-generate');
     debugLog(`Overview: ${overviewSections.length} sections, ${totalCards} cards, ${personBadges.length} badges`);
