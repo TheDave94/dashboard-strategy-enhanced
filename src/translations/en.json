@@ -401,7 +401,10 @@
       "orphan_custom_sections_yaml_title": "Custom section has invalid YAML",
       "orphan_custom_sections_yaml_desc": "One or more custom_sections entries have YAML parse errors. Open the Custom Sections tab to fix them.",
       "orphan_custom_badges_yaml_title": "Custom badge has invalid YAML",
-      "orphan_custom_badges_yaml_desc": "One or more custom_badges entries have YAML parse errors. Open the Custom Badges tab to fix them."
+      "orphan_custom_badges_yaml_desc": "One or more custom_badges entries have YAML parse errors. Open the Custom Badges tab to fix them.",
+      "muted_camera_companions_title": "Some camera companions are muted",
+      "muted_camera_companions_desc": "You have cameras in HA but the `room_camera_companions` config has some categories disabled. If that was intentional, ignore. Otherwise restore the default to surface all five (spotlight, motion, siren, battery, doorbell).",
+      "restore_defaults": "Restore defaults"
     },
     "favorites_viewport_default": "Default",
     "favorites_viewport_phone": "Phone",
@@ -420,6 +423,14 @@
     "live_preview_views": "Views",
     "live_preview_sections": "Sections",
     "live_preview_cards": "Cards",
-    "live_preview_ms": "ms"
+    "live_preview_ms": "ms",
+    "new_badge": "New badge",
+    "room_camera_companions": "Companion entities to surface next to each camera (picture-glance):",
+    "room_camera_companions_desc": "Default: all five enabled. Unchecking all disables picture-glance entirely (cameras fall back to picture-entity).",
+    "room_camera_companion_light": "Spotlight",
+    "room_camera_companion_motion": "Motion sensor",
+    "room_camera_companion_siren": "Siren",
+    "room_camera_companion_battery": "Battery level",
+    "room_camera_companion_doorbell": "Doorbell"
   }
 }

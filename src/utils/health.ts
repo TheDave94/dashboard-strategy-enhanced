@@ -281,6 +281,40 @@ export function detectHealthIssues(
     }
   }
 
+  // ----- Camera companions muted while cameras exist -----
+  // Informational only: the user has a non-default `room_camera_companions`
+  // value AND there are camera entities in HA. The detector doesn't try
+  // to figure out per-camera whether companion entities exist — that's
+  // more work than the signal warrants. Just flags that the knob is
+  // active so users who muted categories accidentally (e.g. by clicking
+  // through the checkboxes) can notice + restore the default with a
+  // single Fix.
+  if (Array.isArray(config.room_camera_companions)) {
+    const hasCameraEntities = Object.keys(hass.states ?? {}).some((id) =>
+      id.startsWith('camera.'),
+    );
+    if (hasCameraEntities) {
+      const enabled = config.room_camera_companions;
+      const all = ['light', 'motion', 'siren', 'battery', 'doorbell'];
+      const muted = all.filter((k) => !enabled.includes(k as 'light'));
+      if (muted.length > 0) {
+        issues.push({
+          id: 'muted-camera-companions',
+          severity: 'info',
+          titleKey: 'editor.health.muted_camera_companions_title',
+          descKey: 'editor.health.muted_camera_companions_desc',
+          detail: muted.join(', '),
+          ctaKey: 'editor.health.restore_defaults',
+          fix: (c) => {
+            const next = { ...c };
+            delete next.room_camera_companions;
+            return next;
+          },
+        });
+      }
+    }
+  }
+
   // ----- YAML parse errors on custom_* entries -----
   // These don't have an auto-fix — the user needs to edit the YAML.
   // We surface them so users notice rather than only seeing the inline

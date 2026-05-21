@@ -250,6 +250,7 @@ function renderFeature(f: FeatureEntry, ctx: SetupTabContext): TemplateResult {
           ? html`
               <ha-switch
                 .checked=${isEnabled}
+                aria-label=${f.label}
                 @change=${(e: Event) =>
                   ctx.onFeatureToggle(f.id, (e.target as HTMLInputElement).checked)}
               ></ha-switch>

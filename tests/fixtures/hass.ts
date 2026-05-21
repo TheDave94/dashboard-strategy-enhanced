@@ -58,7 +58,7 @@ export function makeHass(spec: HassFixtureSpec = {}): HomeAssistant {
   const areas: Record<string, AreaFixture> = {};
 
   for (const e of spec.entities ?? []) {
-    const entry: EntityFixture = {
+    const entry: EntityFixture & { hidden?: boolean } = {
       entity_id: e.entity_id,
       area_id: e.area_id ?? null,
       device_id: e.device_id ?? null,
@@ -66,6 +66,10 @@ export function makeHass(spec: HassFixtureSpec = {}): HomeAssistant {
       disabled_by: e.disabled_by ?? null,
       platform: e.platform,
       labels: e.labels ?? [],
+      // Real HA derives the boolean `hidden` from a non-null
+      // `hidden_by` on the entity registry entry. Mirror that here so
+      // Registry.isEntityExcluded sees the right shape in tests.
+      hidden: e.hidden_by != null,
     };
     entities[e.entity_id] = entry;
     states[e.entity_id] = {

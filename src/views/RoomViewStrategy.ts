@@ -18,6 +18,11 @@ import { localize } from '../utils/localize';
 import { resolveDensity } from '../utils/density';
 import { BADGE_COLOR_MAP, getColorForEntity, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
 import { applyStateIcon } from '../utils/state-iconography';
+import {
+  extractCameraCompanions,
+  hasAnyCompanion,
+  sanitizeCompanionList,
+} from '../utils/camera-companions';
 
 // HA supported_features bitmask values
 const FAN_SET_SPEED = 1;
@@ -425,70 +430,43 @@ class OrielViewRoom extends HTMLElement {
           ? roomEntities.cameras[0]
           : undefined;
       const cameraCards: LovelaceCardConfig[] = [];
+      // Resolved once per area — applies to every camera in this room.
+      // Default = all five companion kinds; the editor knob lets users
+      // opt categories out (e.g. hide battery readouts but keep motion).
+      const companionsEnabled = sanitizeCompanionList(
+        dashboardConfig.room_camera_companions,
+      );
+
       for (const cameraId of roomEntities.cameras) {
         if (cameraId === heroExclude) continue;
         if (!hass.states[cameraId]) continue;
-        const camEntity = Registry.getEntity(cameraId);
-        const deviceId = camEntity?.device_id;
 
-        let isReolink = false;
-        let isAqara = false;
-        if (deviceId) {
-          const device = Registry.getDevice(deviceId);
-          if (device) {
-            const mfr = (device.manufacturer || '').toLowerCase();
-            const model = (device.model || '').toLowerCase();
-            isReolink = mfr.includes('reolink') || model.includes('reolink');
-            isAqara = mfr.includes('aqara') || model.includes('aqara');
-          }
-        }
+        // Vendor-agnostic companion extraction. Replaced the v3.x
+        // Reolink/Aqara hardcoded branches — the extraction logic is
+        // pure HA device-class introspection, not vendor-specific.
+        const companions = extractCameraCompanions(cameraId, hass, companionsEnabled);
 
-        if ((isReolink || isAqara) && deviceId) {
-          const devEntities = Registry.getEntityIdsForDevice(deviceId);
-
-          // Reolink-specific entities
-          const spotlight = devEntities.find(
-            (id) => id.startsWith('light.') && hass.states[id] && !Registry.isEntityExcluded(id)
-          );
-          const motion = devEntities.find(
-            (id) =>
-              id.startsWith('binary_sensor.') &&
-              hass.states[id]?.attributes?.device_class === 'motion' &&
-              !Registry.isEntityExcluded(id)
-          );
-          const siren = devEntities.find(
-            (id) => id.startsWith('siren.') && hass.states[id] && !Registry.isEntityExcluded(id)
-          );
-
-          // Aqara-specific entities
-          const battery = devEntities.find(
-            (id) =>
-              id.startsWith('sensor.') &&
-              hass.states[id]?.attributes?.device_class === 'battery' &&
-              !Registry.isEntityExcluded(id)
-          );
-          const doorbell = devEntities.find(
-            (id) =>
-              id.startsWith('event.') &&
-              hass.states[id]?.attributes?.device_class === 'doorbell' &&
-              !Registry.isEntityExcluded(id)
-          );
-
-          const glanceEntities: any[] = [];
-          if (isReolink) {
-            if (spotlight) glanceEntities.push({ entity: spotlight });
-            if (motion) glanceEntities.push({ entity: motion });
-            if (siren) glanceEntities.push({ entity: siren });
-          }
-          if (isAqara) {
-            if (battery) glanceEntities.push({ entity: battery });
-            if (doorbell) glanceEntities.push({ entity: doorbell });
-          }
+        if (hasAnyCompanion(companions)) {
+          const glanceEntities: Array<{ entity: string }> = [];
+          // Stable ordering: light → motion → siren → battery → doorbell.
+          // Matches the extractor's bucket order so the UI is consistent
+          // across cards.
+          if (companions.light) glanceEntities.push({ entity: companions.light });
+          if (companions.motion) glanceEntities.push({ entity: companions.motion });
+          if (companions.siren) glanceEntities.push({ entity: companions.siren });
+          if (companions.battery) glanceEntities.push({ entity: companions.battery });
+          if (companions.doorbell) glanceEntities.push({ entity: companions.doorbell });
 
           cameraCards.push({
             type: 'picture-glance',
             camera_image: cameraId,
-            camera_view: isAqara ? 'live' : 'auto',
+            // Always 'auto' — battery-powered cams shouldn't stream
+            // continuously and there's no reliable way to detect which
+            // are wired vs battery from registry data alone. The
+            // previous Aqara-specific 'live' override is dropped; users
+            // who want continuous streaming can configure it via the
+            // camera_hero per-area option instead.
+            camera_view: 'auto',
             fit_mode: 'cover',
             title: stripAreaName(cameraId, area, hass),
             entities: glanceEntities,

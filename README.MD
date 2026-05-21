@@ -25,7 +25,7 @@ Requires HA **2025.5+** (for the strategy `getCreateSuggestions` API). Optimised
 ### Auto-generated views
 
 - **Overview** — clock, alarm tile, area cards (with optional alert / temperature badges), summary tiles for lights / covers / security / batteries / climate, customisable header badges (power, unavailable alerts, now-playing, sun, updates).
-- **Per-room views** — one detailed view per HA area with lights, climate, blinds, media, scenes, miscellaneous, plus an auto-rendered zone-presence card.
+- **Per-room views** — one detailed view per HA area with lights, climate, blinds, media, scenes, miscellaneous, plus an auto-rendered zone-presence card. Cameras in a room surface as `picture-glance` cards with their companion entities (spotlight / motion / siren / battery / doorbell) auto-discovered via device-class — works for any vendor that registers companions correctly (since v4.8; previously Reolink + Aqara only). Configure which companion categories to surface via `room_camera_companions` in the Areas tab.
 - **Specialised summary views** — Lights, Blinds & Covers, Security (locks, doors, garages, windows, smoke/gas), Batteries (with custom thresholds + critical/low/good buckets), Climate.
 - **Six opt-in extra overview sections** — Plants, Agenda, Todos, Persons, Vacuums, Maintenance.
 - **Custom views** — declare extra dashboard views with arbitrary card YAML, fully editor-supported.

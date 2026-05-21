@@ -2359,7 +2359,31 @@ class OrielEditor extends LitElement {
       onToggleChange: (k, v, d) => this._toggleChanged(k, v, d),
       onRoomVisibilityChange: (areaId, field, value) =>
         this._roomVisibilityChanged(areaId, field, value),
+      onCameraCompanionsChange: (kinds) => this._cameraCompanionsChanged(kinds),
     });
+  }
+
+  /**
+   * Persist a `room_camera_companions` update. The default (all five
+   * kinds) is stored as "key absent" — when the editor reports all
+   * five enabled, we strip the key from the config to keep saved
+   * YAML sparse. An explicit empty array remains stored — it's the
+   * "disable picture-glance entirely" signal.
+   */
+  private _cameraCompanionsChanged(
+    kinds: Array<'light' | 'motion' | 'siren' | 'battery' | 'doorbell'>,
+  ): void {
+    const newConfig: OrielConfig = { ...this._config };
+    const allFive = ['light', 'motion', 'siren', 'battery', 'doorbell'].every((k) =>
+      kinds.includes(k as 'light'),
+    );
+    if (allFive) {
+      delete newConfig.room_camera_companions;
+    } else {
+      newConfig.room_camera_companions = kinds;
+    }
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
   }
 
   private _roomVisibilityChanged(areaId: string, field: 'entity' | 'state', value: string): void {

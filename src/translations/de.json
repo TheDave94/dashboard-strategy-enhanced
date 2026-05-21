@@ -401,7 +401,10 @@
       "orphan_custom_sections_yaml_title": "Custom-Section hat ungültiges YAML",
       "orphan_custom_sections_yaml_desc": "Ein oder mehrere custom_sections-Einträge haben YAML-Parse-Fehler. Im Custom-Sections-Tab beheben.",
       "orphan_custom_badges_yaml_title": "Custom-Badge hat ungültiges YAML",
-      "orphan_custom_badges_yaml_desc": "Ein oder mehrere custom_badges-Einträge haben YAML-Parse-Fehler. Im Custom-Badges-Tab beheben."
+      "orphan_custom_badges_yaml_desc": "Ein oder mehrere custom_badges-Einträge haben YAML-Parse-Fehler. Im Custom-Badges-Tab beheben.",
+      "muted_camera_companions_title": "Einige Kamera-Begleiter sind ausgeblendet",
+      "muted_camera_companions_desc": "In HA gibt es Kameras, aber die Konfiguration `room_camera_companions` hat einige Kategorien deaktiviert. Falls beabsichtigt, ignorieren. Andernfalls Standardeinstellung wiederherstellen, um alle fünf (Scheinwerfer, Bewegung, Sirene, Akku, Türklingel) anzuzeigen.",
+      "restore_defaults": "Standard wiederherstellen"
     },
     "favorites_viewport_default": "Standard",
     "favorites_viewport_phone": "Mobil",
@@ -420,6 +423,14 @@
     "live_preview_views": "Views",
     "live_preview_sections": "Sektionen",
     "live_preview_cards": "Karten",
-    "live_preview_ms": "ms"
+    "live_preview_ms": "ms",
+    "new_badge": "Neues Badge",
+    "room_camera_companions": "Begleit-Entitäten neben jeder Kamera (Picture-Glance):",
+    "room_camera_companions_desc": "Standard: alle fünf aktiv. Wenn alle deaktiviert sind, wird Picture-Glance abgeschaltet (Kameras fallen auf Picture-Entity zurück).",
+    "room_camera_companion_light": "Scheinwerfer",
+    "room_camera_companion_motion": "Bewegungsmelder",
+    "room_camera_companion_siren": "Sirene",
+    "room_camera_companion_battery": "Akkustand",
+    "room_camera_companion_doorbell": "Türklingel"
   }
 }

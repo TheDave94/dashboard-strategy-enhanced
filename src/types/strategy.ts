@@ -166,6 +166,18 @@ export interface OrielConfig {
   show_automations_in_rooms?: boolean; // default: false
   show_scripts_in_rooms?: boolean; // default: false
   show_cameras_in_rooms?: boolean; // default: true
+  /**
+   * Which device-class companion entities should surface alongside a
+   * camera in its room view (as a picture-glance card). Default is
+   * all five — light, motion, siren, battery, doorbell — discovered
+   * via `extractCameraCompanions()` on the camera's HA device. Set
+   * to `[]` to never emit picture-glance (falls back to plain
+   * picture-entity).
+   *
+   * Available since v4.8 (replaces the Reolink/Aqara hardcoded
+   * branches in RoomViewStrategy).
+   */
+  room_camera_companions?: Array<'light' | 'motion' | 'siren' | 'battery' | 'doorbell'>;
   show_window_contacts_in_rooms?: boolean; // default: true (opt-out — set false to hide window contact badges)
   show_door_contacts_in_rooms?: boolean; // default: true (opt-out — set false to hide door contact badges)
   show_switches_on_areas?: boolean; // default: false

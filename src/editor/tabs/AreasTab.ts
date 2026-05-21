@@ -36,7 +36,18 @@ export interface AreasTabContext {
     field: 'entity' | 'state',
     value: string,
   ) => void;
+  /**
+   * Persist a new room_camera_companions selection. Pass an empty
+   * array to disable picture-glance entirely (cameras fall back to
+   * picture-entity); pass undefined / omitted to restore the default
+   * (all five companion kinds enabled).
+   */
+  onCameraCompanionsChange: (
+    kinds: Array<'light' | 'motion' | 'siren' | 'battery' | 'doorbell'>,
+  ) => void;
 }
+
+const CAMERA_COMPANION_KINDS = ['light', 'motion', 'siren', 'battery', 'doorbell'] as const;
 
 export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
   const c = ctx.config;
@@ -123,6 +134,8 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('show_cameras_in_rooms', checked, true),
       )}
       <div class="description">${localize('editor.show_cameras_in_rooms_desc')}</div>
+
+      ${showCamerasInRooms ? renderCameraCompanionsBlock(ctx) : ''}
 
       ${ctx.renderCheckbox(
         'show-window-contacts-in-rooms',
@@ -228,6 +241,67 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
             })}
         </div>
       </details>
+    </div>
+  `;
+}
+
+/**
+ * Multi-select for `room_camera_companions` — which device-class
+ * categories should surface alongside cameras in their room view's
+ * picture-glance card. v4.8.0 added this knob to replace the v3.x
+ * Reolink/Aqara hardcoded branches.
+ *
+ * Default (when the key is unset): all five kinds enabled. The user
+ * sees five checkboxes, all ticked. Unchecking a box adds the
+ * corresponding kind to a kept-list which is persisted as the
+ * explicit `room_camera_companions` array.
+ */
+function renderCameraCompanionsBlock(ctx: AreasTabContext): TemplateResult {
+  // Default = "key unset" = all enabled. The persisted array is the
+  // explicit list of enabled kinds; an empty array means "disable
+  // picture-glance entirely" (cameras fall back to picture-entity).
+  const stored = ctx.config.room_camera_companions;
+  const enabled = new Set(stored ?? [...CAMERA_COMPANION_KINDS]);
+
+  const toggle = (kind: typeof CAMERA_COMPANION_KINDS[number], on: boolean): void => {
+    const next = new Set(enabled);
+    if (on) next.add(kind);
+    else next.delete(kind);
+    ctx.onCameraCompanionsChange(
+      [...CAMERA_COMPANION_KINDS].filter((k) => next.has(k)),
+    );
+  };
+
+  return html`
+    <div
+      style="margin-left: 16px; margin-top: 6px; margin-bottom: 8px; padding: 8px 10px; border-left: 2px solid var(--divider-color);"
+    >
+      <div
+        style="font-size: 0.85rem; color: var(--secondary-text-color); margin-bottom: 6px;"
+      >
+        ${localize('editor.room_camera_companions') ||
+          'Companion entities to surface next to each camera (picture-glance):'}
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px 14px;">
+        ${CAMERA_COMPANION_KINDS.map(
+          (kind) => html`
+            <label
+              style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;"
+            >
+              <input
+                type="checkbox"
+                ?checked=${enabled.has(kind)}
+                @change=${(e: Event) => toggle(kind, (e.target as HTMLInputElement).checked)}
+              />
+              ${localize(`editor.room_camera_companion_${kind}`) || kind}
+            </label>
+          `,
+        )}
+      </div>
+      <div class="description" style="margin-top: 4px;">
+        ${localize('editor.room_camera_companions_desc') ||
+          'Default: all five enabled. Unchecking all disables picture-glance entirely (cameras fall back to picture-entity).'}
+      </div>
     </div>
   `;
 }

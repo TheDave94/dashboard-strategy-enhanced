@@ -27,7 +27,7 @@ function renderBadgeItem(
   return html`
     <div class="custom-item" data-index=${index}>
       <div class="custom-item-header">
-        <strong>Badge ${index + 1}</strong>
+        <strong>${localize('editor.new_badge')} #${index + 1}</strong>
         <button class="btn-remove" @click=${() => ctx.onRemove(index)}>&#x2715;</button>
       </div>
       <textarea
