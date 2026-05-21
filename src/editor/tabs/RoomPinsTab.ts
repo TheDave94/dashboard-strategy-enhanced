@@ -135,7 +135,7 @@ export function renderRoomPinsTab(ctx: RoomPinsTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('room_pins_show_state', checked, false),
       )}
       ${ctx.renderCheckbox(
-        'room-pins-hioriel-last-changed',
+        'room-pins-hide-last-changed',
         localize('editor.hide_last_changed'),
         roomPinsHideLastChanged,
         (checked) => ctx.onToggleChange('room_pins_hide_last_changed', checked, false),

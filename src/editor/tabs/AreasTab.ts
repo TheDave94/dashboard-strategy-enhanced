@@ -141,7 +141,7 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
       <div class="description">${localize('editor.show_door_contacts_in_rooms_desc')}</div>
 
       ${ctx.renderCheckbox(
-        'hioriel-unavailable-in-rooms',
+        'hide-unavailable-in-rooms',
         localize('editor.hide_unavailable_in_rooms'),
         c.hide_unavailable_in_rooms !== false,
         (checked) => ctx.onToggleChange('hide_unavailable_in_rooms', checked, true),

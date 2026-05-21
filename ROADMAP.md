@@ -1057,7 +1057,7 @@ Already-existing data (`room_mode` / `house_mode`) gets surfaced as visible dash
 
 ### Problem
 
-The current `section_visibility` and `room_visibility` take a single `{entity, state}` predicate. Users with families want role-based visibility (kids see fewer sections), time-of-day visibility (energy section only during day), and mooriel-based (security section only when armed).
+The current `section_visibility` and `room_visibility` take a single `{entity, state}` predicate. Users with families want role-based visibility (kids see fewer sections), time-of-day visibility (energy section only during day), and mode-based (security section only when armed).
 
 ### Idea
 

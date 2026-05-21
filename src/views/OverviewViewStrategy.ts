@@ -266,7 +266,7 @@ class OrielViewOverview extends HTMLElement {
     // Per-section conditional visibility (e.g. show agenda only on workdays).
     const sectionVisibility = dashboardConfig.section_visibility || {};
 
-    // Mooriel-driven section ordering (roadmap C4). If
+    // Mode-driven section ordering (roadmap C4). If
     // `sections_order_by_mode` is configured AND the strategy's
     // house_mode_entity is set AND the entity's current state
     // matches a key (case- and underscore-insensitive), use that

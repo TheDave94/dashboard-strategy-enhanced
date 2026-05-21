@@ -524,7 +524,7 @@ export interface AreaOptions {
   /**
    * Optional sticky-lock companion rendered next to the room-mode
    * tile in the room view. Typically `input_boolean.<area>_sticky` —
-   * when on, your room automation suppresses auto-mooriel-changes. The
+   * when on, your room automation suppresses auto-mode-changes. The
    * companion tile is only rendered when this is set AND the
    * room-mode tile itself rendered.
    */

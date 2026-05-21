@@ -34,9 +34,9 @@ const config = {
     chunkFilename: 'oriel-[name].[contenthash:8].js',
     path: path.resolve(__dirname, 'dist'),
     // publicPath must match the HA resource URL path for async chunk loading.
-    // After the upstream → TheDave94/dashboard-strategy-enhanced repo rename,
-    // HACS serves this plugin from `/hacsfiles/dashboard-strategy-enhanced/`.
-    publicPath: '/hacsfiles/dashboard-strategy-enhanced/',
+    // HACS serves this plugin from `/hacsfiles/oriel-dashboard/` (matching
+    // the GitHub repo name after the v4.1.0 rebrand).
+    publicPath: '/hacsfiles/oriel-dashboard/',
   },
   resolve: {
     extensions: ['.ts', '.js'],

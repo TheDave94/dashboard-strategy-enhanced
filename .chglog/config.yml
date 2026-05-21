@@ -2,7 +2,7 @@ style: github
 template: CHANGELOG.tpl.md
 info:
   title: CHANGELOG
-  repository_url: https://github.com/TheDave94/dashboard-strategy-enhanced
+  repository_url: https://github.com/TheDave94/oriel-dashboard
 options:
   tag_filter_pattern: '^v[0-9]+\.[0-9]+\.[0-9]+$'
   commits:

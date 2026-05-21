@@ -5,7 +5,7 @@ Custom Lovelace Dashboard Strategy for Home Assistant. Generates dynamic dashboa
 ## Architecture
 
 **Language:** TypeScript (ES2020, strict mode)
-**Build:** Webpack → cooriel-split chunks (main + lit + core + views + editor on-demand)
+**Build:** Webpack → code-split chunks (main + lit + core + views + editor on-demand)
 **Distribution:** HACS-compatible (Custom Repository), deployed to `/config/www/community/oriel/`
 
 ### Module Overview
@@ -202,7 +202,7 @@ When PRs were created against the old codebase and cannot be merged directly:
 
 Deliberate architecture decisions that should not be changed:
 
-### Cooriel-Split Chunk Architecture (PERFORMANCE-CRITICAL)
+### Code-Split Chunk Architecture (PERFORMANCE-CRITICAL)
 The bundle is deliberately split into 5 chunks:
 
 | Chunk | Contents | Size | Loads |

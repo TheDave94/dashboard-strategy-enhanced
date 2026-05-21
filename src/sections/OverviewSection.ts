@@ -169,7 +169,7 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
 
   if (showClockCard) {
     if (alarmEntity) {
-      // Clock and alarm panel sioriel-by-side
+      // Clock and alarm panel side-by-side
       cards.push({
         type: 'clock',
         clock_size: 'small',

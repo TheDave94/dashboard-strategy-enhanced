@@ -26,7 +26,7 @@ assignees: ""
 
 <!--
 Screenshots vom Dashboard und/oder der Browser-Konsole (F12) helfen enorm!
-Bitte Fehlermeldungen und Code als Cooriel-Block formatieren (drei Backticks ```).
+Bitte Fehlermeldungen und Code als Code-Block formatieren (drei Backticks ```).
 -->
 
 ## Betroffene Entities (falls relevant)

@@ -297,12 +297,12 @@ function renderHiddenHeadings(ctx: SectionOrderTabContext): TemplateResult {
             <div class="form-row">
               <input
                 type="checkbox"
-                id="hioriel-heading-${hk}"
+                id="hide-heading-${hk}"
                 ?checked=${hiddenHeadings.has(hk)}
                 @change=${(e: Event) =>
                   ctx.onToggleHiddenHeading(hk, (e.target as HTMLInputElement).checked)}
               />
-              <label for="hioriel-heading-${hk}">${localize(`editor.heading_label_${hk}`)}</label>
+              <label for="hide-heading-${hk}">${localize(`editor.heading_label_${hk}`)}</label>
             </div>
           `,
         )}

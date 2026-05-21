@@ -118,7 +118,7 @@ export function renderFavoritesTab(ctx: FavoritesTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('favorites_show_state', checked, false),
       )}
       ${ctx.renderCheckbox(
-        'favorites-hioriel-last-changed',
+        'favorites-hide-last-changed',
         localize('editor.hide_last_changed'),
         favoritesHideLastChanged,
         (checked) => ctx.onToggleChange('favorites_hide_last_changed', checked, false),

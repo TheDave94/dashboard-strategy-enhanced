@@ -99,7 +99,7 @@ test.describe('dashboard rendering', () => {
       // cosmetic — the plugin loads via the other resource entry.
       // Delete the stale entry via the HA WS API to clear it:
       //   lovelace/resources/delete with the matching resource_id
-      /\/hacsfiles\/dashboard-strategy-enhanced\//,
+      /\/hacsfiles\/(dashboard-strategy-enhanced|oriel-dashboard)\//,
       // HA bootstrap races + chunk preloads.
       /No matching state/i,
       /^Failed to load resource/i,

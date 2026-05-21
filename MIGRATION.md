@@ -37,7 +37,7 @@ Mostly additive, but the identifier rename below is a hard break.
 ## Step 1 — install Oriel Dashboard via HACS
 
 1. HACS → Frontend → ⋮ menu → "Custom repositories"
-2. Add `https://github.com/TheDave94/dashboard-strategy-enhanced` as type "Lovelace"
+2. Add `https://github.com/TheDave94/oriel-dashboard` as type "Lovelace"
 3. Install **Oriel Dashboard** (that's the display name)
 4. Reload HA after install (HACS prompts you)
 

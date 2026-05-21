@@ -6,7 +6,7 @@
 // (the most-common state for this entity at this hour-of-day).
 //
 // Not a full statistical model — Z-scores against tiny sample sizes
-// produce more false positives than signal. The mooriel-deviation
+// produce more false positives than signal. The mode-deviation
 // heuristic is good enough to be useful and cheap enough to run on
 // every dashboard load.
 //

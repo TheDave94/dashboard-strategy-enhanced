@@ -13,7 +13,7 @@ A substantially improved fork of [oriel's dashboard strategy](https://github.com
 
 ## Installation
 
-HACS custom repository → `TheDave94/dashboard-strategy-enhanced`, category Lovelace.
+HACS custom repository → `TheDave94/oriel-dashboard`, category Lovelace.
 
 Then create a dashboard with:
 

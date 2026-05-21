@@ -84,7 +84,7 @@ export function createPersonsSection(
     };
     if (battery) {
       // Show a small battery line as additional context. HA tile cards
-      // don't render arbitrary sibling entities, so we add a sioriel-by-side
+      // don't render arbitrary sibling entities, so we add a side-by-side
       // tile for the battery instead — keeps the layout consistent and
       // avoids custom HTML.
       cards.push(tile as LovelaceCardConfig);
