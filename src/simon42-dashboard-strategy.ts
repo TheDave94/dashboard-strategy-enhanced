@@ -70,13 +70,13 @@ class Simon42DashboardStrategy extends HTMLElement {
     // room views / nav tabs. The overview's area cards section is NOT
     // filtered — it uses Registry.areas via OverviewViewStrategy and the
     // user can already hide individual area cards via areas_display.hidden.
-    const roomVisibility = config.room_visibility || {};
-    const visibleAreas = allVisibleAreas.filter((area) => {
-      const rule = Reflect.get(roomVisibility, area.area_id) as { entity?: string; state?: string } | undefined;
-      if (!rule?.entity) return true;
-      const st = Reflect.get(hass.states as Record<string, unknown>, rule.entity) as { state?: string } | undefined;
-      return !!st && st.state === rule.state;
-    });
+    //
+    // Visibility rules support the legacy { entity, state } shape PLUS
+    // the composable v2.3.4 shape (role / time_after / time_before /
+    // mode_entity / mode_is / any / all). See src/utils/visibility.ts.
+    const { getRoomVisibilityChecker } = await import('./utils/visibility');
+    const roomVisible = getRoomVisibilityChecker(config, hass);
+    const visibleAreas = allVisibleAreas.filter((area) => roomVisible(area.area_id));
 
     const showSummaryViews = config.show_summary_views === true;
     const showRoomViews = config.show_room_views === true;

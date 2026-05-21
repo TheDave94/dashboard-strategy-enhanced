@@ -292,13 +292,14 @@ class Simon42ViewOverviewStrategy extends HTMLElement {
       baseOrder ?? DEFAULT_SECTIONS_ORDER,
       customSectionKeys,
     );
+    // Visibility checker — handles legacy { entity, state } shape
+    // AND the new composable rule shape (role / time / mode).
+    const { getSectionVisibilityChecker } = await import('../utils/visibility');
+    const sectionVisible = getSectionVisibilityChecker(dashboardConfig, hass);
+
     const overviewSections: LovelaceSectionConfig[] = [];
     for (const key of sectionsOrder) {
-      const rule = Reflect.get(sectionVisibility, key) as { entity?: string; state?: string } | undefined;
-      if (rule?.entity) {
-        const entState = Reflect.get(hass.states as Record<string, unknown>, rule.entity) as { state?: string } | undefined;
-        if (!entState || entState.state !== rule.state) continue;
-      }
+      if (!sectionVisible(key)) continue;
       const result = sectionMap.get(key);
       if (!result) continue;
       if (Array.isArray(result)) {
