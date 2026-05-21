@@ -380,10 +380,52 @@ class Simon42ViewRoomStrategy extends HTMLElement {
     // === SECTIONS ===
     const sections: LovelaceSectionConfig[] = [];
 
+    // Resolve per-area options early — used by the camera hero block
+    // below, and again later for room-mode tile resolution. Reading
+    // it once at the top of the section-building flow keeps both
+    // sites referring to the same shape.
+    const areaOptsEarly: Record<string, unknown> =
+      (dashboardConfig.areas_options?.[area.area_id] as Record<string, unknown>) || {};
+
+    // Camera hero — when `areas_options.<area>.camera_hero: true`, emit
+    // the first camera as a full-width live picture card at the top of
+    // the room view, no heading, no other section chrome. The rest of
+    // the cameras (if any) still render in the regular "Cameras"
+    // section below.
+    if (areaOptsEarly.camera_hero === true && roomEntities.cameras.length > 0) {
+      const heroId = roomEntities.cameras[0];
+      if (heroId && hass.states[heroId]) {
+        sections.push({
+          type: 'grid',
+          cards: [
+            {
+              type: 'picture-entity',
+              entity: heroId,
+              camera_image: heroId,
+              camera_view: 'live',
+              fit_mode: 'cover',
+              show_name: false,
+              show_state: false,
+              grid_options: { columns: 'full', rows: 4 },
+            } as LovelaceCardConfig,
+          ],
+        });
+      }
+    }
+
     // Cameras
     if (roomEntities.cameras.length > 0) {
+      // When camera_hero is set, the first camera already renders as
+      // the hero above — exclude it from the regular Cameras section
+      // to avoid duplicate emission. The Cameras section still
+      // appears if there are additional cameras after the hero.
+      const heroExclude =
+        areaOptsEarly.camera_hero === true && roomEntities.cameras.length > 0
+          ? roomEntities.cameras[0]
+          : undefined;
       const cameraCards: LovelaceCardConfig[] = [];
       for (const cameraId of roomEntities.cameras) {
+        if (cameraId === heroExclude) continue;
         if (!hass.states[cameraId]) continue;
         const camEntity = Registry.getEntity(cameraId);
         const deviceId = camEntity?.device_id;
