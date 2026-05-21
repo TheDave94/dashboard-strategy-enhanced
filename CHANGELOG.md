@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.6.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.5.0...v4.6.0) (2026-05-21)
+
+
+### Features
+
+* v4.6 review follow-ups + adversarial tests + new editor surfaces ([#24](https://github.com/TheDave94/oriel-dashboard/issues/24)) ([0049d84](https://github.com/TheDave94/oriel-dashboard/commit/0049d84b156c2baa138954809b4c0f05f62185d0))
+
 ## v4.1.0 — Rebrand to Oriel Dashboard (2026-05-21)
 
 Rebranded from `dashboard-strategy-enhanced` to **Oriel Dashboard**. Repo renamed to `TheDave94/oriel-dashboard`. **Breaking change** — every user-facing identifier renamed; see [MIGRATION.md](MIGRATION.md) for the upgrade path.
