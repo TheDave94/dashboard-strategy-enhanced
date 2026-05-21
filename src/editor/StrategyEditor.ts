@@ -6,6 +6,7 @@
 // ====================================================================
 
 import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
+import { state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import yaml from 'js-yaml';
 
@@ -71,19 +72,13 @@ declare global {
 // ====================================================================
 
 class Simon42DashboardStrategyEditor extends LitElement {
-  static properties = {
-    _config: { state: true },
-    _expandedAreas: { state: true },
-    _expandedGroups: { state: true },
-  };
+  @state() accessor _config: Simon42StrategyConfig = {};
+  @state() accessor _expandedAreas = new Set<string>();
+  @state() accessor _expandedGroups = new Map<string, Set<string>>();
 
   // hass is set externally by HA — use a setter, not a Lit property
   private _hass: HomeAssistant | null = null;
   private _isUpdatingConfig = false;
-
-  _config: Simon42StrategyConfig = {};
-  _expandedAreas = new Set<string>();
-  _expandedGroups = new Map<string, Set<string>>();
 
   // Entity search state (NOT @state — we call requestUpdate manually)
   private _favoriteSearch = '';

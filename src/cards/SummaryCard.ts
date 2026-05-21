@@ -3,6 +3,7 @@
 // ====================================================================
 
 import { LitElement, html, css, type PropertyValues } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
 import { Registry } from '../Registry';
 import { trackHassUpdate, debugLog, timeStart, timeEnd } from '../utils/debug';
@@ -53,13 +54,9 @@ const COLOR_MAP: Record<string, string> = {
 };
 
 class Simon42SummaryCard extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-    _count: { state: true },
-  };
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
+  @state() accessor _count = 0;
 
-  public hass?: HomeAssistant;
-  private _count = 0;
   private _config!: SummaryCardConfig;
   private _relevantEntityIds: Set<string> | null = null;
 

@@ -3,6 +3,7 @@
 // ====================================================================
 
 import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
+import { property } from 'lit/decorators.js';
 import type { HomeAssistant, HassEntity } from '../types/homeassistant';
 import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
@@ -52,11 +53,8 @@ interface LovelaceCardElement extends HTMLElement {
 const LIGHT_BRIGHTNESS_MODES = ['brightness', 'color_temp', 'hs', 'xy', 'rgb', 'rgbw', 'rgbww', 'white'];
 
 class Simon42LightsGroupCard extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-  };
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
 
-  public hass?: HomeAssistant;
   private _config!: LightsGroupConfig;
   private _cachedSourceIds: Set<string> | null = null;
   private _cachedAreaForEntity: Map<string, string | null> | null = null;

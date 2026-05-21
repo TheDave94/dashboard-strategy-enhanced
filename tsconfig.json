@@ -22,12 +22,9 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    // Pin legacy class-field semantics regardless of target.
-    // Lit installs `hass`/`_config` accessors on the prototype; with
-    // useDefineForClassFields:true (TS default at target >= ES2022)
-    // an instance-field declaration would shadow them via [[Define]]
-    // and break reactivity in every card. Locked off until cards
-    // migrate to the stage-3 decorator API (@property accessor).
-    "useDefineForClassFields": false
+    // Cards use stage-3 standard decorators (`@property() accessor x`)
+    // since v2.2 — the `accessor` keyword owns the slot, so the
+    // [[Define]] semantics no longer conflict with Lit's reactivity.
+    "useDefineForClassFields": true
   }
 }

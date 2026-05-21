@@ -3,6 +3,7 @@
 // ====================================================================
 
 import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
+import { property } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types/homeassistant';
 import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
@@ -82,11 +83,8 @@ const coverAttrs = (state: { attributes?: Record<string, unknown> } | undefined)
   (state?.attributes ?? {}) as CoverAttrs;
 
 class Simon42CoversGroupCard extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-  };
+  @property({ attribute: false }) accessor hass: HomeAssistant | undefined;
 
-  public hass?: HomeAssistant;
   private _config!: CoversGroupConfig;
   private _deviceClasses!: string[];
   private _cachedFilteredIds: Set<string> | null = null;
