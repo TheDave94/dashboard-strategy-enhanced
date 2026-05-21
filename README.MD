@@ -12,7 +12,7 @@ Built for HA users who want **maximum flexibility through the editor instead of 
 
 > An oriel is a bay window jutting out from a wall — "a window that lets you see more." The plugin is named after the metaphor.
 
-Optimised for HA **2026.5+** with modern design tokens, CSS container queries, and the `<ha-form>` editor pattern.
+Requires HA **2025.5+** (for the strategy `getCreateSuggestions` API). Optimised for newer HA versions — modern design tokens (`--ha-*`) are used where available with px fallbacks for older themes.
 
 ## Core principles
 
@@ -96,7 +96,8 @@ window.oriel?.registerSection({
 
 ### Architecture / quality
 
-- **HA 2026.5+ baseline** with modern design tokens (`--ha-space-*`, `--ha-card-*`, `--ha-font-*`), CSS container queries, `<ha-form>`-driven editors, `actionHandler` directive support on every interactive surface.
+- **HA 2025.5+ baseline** (hard floor — `getCreateSuggestions` strategy API). Newer-HA features (`--ha-space-*`, `--ha-card-*`, `--ha-font-*` design tokens, CSS container queries, `<ha-form>`-driven editors, `actionHandler` directive) are opt-in via the fallback chain — themes that don't expose `--ha-*` tokens get px fallbacks; every interactive surface degrades to native click semantics.
+- **Design tokens in cards, legacy vars in the editor.** The custom cards (NotificationCard, SummaryCard, ZonePresenceCard, RoutinesCard, etc.) use `--ha-font-size-*` and `--ha-font-weight-*` tokens with px fallbacks. The strategy editor surfaces (StrategyEditor, SetupTab, every tab module) intentionally stay on the legacy `--primary-color` / `--secondary-text-color` / `--divider-color` family — HA back-maps those to the new `--ha-*` tokens internally, so theme compatibility is identical and the line count for migration would be high for zero user-visible change. Documented as a deliberate scope decision in the v4.7 design-token PR.
 - **Code-split bundles** (main + lit + core + views + editor), lazy-loaded — the editor chunk never loads unless the user opens it.
 - **Source maps in production** for crash-report symbolication.
 - **Built-in test suite** (vitest + happy-dom + Playwright against live HA) — currently 65 unit tests + 2 browser tests.
@@ -213,7 +214,7 @@ See [MIGRATION.md](MIGRATION.md) for the full guide. Tl;dr: replace `custom:simo
 
 ## Versioning
 
-Semver — current line is **v4.x** on the HA 2026.5+ baseline. Release notes per version in [GitHub releases](https://github.com/TheDave94/oriel-dashboard/releases).
+Semver — current line is **v4.x** on the HA 2025.5+ minimum (newer HA preferred). Release notes per version in [GitHub releases](https://github.com/TheDave94/oriel-dashboard/releases).
 
 The v1.x–v3.x history covers intermediate brand names from before the v4.1.0 rebrand. Those releases aren't supported; if you're on one, uninstall and reinstall.
 

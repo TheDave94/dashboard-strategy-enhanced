@@ -64,12 +64,16 @@ const COVER_DEVICE_CLASSES = new Set(['awning', 'blind', 'curtain', 'shade', 'sh
 const SECURITY_COVER_CLASSES = new Set(['door', 'garage', 'gate', 'window']);
 const SECURITY_BINARY_SENSOR_CLASSES = new Set(['door', 'window', 'garage_door', 'opening', 'smoke', 'gas', 'moisture']);
 
+// Maps user-facing palette names from config to HA's CSS variables.
+// HA's frontend provides `--<name>-color` tokens (mushroom-derived
+// palette, present from 2024.x onwards); no inline hex fallback so
+// hostile palette names can't smuggle in an arbitrary value.
 const COLOR_MAP: Record<string, string> = {
-  orange: 'var(--orange-color, #ff9800)',
-  purple: 'var(--purple-color, #9c27b0)',
-  yellow: 'var(--yellow-color, #ffc107)',
-  red: 'var(--red-color, #f44336)',
-  grey: 'var(--disabled-color, #bdbdbd)',
+  orange: 'var(--orange-color)',
+  purple: 'var(--purple-color)',
+  yellow: 'var(--yellow-color)',
+  red: 'var(--red-color)',
+  grey: 'var(--disabled-color)',
 };
 
 class OrielSummaryCard extends LitElement {
@@ -177,10 +181,13 @@ class OrielSummaryCard extends LitElement {
     .delta {
       margin-left: 6px;
       font-variant-numeric: tabular-nums;
-      font-size: 0.95em;
+      /* Slightly smaller than the parent state-content. The original
+         was 0.95em ≈ 15px; --ha-font-size-s (14px) is the closest
+         token that preserves the "smaller than parent" intent. */
+      font-size: var(--ha-font-size-s, 14px);
     }
-    .delta-up   { color: var(--warning-color, #ff9800); }
-    .delta-down { color: var(--success-color, #4caf50); }
+    .delta-up   { color: var(--warning-color); }
+    .delta-down { color: var(--success-color); }
     .delta-zero { color: var(--secondary-text-color); opacity: 0.7; }
   `;
 

@@ -69,21 +69,21 @@ class OrielNotificationCard extends LitElement {
       from { transform: translateY(-12px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .banner.info { background: var(--info-color, #2196f3); color: white; }
-    .banner.warning { background: var(--warning-color, #ff9800); color: white; }
+    .banner.info { background: var(--info-color); color: var(--text-primary-color, white); }
+    .banner.warning { background: var(--warning-color); color: var(--text-primary-color, white); }
     .banner.critical {
-      background: var(--error-color, #f44336);
-      color: white;
+      background: var(--error-color);
+      color: var(--text-primary-color, white);
       animation: slideIn 220ms ease-out, pulse 2s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 4px 18px rgba(244, 67, 54, 0.4); }
-      50% { box-shadow: 0 4px 30px rgba(244, 67, 54, 0.85); }
+      0%, 100% { box-shadow: 0 4px 18px color-mix(in srgb, var(--error-color) 40%, transparent); }
+      50% { box-shadow: 0 4px 30px color-mix(in srgb, var(--error-color) 85%, transparent); }
     }
     .icon { --mdc-icon-size: 28px; flex: 0 0 auto; }
     .body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; }
-    .title { font-size: 16px; font-weight: 600; line-height: 1.2; }
-    .message { font-size: 14px; opacity: 0.92; line-height: 1.3; }
+    .title { font-size: var(--ha-font-size-m, 16px); font-weight: var(--ha-font-weight-semibold, 600); line-height: 1.2; }
+    .message { font-size: var(--ha-font-size-s, 14px); opacity: 0.92; line-height: 1.3; }
     .dismiss {
       all: unset;
       cursor: pointer;

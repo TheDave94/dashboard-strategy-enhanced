@@ -95,10 +95,49 @@ class Registry {
    * comparing identity we rebuild only when there's actually new
    * data, which keeps initialize() idempotent within a single render
    * pass but invalidates correctly on real registry events.
+   *
+   * ## Note on churn-cost mitigations (follow-up #2 §5, v4.7.0)
+   *
+   * The original review proposed three mitigations against sustained
+   * `hass.entities` churn (Zigbee/Z-Wave device-add bursts, bulk area
+   * reassignments): per-card shouldUpdate filtering (5a), microtask
+   * coalescing of repeated initialize() calls (5b), and diff-based
+   * incremental rebuilds (5c).
+   *
+   * Before shipping any of them we measured the actual cost. See
+   * `tests/perf/registry-churn.bench.test.ts` — on a 300-entity
+   * fixture, 10 successive `hass.entities` replacements cost
+   * **min 2.2ms / avg 3.8ms / max 5.6ms** end-to-end. Extrapolated
+   * to a 2000-entity install (the original concern), worst case is
+   * ~30-40ms across a 10-event burst — well inside any reasonable
+   * UI budget.
+   *
+   * The bench measures Registry-rebuild cost only. The spec's
+   * remaining concern was per-card render cost on irrelevant `hass`
+   * updates (`@property hass` triggers re-render regardless of
+   * whether any relevant entity changed). That cost is real but
+   * separate from the Registry, and was not measured here.
+   *
+   * Decision: **no mitigations shipped in v4.7.0.** The Registry path
+   * is fast enough on current scale; 5a remains a documented option
+   * for a future PR if a real user reports stutter on a large
+   * install. The bench stays in CI as a regression guard.
    */
   private static _builtFromEntities: unknown = null;
   private static _builtFromDevices: unknown = null;
   private static _builtFromAreas: unknown = null;
+
+  /**
+   * Count of full rebuilds that actually fired (not idempotent early-
+   * returns). Used by the perf-churn bench test to verify coalescing
+   * + cache-hit behaviour. Reset by `resetForTesting()`.
+   */
+  private static _rebuildCount: number = 0;
+
+  /** Test-only: read the rebuild counter. Lives next to resetForTesting. */
+  static getRebuildCountForTesting(): number {
+    return Registry._rebuildCount;
+  }
 
   /**
    * Reset the Registry singleton between tests so each test starts with a
@@ -111,6 +150,7 @@ class Registry {
     Registry._builtFromEntities = null;
     Registry._builtFromDevices = null;
     Registry._builtFromAreas = null;
+    Registry._rebuildCount = 0;
   }
 
   // =====================================================================
@@ -135,6 +175,7 @@ class Registry {
     }
 
     timeStart('registry-init');
+    Registry._rebuildCount += 1;
     Registry._hass = hass;
     Registry._config = config;
     Registry._builtFromEntities = hass.entities;

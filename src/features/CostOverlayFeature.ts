@@ -56,7 +56,7 @@ class OrielCostOverlayFeature extends LitElement {
       font-size: var(--ha-font-size-s, 13px);
       font-variant-numeric: tabular-nums;
     }
-    .cost { color: var(--primary-text-color); font-weight: 500; }
+    .cost { color: var(--primary-text-color); font-weight: var(--ha-font-weight-medium, 500); }
     .unit { margin-left: 3px; opacity: 0.7; }
   `;
 

@@ -50,6 +50,7 @@ import { renderModeOrderTab } from './tabs/ModeOrderTab';
 import { renderFloorplanTab } from './tabs/FloorplanTab';
 import { renderRoomOverridesTab } from './tabs/RoomOverridesTab';
 import { renderHealthTab } from './tabs/HealthTab';
+import { onActivateKey } from '../utils/keyboard-activation';
 import {
   LivePreviewRunner,
   renderLivePreviewPanel,
@@ -2628,7 +2629,11 @@ class OrielEditor extends LitElement {
           return html`
             <div class="entity-group" data-group=${group.key}>
               <div class="entity-group-header"
-                @click=${() => this._toggleGroupExpand(areaId, group.key)}>
+                role="button"
+                tabindex="0"
+                aria-expanded=${isGroupExpanded ? 'true' : 'false'}
+                @click=${() => this._toggleGroupExpand(areaId, group.key)}
+                @keydown=${onActivateKey(() => this._toggleGroupExpand(areaId, group.key))}>
                 <input type="checkbox" class="group-checkbox"
                   data-area-id=${areaId}
                   data-group=${group.key}
@@ -2708,7 +2713,11 @@ class OrielEditor extends LitElement {
     return html`
       <div class="entity-group" data-group="badges">
         <div class="entity-group-header"
-          @click=${() => this._toggleGroupExpand(areaId, 'badges')}>
+          role="button"
+          tabindex="0"
+          aria-expanded=${isGroupExpanded ? 'true' : 'false'}
+          @click=${() => this._toggleGroupExpand(areaId, 'badges')}
+          @keydown=${onActivateKey(() => this._toggleGroupExpand(areaId, 'badges'))}>
           <input type="checkbox" class="group-checkbox"
             data-area-id=${areaId}
             data-group="badges"

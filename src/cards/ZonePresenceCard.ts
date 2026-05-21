@@ -284,7 +284,7 @@ class OrielZonePresenceCard extends LitElement {
     }
     .zone.active .label {
       color: var(--primary-text-color);
-      font-weight: 500;
+      font-weight: var(--ha-font-weight-medium, 500);
     }
   `;
 

@@ -55,6 +55,22 @@ jobs:
       - name: Lint translation files
         run: node scripts/lint-translations.mjs
 
+  ha-version-markers:
+    name: HA version-marker check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+      # Guards against silent bumps to the minimum HA version.
+      # hacs.json declares the floor; this script fails if src/ uses
+      # any API introduced in a strictly newer HA than that floor.
+      # See scripts/check-ha-version-markers.mjs for the marker list +
+      # the bump procedure.
+      - name: Check HA version markers
+        run: node scripts/check-ha-version-markers.mjs
+
   audit:
     name: npm audit (moderate+)
     runs-on: ubuntu-latest

@@ -9,6 +9,13 @@
 //
 // Mount is idempotent: calling installDebugPanel() multiple times is
 // a no-op if the panel is already present.
+//
+// **Palette is intentionally hardcoded** (white panel chrome, light-grey
+// text, custom border colors) regardless of the active HA theme — the
+// panel is a developer-debug surface that must be visually identical
+// across themes so screenshots in bug reports are recognisable. Don't
+// migrate to `--ha-*` design tokens; it stays in the hardcoded-hex
+// allowlist defined in the v4.7.0 design-token migration.
 // ====================================================================
 
 import { isDebugActive } from './debug';

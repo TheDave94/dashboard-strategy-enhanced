@@ -367,8 +367,10 @@ class Oriel extends HTMLElement {
 }
 
 // Register the strategy custom element under HA's current naming
-// convention (`ll-strategy-<type>-<name>`). HA 2026.5+ enforces this
-// strictly; Oriel doesn't carry a pre-2025 fallback.
+// convention (`ll-strategy-<type>-<name>`). HA 2025.5+ uses this
+// shape for dashboard strategies; older versions used the looser
+// `ll-strategy-<name>` form (pre-2024.10). Oriel only supports the
+// 2025.5+ shape — minimum HA version is gated by `hacs.json`.
 customElements.define('ll-strategy-dashboard-oriel', Oriel);
 
 console.log(`Oriel Dashboard v${STRATEGY_VERSION} loaded`);
