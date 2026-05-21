@@ -15,12 +15,29 @@ name: Release Please
 #
 # The maintainer's job is simply to merge the Release PR when ready —
 # no manual version bumps, no manual changelog edits, no manual tagging.
+#
+# ## Why a GitHub App token
+#
+# GitHub intentionally suppresses downstream workflow triggers from events
+# that originated via GITHUB_TOKEN (anti-loop guarantee). When release-please
+# ran under GITHUB_TOKEN, the resulting `release: published` event did NOT
+# fire release-build.yml — v4.6.0 and v4.7.0 both needed manual workflow
+# dispatches. The fix: mint a short-lived installation token from the
+# `oriel-release-bot` GitHub App and pass it to release-please. App-token
+# events are not suppressed.
+#
+# See docs/RELEASE-INFRASTRUCTURE.md for the App setup, permissions list,
+# rotation procedure, and troubleshooting.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Both permissions are now satisfied by the App-token in the workflow steps
+# below, but we keep these set so the workflow's intent is documented and
+# so the GITHUB_TOKEN still has a sensible scope if anything in this file
+# ever needs it for a fallback or debug step.
 permissions:
   contents: write
   pull-requests: write
@@ -29,6 +46,27 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      # Mint a short-lived installation token from oriel-release-bot.
+      # The App's RELEASE_APP_ID + RELEASE_APP_PRIVATE_KEY repo secrets
+      # drive the exchange. Pinned by SHA per the repo's third-party-
+      # action policy; current SHA is v3.2.0.
+      - name: Mint release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      # release-please now runs under the App identity. Commits it
+      # pushes + PRs it opens + releases it creates all carry the App
+      # actor — so the resulting `release: published` event triggers
+      # release-build.yml the normal way (the GITHUB_TOKEN anti-loop
+      # suppression doesn't apply to App-initiated events).
+      #
+      # SHA-pinned to the same v4 commit the previous `@v4` tag
+      # resolved to. Bump deliberately when a new version is reviewed.
+      - name: Release Please
+        uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
           release-type: node
