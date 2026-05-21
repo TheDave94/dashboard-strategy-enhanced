@@ -9,7 +9,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
-import { findKnownCard } from '../utils/section-card-registry';
+import { findKnownCard, isCardInstalled } from '../utils/section-card-registry';
 
 /**
  * Creates the plants section.
@@ -43,13 +43,23 @@ export function createPlantsSection(
     });
   }
 
-  // Registry swap — emit the HACS card once per plant.
+  // Registry swap — emit the HACS card once per plant. Graceful
+  // fallback: only when the plugin is actually installed, otherwise
+  // keep the default tile-per-plant layout.
   const known = presentation ? findKnownCard(presentation) : null;
   if (known && known.section === 'plants') {
-    for (const entityId of plantIds) {
-      cards.push(known.buildConfig(entityId) as LovelaceCardConfig);
+    if (isCardInstalled(known.elementTag)) {
+      for (const entityId of plantIds) {
+        cards.push(known.buildConfig(entityId) as LovelaceCardConfig);
+      }
+      return { type: 'grid', cards };
     }
-    return { type: 'grid', cards };
+    console.warn(
+      `[oriel] plants_presentation="${presentation}" requires HACS plugin ` +
+      `'${known.hacs?.name ?? known.elementTag}' which isn't installed. ` +
+      `Falling back to default tile-per-plant layout.`,
+    );
+    // fall through to default tile loop below
   }
 
   for (const entityId of plantIds) {

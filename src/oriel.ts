@@ -238,27 +238,37 @@ class Oriel extends HTMLElement {
       }
     }
 
-    // Floorplan view (v3.2.3) — emit a dedicated view containing a
-    // single `custom:floorplan-card`. The view auto-hides when
-    // floorplan-card isn't installed (HA shows a "card type doesn't
-    // exist" placeholder, which is the standard signal that a HACS
-    // plugin is missing). The view is always emitted; the strategy
-    // doesn't probe for the plugin so users can configure ahead of
-    // installing.
+    // Floorplan view (v3.2.3, gracefully gated v4.3+) — emit a
+    // dedicated view containing a `custom:floorplan-card` ONLY when
+    // floorplan-card is detected at runtime. Without this gate, users
+    // who set `floorplan_view` and later uninstall the HACS plugin
+    // would see a dead-tab "Custom element doesn't exist" placeholder.
+    // Principle 2: HACS plugins are enhancement, never required.
     if (config.floorplan_view && config.floorplan_view.config) {
-      const fp = config.floorplan_view;
-      views.push(densityOverlay({
-        title: fp.title ?? 'Floorplan',
-        path: fp.path ?? 'floorplan',
-        icon: fp.icon ?? 'mdi:floor-plan',
-        type: 'panel',
-        cards: [
-          {
-            type: 'custom:floorplan-card',
-            ...fp.config,
-          },
-        ],
-      } as LovelaceViewConfig));
+      const floorplanInstalled =
+        typeof customElements !== 'undefined' &&
+        !!customElements.get('floorplan-card');
+      if (floorplanInstalled) {
+        const fp = config.floorplan_view;
+        views.push(densityOverlay({
+          title: fp.title ?? 'Floorplan',
+          path: fp.path ?? 'floorplan',
+          icon: fp.icon ?? 'mdi:floor-plan',
+          type: 'panel',
+          cards: [
+            {
+              type: 'custom:floorplan-card',
+              ...fp.config,
+            },
+          ],
+        } as LovelaceViewConfig));
+      } else {
+        console.warn(
+          '[oriel] floorplan_view is set but floorplan-card HACS plugin ' +
+          "isn't installed. View skipped — install pkozul/ha-floorplan " +
+          'to make it appear.',
+        );
+      }
     }
 
     t(`generate() done — ${views.length} views`);

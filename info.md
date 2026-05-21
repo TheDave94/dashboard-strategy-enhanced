@@ -1,16 +1,14 @@
 # Oriel Dashboard
 
-A Home Assistant Lovelace strategy that **auto-generates a complete dashboard** from your areas, devices, and entities. No per-card YAML, no manual layout.
+**Customization without YAML.** Auto-generates your dashboard from areas, devices, and entities — then lets you customise every piece via a visual editor. For Home Assistant users who want maximum flexibility without editing config files.
 
 ## Highlights
 
-- **Setup wizard** in the editor — auto-detects installed HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card) and surfaces each advanced feature with an install hint when missing.
-- **Per-user / per-role dashboards** — different layouts per HA user or label.
+- **Setup wizard** in the editor — auto-detects installed HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card, weather/energy card swaps) and surfaces each as an additional option when present.
+- **Visual editor for every advanced feature** — per-user dashboards, mode-driven section reorder, composable visibility rules, wall-panel mode, all reachable without writing YAML.
 - **Ten custom cards / features** — summary, zone-presence, lights group, covers group, sparkline, notification banners, routines, screensaver, voice FAB, sticky-lock + cost-overlay features.
-- **Mode-driven section reorder** and **composable visibility rules** (role / time-of-day / mode).
-- **Wall-panel mode** with screensaver, **lazy-mounting** for large installs, **per-area room view overrides**.
+- **HACS plugins always optional.** Built-in fallback path works without any of them. Less shiny without HACS, but never broken.
 - **Plugin extension API** — third-party plugins can `window.oriel.registerSection(...)` to add sections.
-- **Visual `<ha-form>` editor** for every config option, with migration assistants and usage-aware layout suggestions.
 - **HA 2026.5+** baseline with modern design tokens, container queries, and code-split bundles.
 
 ## Installation
@@ -28,8 +26,6 @@ See [README](README.MD) for the full configuration surface.
 
 ## Origin
 
-Built on the foundation [@TheRealSimon42](https://github.com/TheRealSimon42)'s dashboard strategy established — credit there for the auto-generation pattern. Oriel adds a setup wizard, plugin extension API, per-user dashboards, HACS-plugin awareness, and the rest of the surface above on top.
-
-**Not a replacement for Simon42.** Different design point; both projects valid for different needs. Migrate over when you want one of the features Oriel layers on. See [MIGRATION.md](MIGRATION.md).
+Forked from [@TheRealSimon42](https://github.com/TheRealSimon42)'s dashboard strategy — credit there for the auto-generation pattern. Oriel takes that core in a different direction: maximum configurability + integration surface, all reachable through the editor. simon42 stays the focused, opinionated option; Oriel is for users who want the configurable one. See [MIGRATION.md](MIGRATION.md) to switch.
 
 Built by [@TheDave94](https://github.com/TheDave94).

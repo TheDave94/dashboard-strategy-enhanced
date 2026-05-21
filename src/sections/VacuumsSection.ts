@@ -9,7 +9,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
-import { findKnownCard } from '../utils/section-card-registry';
+import { findKnownCard, isCardInstalled } from '../utils/section-card-registry';
 
 export function createVacuumsSection(
   hass: HomeAssistant,
@@ -38,13 +38,22 @@ export function createVacuumsSection(
     });
   }
 
-  // Registry swap — emit one HACS card per vacuum entity.
+  // Registry swap — emit one HACS card per vacuum entity. Graceful
+  // fallback: keep the default tile layout when the plugin isn't
+  // installed.
   const known = presentation ? findKnownCard(presentation) : null;
   if (known && known.section === 'vacuums') {
-    for (const entityId of entities) {
-      cards.push(known.buildConfig(entityId) as LovelaceCardConfig);
+    if (isCardInstalled(known.elementTag)) {
+      for (const entityId of entities) {
+        cards.push(known.buildConfig(entityId) as LovelaceCardConfig);
+      }
+      return { type: 'grid', cards };
     }
-    return { type: 'grid', cards };
+    console.warn(
+      `[oriel] vacuums_presentation="${presentation}" requires HACS plugin ` +
+      `'${known.hacs?.name ?? known.elementTag}' which isn't installed. ` +
+      `Falling back to default tile-per-vacuum layout.`,
+    );
   }
 
   for (const entityId of entities) {

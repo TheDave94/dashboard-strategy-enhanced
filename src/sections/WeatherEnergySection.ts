@@ -8,7 +8,7 @@
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import type { WeatherPresentation, WeatherSensorConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
-import { findKnownCard } from '../utils/section-card-registry';
+import { findKnownCard, isCardInstalled } from '../utils/section-card-registry';
 
 // Entity ids follow `domain.object_id` where each part is lowercase
 // letters/digits/underscores. Anything else is a malformed config value
@@ -118,9 +118,21 @@ function buildPresentationCard(
       // it as a dropdown option and stores its `id` as the presentation
       // value. We hand off to the registry's buildConfig to produce the
       // emitted card.
+      // Graceful fallback: emit registry card only when the plugin is
+      // actually installed. Otherwise drop back to the safe built-in
+      // forecast-daily and warn so users notice. Principle 2: HACS
+      // plugins are enhancement, never required.
       const known = findKnownCard(presentation as unknown as string);
       if (known && known.section === 'weather') {
-        return known.buildConfig(weatherEntity) as LovelaceCardConfig;
+        if (isCardInstalled(known.elementTag)) {
+          return known.buildConfig(weatherEntity) as LovelaceCardConfig;
+        }
+        console.warn(
+          `[oriel] weather_presentation="${presentation}" requires HACS plugin ` +
+          `'${known.hacs?.name ?? known.elementTag}' which isn't installed. ` +
+          `Falling back to forecast-daily.`,
+        );
+        return { type: 'weather-forecast', entity: weatherEntity, forecast_type: 'daily' };
       }
       return null;
     }
@@ -205,12 +217,22 @@ export function createEnergySection(
   // If the user picked a HACS-detected energy card via the registry,
   // emit it instead of the built-in distribution card. `distribution`
   // + undefined both fall through to legacy behaviour gated on
-  // `showDistributionCard`.
+  // `showDistributionCard`. Graceful fallback: registry card emitted
+  // only when actually installed; otherwise the built-in distribution
+  // card stays and a console warning fires.
   if (presentation && presentation !== 'distribution' && presentation !== 'none') {
     const known = findKnownCard(presentation);
     if (known && known.section === 'energy') {
-      cards.push(known.buildConfig() as LovelaceCardConfig);
-      return { type: 'grid', cards };
+      if (isCardInstalled(known.elementTag)) {
+        cards.push(known.buildConfig() as LovelaceCardConfig);
+        return { type: 'grid', cards };
+      }
+      console.warn(
+        `[oriel] energy_presentation="${presentation}" requires HACS plugin ` +
+        `'${known.hacs?.name ?? known.elementTag}' which isn't installed. ` +
+        `Falling back to built-in energy-distribution card.`,
+      );
+      // fall through to the built-in path
     }
   }
 

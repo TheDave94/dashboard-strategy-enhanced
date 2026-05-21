@@ -6,11 +6,19 @@
 ![AI-Assisted](https://img.shields.io/badge/AI--Assisted-blue?style=for-the-badge)
 [![License](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey?style=for-the-badge)](LICENSE)
 
-A modular, highly-configurable Lovelace strategy for Home Assistant that **auto-generates a complete dashboard from your areas, devices, and entities** — no per-card YAML, no manual layout. Includes a setup wizard, ten custom cards, a visual config editor, per-user dashboards, mode-driven section reordering, and integration shims for popular HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card).
+**Customization without YAML.** A Home Assistant Lovelace strategy that auto-generates your dashboard from areas, devices, and entities — then lets you customise every piece via a visual editor. Per-user layouts, mode-driven section ordering, composable visibility rules, wall-panel mode, and ten custom cards. HACS plugins (Bubble Card, ApexCharts, decluttering-card, floorplan-card, weather/energy card swaps) are auto-detected and added as additional options when installed — but every feature works without any of them.
+
+Built for HA users who want **maximum flexibility through the editor instead of editing YAML**.
 
 > An oriel is a bay window jutting out from a wall — "a window that lets you see more." The plugin is named after the metaphor.
 
 Optimised for HA **2026.5+** with modern design tokens, CSS container queries, and the `<ha-form>` editor pattern.
+
+## Core principles
+
+1. **Ease + flexibility, both maxed.** Non-technical users build complex, customised dashboards without writing YAML.
+2. **HACS plugins are enhancement, never requirement.** The clean fallback path always works. "Less shiny without HACS" is fine; "broken without HACS" isn't.
+3. **Everything reachable via the editor.** Power features don't live behind code-only escape hatches.
 
 ## What you get
 
@@ -209,13 +217,13 @@ The v1.x–v3.x history covers intermediate brand names from before the v4.1.0 r
 
 ## Origin
 
-Built on the foundation [simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy) established — auto-generated room views, summary tiles, area grid. Credit to [@TheRealSimon42](https://github.com/TheRealSimon42) for that core pattern; it's still the load-bearing idea.
+Forked from [simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy). The auto-generation pattern (room views, summary tiles, area grid) comes from there — credit to [@TheRealSimon42](https://github.com/TheRealSimon42).
 
-Oriel layers power-user features on top: setup wizard, plugin extension API, per-user / per-role layouts, HACS-plugin auto-detection, mode-driven section reorder, composable visibility rules, wall-panel mode, lazy-mounting, migration assistants, additional custom cards and tile features, the HA 2026.5+ architectural baseline.
+Oriel and simon42 serve different audiences:
+- **simon42** is the right pick if you want a focused, opinionated dashboard with minimal configuration surface
+- **Oriel** is the right pick if you want a configurable dashboard with everything reachable via the editor — power-user features, HACS-plugin integrations, per-user layouts, composable rules, all without YAML editing
 
-**Not a replacement for Simon42.** If you want a clean, focused, opinionated auto-dashboard, Simon42 stays the right pick — and the upstream remains actively developed. Oriel is for users who want to extend that base with more configurability and integration surface. Different design points; both valid.
-
-Migrating is a YAML edit — see [MIGRATION.md](MIGRATION.md).
+Migrating between them is a one-line YAML change. See [MIGRATION.md](MIGRATION.md).
 
 ## License
 

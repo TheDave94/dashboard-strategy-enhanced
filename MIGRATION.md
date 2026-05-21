@@ -1,8 +1,8 @@
 # Migrating from Simon42 → Oriel
 
-For users on [simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy) who want to switch to Oriel.
+For users on [simon42-dashboard-strategy](https://github.com/TheRealSimon42/simon42-dashboard-strategy) who want maximum configurability through the editor instead of editing YAML.
 
-> **Oriel isn't trying to replace Simon42.** Simon42 owns the auto-generation core and ships clean, focused defaults that work great for a lot of users — and the upstream remains actively developed. Oriel sits on top of that base, adding configurability and integration surface for users who want more handles to pull. If you're happy with Simon42, stay on it. Move over to Oriel when you want one of the features it layers on top.
+The two projects target different audiences. **simon42** is the focused, opinionated auto-dashboard — minimal configuration surface, sensible defaults out of the box. **Oriel** keeps the same auto-generation core but exposes every advanced feature in the editor: per-user dashboards, composable visibility rules, mode-driven section reorder, HACS-plugin auto-detection, wall-panel mode, custom cards beyond the original set. Pick the one that fits how you want to work.
 
 Switching is a one-shot YAML edit + a HACS swap.
 

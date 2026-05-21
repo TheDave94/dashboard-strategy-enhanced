@@ -40,6 +40,7 @@ import { renderCustomCardsTab } from './tabs/CustomCardsTab';
 import { renderCustomSectionsTab } from './tabs/CustomSectionsTab';
 import { renderCustomBadgesTab } from './tabs/CustomBadgesTab';
 import { renderCustomViewsTab } from './tabs/CustomViewsTab';
+import { renderPerUserTab } from './tabs/PerUserTab';
 import { renderSetupTab, SETUP_TAB_CSS } from './tabs/SetupTab';
 import { unsafeCSS } from 'lit';
 import { FEATURE_REGISTRY, findFeature } from '../onboarding/features';
@@ -89,6 +90,10 @@ class OrielEditor extends LitElement {
   // _onboarding_seen on each mount; _onboarding_seen persists with
   // dashboard config so the panel auto-collapses on subsequent edits.
   @state() accessor _setupCollapsedOverride: boolean | undefined = undefined;
+  // Discovered HA users for the per-user editor. Empty when the WS
+  // call fails (e.g. non-admin session). Populated lazily on first
+  // editor mount via `config/auth/list`.
+  @state() accessor _haUsers: Array<{ id: string; name: string; is_admin?: boolean; is_owner?: boolean }> = [];
 
   // hass is set externally by HA — use a setter, not a Lit property
   private _hass: HomeAssistant | null = null;
@@ -1239,6 +1244,7 @@ class OrielEditor extends LitElement {
         ${this._renderCustomSectionsSection()}
         ${this._renderCustomBadgesSection()}
         ${this._renderCustomViewsSection()}
+        ${this._renderPerUserSection()}
       </div>
     `;
   }
@@ -1509,6 +1515,76 @@ class OrielEditor extends LitElement {
     this._fireConfigChanged(newConfig);
   }
 
+  // -- Per-user / per-role overrides ------------------------------------
+
+  private _renderPerUserSection(): TemplateResult {
+    if (!this._hass) return html``;
+    // Lazy-fetch HA users on first render. Cached afterwards in
+    // _haUsers state so subsequent renders are instant.
+    if (this._haUsers.length === 0 && !this._haUsersFetchAttempted) {
+      this._haUsersFetchAttempted = true;
+      void this._fetchHaUsers();
+    }
+    return renderPerUserTab({
+      hass: this._hass,
+      config: this._config,
+      users: this._haUsers,
+      onUsersConfigChange: (users) => {
+        const newConfig: OrielConfig = { ...this._config };
+        if (Object.keys(users).length === 0) delete newConfig.users;
+        else newConfig.users = users;
+        this._config = newConfig;
+        this._fireConfigChanged(newConfig);
+      },
+      onUsersByRoleChange: (usersByRole) => {
+        const newConfig: OrielConfig = { ...this._config };
+        if (Object.keys(usersByRole).length === 0) delete newConfig.users_by_role;
+        else newConfig.users_by_role = usersByRole;
+        this._config = newConfig;
+        this._fireConfigChanged(newConfig);
+      },
+    });
+  }
+
+  private _haUsersFetchAttempted = false;
+
+  /**
+   * Fetch HA's user list via the admin-only `config/auth/list` WS
+   * command. Silently fails on non-admin sessions — the editor falls
+   * back to "type the user ID manually".
+   */
+  private async _fetchHaUsers(): Promise<void> {
+    if (!this._hass) return;
+    try {
+      const result = await this._hass.callWS<Array<{ id: string; name: string; is_admin?: boolean; is_owner?: boolean }>>({
+        type: 'config/auth/list',
+      });
+      if (Array.isArray(result)) this._haUsers = result;
+    } catch {
+      // Non-admin or transient — keep empty list, editor falls back to manual entry.
+    }
+  }
+
+  /**
+   * Persist plants_presentation / vacuums_presentation. Empty string
+   * means "default tile layout" — strip the key to keep YAML sparse.
+   */
+  private _setPlantsPresentation(value: string): void {
+    const newConfig: OrielConfig = { ...this._config };
+    if (value) newConfig.plants_presentation = value;
+    else delete newConfig.plants_presentation;
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  private _setVacuumsPresentation(value: string): void {
+    const newConfig: OrielConfig = { ...this._config };
+    if (value) newConfig.vacuums_presentation = value;
+    else delete newConfig.vacuums_presentation;
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
   private _renderSectionOrderPanel(): TemplateResult {
     // Section-order render template lives in a per-tab module; drag-drop
     // state + every mutator stays on the editor class. See
@@ -1526,6 +1602,8 @@ class OrielEditor extends LitElement {
       onToggleChange: (k, v, d) => this._toggleChanged(k, v, d),
       onSetWeatherPresentation: (v) => this._setWeatherPresentation(v),
       onSetEnergyPresentation: (v) => this._setEnergyPresentation(v),
+      onSetPlantsPresentation: (v) => this._setPlantsPresentation(v),
+      onSetVacuumsPresentation: (v) => this._setVacuumsPresentation(v),
       onWeatherEntityChange: (e) => this._weatherEntityChanged(e),
       onPowerBadgeEntityChange: (e) => this._powerBadgeEntityChanged(e),
       onToggleSectionVisibility: (k, v) => this._toggleSectionVisibility(k, v),
@@ -1556,12 +1634,24 @@ class OrielEditor extends LitElement {
     this._fireConfigChanged(updated);
   }
 
-  private _sectionVisibilityChanged(sectionKey: string, field: 'entity' | 'state', value: string): void {
+  private _sectionVisibilityChanged(
+    sectionKey: string,
+    field: 'entity' | 'state' | 'role' | 'time_after' | 'time_before' | 'mode_entity' | 'mode_is',
+    value: string,
+  ): void {
     const updated: OrielConfig = { ...this._config };
-    const current = { ...(updated.section_visibility || {}) };
-    const rule = { ...(current[sectionKey] || { entity: '', state: '' }) };
-    rule[field] = value.trim();
-    if (!rule.entity && !rule.state) {
+    const current = {
+      ...(updated.section_visibility || {}),
+    } as Record<string, Record<string, unknown>>;
+    const rule = { ...(current[sectionKey] || {}) };
+    const trimmed = value.trim();
+    if (trimmed) {
+      rule[field] = trimmed;
+    } else {
+      delete rule[field];
+    }
+    // Drop the rule entirely when every field is empty — keeps YAML sparse
+    if (Object.keys(rule).length === 0) {
       delete current[sectionKey];
     } else {
       current[sectionKey] = rule;
@@ -1569,7 +1659,7 @@ class OrielEditor extends LitElement {
     if (Object.keys(current).length === 0) {
       delete updated.section_visibility;
     } else {
-      updated.section_visibility = current;
+      updated.section_visibility = current as OrielConfig['section_visibility'];
     }
     this._fireConfigChanged(updated);
   }

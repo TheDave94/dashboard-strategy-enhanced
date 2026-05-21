@@ -52,13 +52,15 @@ export interface SectionOrderTabContext {
   onToggleChange: (key: string, value: boolean, defaultValue: boolean) => void;
   onSetWeatherPresentation: (v: WeatherPresentation) => void;
   onSetEnergyPresentation: (v: EnergyPresentation) => void;
+  onSetPlantsPresentation: (v: string) => void;
+  onSetVacuumsPresentation: (v: string) => void;
   onWeatherEntityChange: (ev: Event) => void;
   onPowerBadgeEntityChange: (ev: Event) => void;
   onToggleSectionVisibility: (key: SectionKey, visible: boolean) => void;
   onToggleHiddenHeading: (key: string, hide: boolean) => void;
   onSectionVisibilityChange: (
     key: string,
-    field: 'entity' | 'state',
+    field: 'entity' | 'state' | 'role' | 'time_after' | 'time_before' | 'mode_entity' | 'mode_is',
     value: string,
   ) => void;
   // Drag-and-drop handlers — these mutate `_sectionDraggedElement`
@@ -138,7 +140,81 @@ function renderSectionRow(
         : nothing}
     </div>
     ${renderWeatherSub(ctx, key)} ${renderEnergySub(ctx, key)}
+    ${renderPlantsSub(ctx, key)} ${renderVacuumsSub(ctx, key)}
   `;
+}
+
+/**
+ * Reusable presentation-dropdown renderer for sections that swap a
+ * default tile-grid for a single registry-known HACS card per entity.
+ * Used by plants + vacuums.
+ *
+ * `defaultLabel` is what shows for the "no swap, default layout" choice.
+ */
+function renderEntityPerCardSub(
+  ctx: SectionOrderTabContext,
+  section: 'plants' | 'vacuums',
+  presentationFieldId: string,
+  configKey: 'plants_presentation' | 'vacuums_presentation',
+  onChange: (value: string) => void,
+  defaultLabel: string,
+): TemplateResult {
+  const detected: KnownCard[] = detectAvailable(section);
+  if (detected.length === 0) return html``;
+  const current = (ctx.config[configKey] as string | undefined) ?? '';
+  return html`
+    <div class="section-order-sub" style="flex-wrap: wrap;">
+      <label for=${presentationFieldId}>
+        ${localize(`editor.${configKey}`) || (section.charAt(0).toUpperCase() + section.slice(1) + ' card')}
+      </label>
+      <select
+        id=${presentationFieldId}
+        .value=${current}
+        @change=${(e: Event) => onChange((e.target as HTMLSelectElement).value)}
+      >
+        <option value="" ?selected=${current === ''}>${defaultLabel}</option>
+        <optgroup label=${localize('editor.section_presentation_hacs_group') || 'Installed HACS cards'}>
+          ${detected.map(
+            (c) => html`
+              <option value=${c.id} ?selected=${current === c.id}>${c.label}</option>
+            `,
+          )}
+        </optgroup>
+      </select>
+    </div>
+  `;
+}
+
+function renderPlantsSub(
+  ctx: SectionOrderTabContext,
+  key: SectionKey,
+): TemplateResult | typeof nothing {
+  if (key !== 'plants') return nothing;
+  if (ctx.config.show_plants_section !== true) return nothing;
+  return renderEntityPerCardSub(
+    ctx,
+    'plants',
+    'plants-presentation',
+    'plants_presentation',
+    ctx.onSetPlantsPresentation,
+    localize('editor.plants_presentation_default') || 'Default (tile per plant)',
+  );
+}
+
+function renderVacuumsSub(
+  ctx: SectionOrderTabContext,
+  key: SectionKey,
+): TemplateResult | typeof nothing {
+  if (key !== 'vacuums') return nothing;
+  if (ctx.config.show_vacuums_section !== true) return nothing;
+  return renderEntityPerCardSub(
+    ctx,
+    'vacuums',
+    'vacuums-presentation',
+    'vacuums_presentation',
+    ctx.onSetVacuumsPresentation,
+    localize('editor.vacuums_presentation_default') || 'Default (tile per vacuum)',
+  );
 }
 
 function renderWeatherSub(
@@ -449,6 +525,105 @@ function renderVisibilityRules(ctx: SectionOrderTabContext): TemplateResult {
                     )}
                 />
               </div>
+              <details style="margin-top: 6px;">
+                <summary style="cursor: pointer; font-size: 11px; color: var(--secondary-text-color);">
+                  ${localize('editor.section_visibility_advanced') || 'More rules (role / time / mode) — all must match (AND)'}
+                </summary>
+                <div style="margin-left: 8px; margin-top: 6px;">
+                  <div class="form-row">
+                    <label for="visibility-role-${key}" style="min-width: 80px; font-size: 12px;">
+                      ${localize('editor.section_visibility_role') || 'Role(s)'}
+                    </label>
+                    <input
+                      type="text"
+                      id="visibility-role-${key}"
+                      style="flex: 1;"
+                      placeholder="admin, resident"
+                      .value=${(rule as { role?: string | string[] })?.role
+                        ? Array.isArray((rule as { role?: string | string[] }).role)
+                          ? ((rule as { role?: string[] }).role as string[]).join(', ')
+                          : ((rule as { role?: string }).role as string)
+                        : ''}
+                      @change=${(e: Event) =>
+                        ctx.onSectionVisibilityChange(
+                          key,
+                          'role',
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </div>
+                  <div class="form-row">
+                    <label for="visibility-time-after-${key}" style="min-width: 80px; font-size: 12px;">
+                      ${localize('editor.section_visibility_time_after') || 'After (HH:MM)'}
+                    </label>
+                    <input
+                      type="time"
+                      id="visibility-time-after-${key}"
+                      style="flex: 1;"
+                      .value=${(rule as { time_after?: string })?.time_after || ''}
+                      @change=${(e: Event) =>
+                        ctx.onSectionVisibilityChange(
+                          key,
+                          'time_after',
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </div>
+                  <div class="form-row">
+                    <label for="visibility-time-before-${key}" style="min-width: 80px; font-size: 12px;">
+                      ${localize('editor.section_visibility_time_before') || 'Before (HH:MM)'}
+                    </label>
+                    <input
+                      type="time"
+                      id="visibility-time-before-${key}"
+                      style="flex: 1;"
+                      .value=${(rule as { time_before?: string })?.time_before || ''}
+                      @change=${(e: Event) =>
+                        ctx.onSectionVisibilityChange(
+                          key,
+                          'time_before',
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </div>
+                  <div class="form-row">
+                    <label for="visibility-mode-entity-${key}" style="min-width: 80px; font-size: 12px;">
+                      ${localize('editor.section_visibility_mode_entity') || 'Mode entity'}
+                    </label>
+                    <input
+                      type="text"
+                      id="visibility-mode-entity-${key}"
+                      style="flex: 1;"
+                      placeholder="input_select.house_mode"
+                      .value=${(rule as { mode_entity?: string })?.mode_entity || ''}
+                      @change=${(e: Event) =>
+                        ctx.onSectionVisibilityChange(
+                          key,
+                          'mode_entity',
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </div>
+                  <div class="form-row">
+                    <label for="visibility-mode-is-${key}" style="min-width: 80px; font-size: 12px;">
+                      ${localize('editor.section_visibility_mode_is') || 'Mode is'}
+                    </label>
+                    <input
+                      type="text"
+                      id="visibility-mode-is-${key}"
+                      style="flex: 1;"
+                      placeholder="at_home"
+                      .value=${(rule as { mode_is?: string })?.mode_is || ''}
+                      @change=${(e: Event) =>
+                        ctx.onSectionVisibilityChange(
+                          key,
+                          'mode_is',
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </div>
+                </div>
+              </details>
             </div>
           `;
         })}
