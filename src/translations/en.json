@@ -402,6 +402,15 @@
       "orphan_custom_sections_yaml_desc": "One or more custom_sections entries have YAML parse errors. Open the Custom Sections tab to fix them.",
       "orphan_custom_badges_yaml_title": "Custom badge has invalid YAML",
       "orphan_custom_badges_yaml_desc": "One or more custom_badges entries have YAML parse errors. Open the Custom Badges tab to fix them."
-    }
+    },
+    "favorites_viewport_default": "Default",
+    "favorites_viewport_phone": "Phone",
+    "favorites_viewport_tablet": "Tablet",
+    "favorites_viewport_wall": "Wall panel",
+    "favorites_split": "Split by viewport",
+    "favorites_split_help": "Switch to per-viewport favorites (phone / tablet / wall)",
+    "favorites_merge": "Merge to single list",
+    "favorites_merge_help": "Merge all viewports back into a single flat list (preserves union)",
+    "favorites_flat_hint": "Single list shown on every device. Split per device to differentiate."
   }
 }

@@ -402,6 +402,15 @@
       "orphan_custom_sections_yaml_desc": "Ein oder mehrere custom_sections-Einträge haben YAML-Parse-Fehler. Im Custom-Sections-Tab beheben.",
       "orphan_custom_badges_yaml_title": "Custom-Badge hat ungültiges YAML",
       "orphan_custom_badges_yaml_desc": "Ein oder mehrere custom_badges-Einträge haben YAML-Parse-Fehler. Im Custom-Badges-Tab beheben."
-    }
+    },
+    "favorites_viewport_default": "Standard",
+    "favorites_viewport_phone": "Mobil",
+    "favorites_viewport_tablet": "Tablet",
+    "favorites_viewport_wall": "Wand-Panel",
+    "favorites_split": "Pro Viewport aufteilen",
+    "favorites_split_help": "Auf gerätespezifische Favoriten umstellen (Mobil / Tablet / Wand)",
+    "favorites_merge": "Zu einer Liste zusammenführen",
+    "favorites_merge_help": "Alle Viewports in eine einzige Liste zusammenführen (Union bleibt erhalten)",
+    "favorites_flat_hint": "Eine Liste auf allen Geräten. Pro Gerät aufteilen für unterschiedliche Favoriten."
   }
 }
