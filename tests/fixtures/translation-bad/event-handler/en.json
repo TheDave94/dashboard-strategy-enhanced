@@ -1,0 +1,5 @@
+{
+  "editor": {
+    "show_search_card_missing": "<strong onmouseover=alert(1)>hi</strong>"
+  }
+}

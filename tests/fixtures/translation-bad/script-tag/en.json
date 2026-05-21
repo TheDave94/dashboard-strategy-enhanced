@@ -1,0 +1,5 @@
+{
+  "editor": {
+    "show_search_card_missing": "Hello <script>alert(1)</script>"
+  }
+}
