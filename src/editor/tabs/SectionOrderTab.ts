@@ -70,6 +70,12 @@ export interface SectionOrderTabContext {
   onDragOver: (ev: DragEvent) => void;
   onDragLeave: (ev: DragEvent) => void;
   onDrop: (ev: DragEvent) => void;
+  // Keyboard-equivalent reorder (a11y). Drag-drop stays; these are
+  // added paths, not replacements. Idx is 0-based against `order`.
+  // Implementations should be no-ops when idx is out of range
+  // (move-up on 0, move-down on length-1).
+  onMoveSectionUp: (idx: number) => void;
+  onMoveSectionDown: (idx: number) => void;
 }
 
 const HIDDEN_HEADING_KEYS = [
@@ -93,12 +99,19 @@ const BADGE_TOGGLE_KEYS = [
 function renderSectionRow(
   ctx: SectionOrderTabContext,
   key: SectionKey,
+  idx: number,
+  total: number,
 ): TemplateResult | typeof nothing {
   const meta = ctx.sectionMeta.get(key);
   if (!meta) return nothing;
 
   const disabled = ctx.isSectionDisabled(key);
   const toggleable = ctx.isSectionToggleable(key);
+  const isFirst = idx === 0;
+  const isLast = idx === total - 1;
+  const sectionLabel = localize(meta.labelKey);
+  const moveUpLabel = `${localize('editor.move_section_up') || 'Move up'}: ${sectionLabel}`;
+  const moveDownLabel = `${localize('editor.move_section_down') || 'Move down'}: ${sectionLabel}`;
 
   return html`
     <div
@@ -113,10 +126,30 @@ function renderSectionRow(
     >
       <span class="drag-handle" draggable="true">&#x2630;</span>
       <ha-icon class="section-icon" icon=${meta.icon}></ha-icon>
-      <span class="section-label">${localize(meta.labelKey)}</span>
+      <span class="section-label">${sectionLabel}</span>
       ${disabled && !toggleable
         ? html`<span class="section-hidden-tag">(${localize('editor.section_hidden')})</span>`
         : nothing}
+      <button
+        class="section-move-btn"
+        type="button"
+        aria-label=${moveUpLabel}
+        title=${moveUpLabel}
+        ?disabled=${isFirst}
+        @click=${() => ctx.onMoveSectionUp(idx)}
+        @mousedown=${(e: Event) => e.stopPropagation()}
+        @dragstart=${(e: Event) => e.stopPropagation()}
+      >↑</button>
+      <button
+        class="section-move-btn"
+        type="button"
+        aria-label=${moveDownLabel}
+        title=${moveDownLabel}
+        ?disabled=${isLast}
+        @click=${() => ctx.onMoveSectionDown(idx)}
+        @mousedown=${(e: Event) => e.stopPropagation()}
+        @dragstart=${(e: Event) => e.stopPropagation()}
+      >↓</button>
       ${toggleable
         ? html`
             <label
@@ -647,7 +680,7 @@ export function renderSectionOrderTab(ctx: SectionOrderTabContext): TemplateResu
         ${localize('editor.section_order_desc')}
       </div>
       <div class="section-order-list" id="section-order-list">
-        ${ctx.order.map((key) => renderSectionRow(ctx, key))}
+        ${ctx.order.map((key, idx) => renderSectionRow(ctx, key, idx, ctx.order.length))}
       </div>
       ${renderHiddenHeadings(ctx)} ${renderBadgeToggles(ctx)} ${renderVisibilityRules(ctx)}
     </div>

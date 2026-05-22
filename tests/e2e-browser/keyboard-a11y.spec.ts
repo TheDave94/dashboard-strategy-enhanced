@@ -128,6 +128,90 @@ test.describe('Keyboard a11y', () => {
     expect(state.ariaExpandedAfter).not.toBe(state.ariaExpandedBefore);
   });
 
+  test('SectionOrderTab move-up button is focusable + reorders on activation', async ({ page }) => {
+    await page.goto(`/${DASHBOARD_PATH}/0`, { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle', { timeout: 30_000 });
+    await page.waitForTimeout(2_500);
+    await waitForHaReady(page);
+
+    // Mount editor + give it a known sections_order, then click the
+    // "move up" button on index 2 and confirm the DOM order swapped.
+    // <button> natively handles Enter/Space (browser dispatches click);
+    // proving the click handler reorders + the button is focusable is
+    // what matters for the a11y surface.
+    type State = {
+      buttonFound: boolean;
+      tabIndex: number;
+      ariaLabel: string;
+      orderBefore: string[];
+      orderAfter: string[];
+    };
+    const state: State = await page.evaluate(async () => {
+      const haRoot = document.querySelector('home-assistant') as HTMLElement & { hass?: unknown };
+      let host = document.querySelector('#oriel-a11y-host');
+      if (host) host.remove();
+      host = document.createElement('div');
+      host.id = 'oriel-a11y-host';
+      document.body.appendChild(host);
+      const editor = document.createElement('oriel-editor') as HTMLElement & {
+        hass?: unknown;
+        setConfig: (cfg: unknown) => void;
+        updateComplete?: Promise<unknown>;
+      };
+      editor.hass = haRoot.hass;
+      // Explicit order so the test isn't sensitive to default-order drift.
+      editor.setConfig({
+        type: 'custom:oriel',
+        sections_order: ['overview', 'areas', 'weather', 'energy'],
+      });
+      host.appendChild(editor);
+      if (editor.updateComplete) await editor.updateComplete;
+      await new Promise((r) => setTimeout(r, 100));
+
+      const root = editor.shadowRoot;
+      if (!root) throw new Error('editor shadow root missing');
+
+      const readOrder = (): string[] => {
+        const items = Array.from(
+          root.querySelectorAll<HTMLElement>('#section-order-list .section-order-item'),
+        );
+        return items.map((el) => el.dataset.sectionKey ?? '');
+      };
+
+      const orderBefore = readOrder();
+
+      // Find the move-up button on the row at index 2 (the third row,
+      // 'weather' for the config we set above).
+      const row = root.querySelector<HTMLElement>(
+        '#section-order-list .section-order-item[data-section-key="weather"]',
+      );
+      if (!row) {
+        return { buttonFound: false, tabIndex: -1, ariaLabel: '', orderBefore, orderAfter: orderBefore };
+      }
+      const moveUpBtn = row.querySelector<HTMLButtonElement>('button.section-move-btn');
+      if (!moveUpBtn) {
+        return { buttonFound: false, tabIndex: -1, ariaLabel: '', orderBefore, orderAfter: orderBefore };
+      }
+      const tabIndex = moveUpBtn.tabIndex;
+      const ariaLabel = moveUpBtn.getAttribute('aria-label') ?? '';
+      moveUpBtn.focus();
+      // Native button activation. Native HTML semantics handle Enter →
+      // click, so calling .click() represents the keyboard-activation
+      // path users hit when they press Enter on a focused button.
+      moveUpBtn.click();
+      if (editor.updateComplete) await editor.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+      const orderAfter = readOrder();
+      return { buttonFound: true, tabIndex, ariaLabel, orderBefore, orderAfter };
+    });
+
+    expect(state.buttonFound, 'move-up button on the weather row must exist').toBe(true);
+    expect(state.tabIndex).toBeGreaterThanOrEqual(0);
+    expect(state.ariaLabel.length, 'move-up button needs an aria-label').toBeGreaterThan(0);
+    expect(state.orderBefore).toEqual(['overview', 'areas', 'weather', 'energy']);
+    expect(state.orderAfter).toEqual(['overview', 'weather', 'areas', 'energy']);
+  });
+
   test('ScreensaverCard overlay is focusable + activates on Space (dismiss)', async ({ page }) => {
     await page.goto(`/${DASHBOARD_PATH}/0`, { waitUntil: 'load' });
     await page.waitForLoadState('networkidle', { timeout: 30_000 });

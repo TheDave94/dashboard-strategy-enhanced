@@ -154,8 +154,10 @@
   },
   "editor": {
     "section_order": "Section Order",
-    "section_order_desc": "Drag sections to reorder them on the overview page. Empty sections are hidden automatically.",
+    "section_order_desc": "Drag sections to reorder them on the overview page. Empty sections are hidden automatically. Keyboard users: use the ↑ / ↓ buttons on each row.",
     "section_hidden": "hidden",
+    "move_section_up": "Move section up",
+    "move_section_down": "Move section down",
     "energy_link_dashboard": "Link to energy dashboard",
     "show_weather_forecast_card": "Show built-in forecast card",
     "show_energy_distribution_card": "Show built-in energy distribution card",

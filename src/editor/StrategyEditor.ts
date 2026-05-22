@@ -27,6 +27,7 @@ import { DEFAULT_SECTIONS_ORDER } from '../types/strategy';
 import type { AreaRegistryEntry, EntityRegistryEntry } from '../types/registries';
 import { localize } from '../utils/localize';
 import { isBadgeCandidate, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
+import { swapAdjacentUp, swapAdjacentDown } from '../utils/array-reorder';
 import { renderViewsTab } from './tabs/ViewsTab';
 import { renderOverviewTab } from './tabs/OverviewTab';
 import { renderSummariesTab } from './tabs/SummariesTab';
@@ -631,13 +632,34 @@ class OrielEditor extends LitElement {
       margin-left: 8px;
     }
     .section-order-item .section-toggle {
-      margin-left: auto;
+      margin-left: 8px;
       cursor: pointer;
     }
     .section-order-item .section-toggle input {
       cursor: pointer;
       width: 16px;
       height: 16px;
+    }
+    .section-order-item .section-move-btn {
+      margin-left: 4px;
+      background: transparent;
+      border: 1px solid var(--divider-color);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 14px;
+      line-height: 1;
+      color: var(--primary-text-color);
+      cursor: pointer;
+    }
+    .section-order-item .section-move-btn:first-of-type {
+      margin-left: auto;
+    }
+    .section-order-item .section-move-btn:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    }
+    .section-order-item .section-move-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
     }
     .section-order-sub {
       display: flex;
@@ -1625,6 +1647,20 @@ class OrielEditor extends LitElement {
     this._fireConfigChanged(newConfig);
   }
 
+  private _moveSectionUp(idx: number): void {
+    const order = this._getSectionsOrder();
+    const next = swapAdjacentUp(order, idx);
+    if (next === order) return;
+    this._updateSectionsOrder(next as SectionKey[]);
+  }
+
+  private _moveSectionDown(idx: number): void {
+    const order = this._getSectionsOrder();
+    const next = swapAdjacentDown(order, idx);
+    if (next === order) return;
+    this._updateSectionsOrder(next as SectionKey[]);
+  }
+
   private _isSectionDisabled(key: SectionKey): boolean {
     switch (key) {
       case 'custom_cards':
@@ -1819,6 +1855,8 @@ class OrielEditor extends LitElement {
       onDragOver: this._handleSectionDragOver,
       onDragLeave: this._handleSectionDragLeave,
       onDrop: this._handleSectionDrop,
+      onMoveSectionUp: (idx) => this._moveSectionUp(idx),
+      onMoveSectionDown: (idx) => this._moveSectionDown(idx),
     });
   }
 

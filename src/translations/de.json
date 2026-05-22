@@ -154,8 +154,10 @@
   },
   "editor": {
     "section_order": "Abschnitts-Reihenfolge",
-    "section_order_desc": "Ziehe die Abschnitte per Drag & Drop in die gewünschte Reihenfolge. Leere Abschnitte werden automatisch ausgeblendet.",
+    "section_order_desc": "Ziehe die Abschnitte per Drag & Drop in die gewünschte Reihenfolge. Leere Abschnitte werden automatisch ausgeblendet. Per Tastatur: ↑ / ↓ Schaltflächen in jeder Zeile.",
     "section_hidden": "ausgeblendet",
+    "move_section_up": "Abschnitt nach oben verschieben",
+    "move_section_down": "Abschnitt nach unten verschieben",
     "energy_link_dashboard": "Energie-Dashboard verlinken",
     "show_weather_forecast_card": "Eingebaute Wetter-Karte anzeigen",
     "show_energy_distribution_card": "Eingebaute Energie-Karte anzeigen",
