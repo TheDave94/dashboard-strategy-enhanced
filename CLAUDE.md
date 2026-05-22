@@ -147,7 +147,7 @@ These files require extra care — changes here most likely cause regressions:
 
 1. Create a feature branch from `main` (e.g. `feature/climate-summary-view`)
 2. Build: `npm run build` (production) or `npm run build-dev` (with source maps)
-3. Deploy: copy `dist/` contents to `/Volumes/config/www/community/oriel-dashboard/`
+3. Deploy: copy `dist/` contents to your local HA's `www/community/oriel-dashboard/` directory for live testing
 4. Delete stale `.gz` and `.br` files after copying (HA serves compressed over `.js` if present)
 5. Hard-refresh browser (Cmd+Shift+R). HA restart only needed for structural changes, not logic changes
 6. **Test on the live system** — always before pushing to GitHub!
@@ -183,26 +183,6 @@ What happens after your PR merges to `main`:
 4. **HACS users fetch the release assets**, not the source tree. The source-tree `dist/` is not load-bearing for users — release-build.yml builds it fresh on every release.
 
 See [docs/RELEASE-INFRASTRUCTURE.md](docs/RELEASE-INFRASTRUCTURE.md) for the GitHub App + release-please auth setup that lets the `release: published` event actually fire `release-build.yml` (the suppression-rule workaround).
-
-### Beta Releases
-- Beta versions are tagged as **Pre-Release** on GitHub (e.g. `v1.3.0-beta.1`)
-- Each beta builds on the previous one — everything flows into `main`
-- Increment beta number: `beta.1` → `beta.2` → `beta.3`
-- When stable: tag `v1.3.0` as a regular release
-- **Minor bump** (`v1.3.0`) for new features, **patch bump** (`v1.2.1`) for pure bugfixes
-
-### Version Checklist (before every release/beta)
-
-The following locations must be updated for a new version:
-
-| File | Field | Example |
-|------|-------|---------|
-| `package.json` | `"version"` | `"1.3.0"` |
-| `src/oriel.ts` | `STRATEGY_VERSION` | `'1.3.0-beta.5'` |
-| `package-lock.json` | updated automatically via `npm install` | — |
-| **Git tag** | create on release | `v1.3.0-beta.5` or `v1.3.0` |
-
-**Important:** `STRATEGY_VERSION` is logged to the browser console — useful for asking users which version they have installed.
 
 ### Porting Community PRs
 When PRs were created against the old codebase and cannot be merged directly:
@@ -274,52 +254,6 @@ All custom cards (SummaryCard, LightsGroupCard, CoversGroupCard) use LitElement 
 
 ### Climate Summary Default: Off
 `show_climate_summary` defaults to `false` because not every user has thermostats. All other summaries (lights, covers, security, batteries) default to on.
-
-## Roadmap: HA Best Practices Alignment
-
-Gradual alignment with the official HA Home Strategy. Reference: `../references/ha-strategies/`
-
-**Original problem:** With disabled cache + Slow 4G throttling:
-`Error: Timeout waiting for strategy element ll-strategy-dashboard-oriel to be registered`
-→ HA has a fixed 5-second timeout for custom element registration. Official strategies are part of the frontend bundle (no HTTP request), custom strategies must be loaded as external JS files.
-
-**Analysis result:** The remaining timeout on Slow 4G is a browser connection limit issue (max. 6 concurrent HTTP connections per origin). HA's own frontend chunks + all installed custom cards compete for slots. The strategy JS must wait until a slot is free. We have no control over this — neither HACS nor HA offer prioritization for custom resources. On normal connections (Fast 4G+) everything works smoothly.
-
-### Completed (main)
-- [x] LightsGroupCard: innerHTML rebuild → stable DOM + tile card pooling
-- [x] LightsGroupCard: custom batch button → heading card with button badges (perform-action)
-- [x] SummaryCard: dummy entity hack → own shadow DOM template
-- [x] Registry.initialize() in dashboard strategy entry point (race condition fix)
-- [x] Lit migration: all 3 custom cards (LightsGroupCard, CoversGroupCard, SummaryCard) to LitElement
-- [x] CoversGroupCard: innerHTML eliminated + heading badges + tile card pooling (analogous to LightsGroupCard)
-- [x] Bugfix: `hide_mobile_app_batteries` was not passed to SummaryCard
-- [x] Lazy imports: entry point reduced to tiny size, instant custom element registration
-- [x] Chunk architecture: main → lit → core → views → editor (on-demand)
-- [x] Custom cards: set hass() → Lit @property + willUpdate() (HA best practice pattern)
-- [x] Area cards: pre-filtered controls + conditional sensor_classes (HA best practice, performance fix for weak devices)
-- [x] Views pre-resolved in generate() instead of strategy stubs (like HA Home Panel, eliminates lazy resolution on navigation)
-- [x] Chunk loading: immediate start at entry point instead of in generate()
-- [x] Dead code removed: createUtilityViews(), createAreaViews() from view-builder.ts
-- [x] Conditional tile features: light-brightness, fan-speed, media-player-playback only when entity supports it (supported_features / color_modes)
-- [x] Aqara camera support in RoomViewStrategy (community PR #46, ported)
-- [x] Toggleable summary cards: clock, lights, covers, security, batteries individually toggleable (community PR #15, ported)
-- [x] HA-native area sorting via `use_default_area_sort` (community PR #34, ported)
-- [x] Empty overview section no longer rendered
-- [x] Editor sections logically regrouped
-- [x] LightsGroupCard: optional floor grouping with per-floor batch actions (`group_lights_by_floors`)
-- [x] ClimateViewStrategy: new climate view (heating/cooling/idle/off) + climate SummaryCard
-- [x] Content-hash chunk filenames for cache busting after HACS updates
-- [x] i18n: localize utility + DE/EN translations, auto-detect from hass.locale.language (#56)
-- [x] Alert icons on area cards: configurable `show_alerts_on_areas` toggle with curated allowlist (#114)
-- [x] Smoke/gas detectors in SecurityView, SummaryCard count, and room badges (#104)
-- [x] Security view headings: emojis replaced with MDI icons
-
-### Open: Evaluate
-- SummaryCard entity caching removal (HA's home-summary doesn't cache — stateless per render = more correct behavior for dynamic entity changes)
-
-### Phase 2: Align Further Views
-- CoversViewStrategy, SecurityViewStrategy, BatteriesViewStrategy — optimize analogous to LightsView
-- RoomViewStrategy: evaluate HA patterns (computeAreaTileCardConfig, feature auto-detection)
 
 ## References
 
