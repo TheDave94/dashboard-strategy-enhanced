@@ -21,10 +21,10 @@ Concrete items intended to ship, with acceptance criteria recorded so the work d
 
 ### `camera_hero` editor surface
 
-- **What**: Add a "Camera hero" toggle to the per-area expansion in `AreasTab`, exposing the existing `areas_options.<area>.camera_hero` config knob in the editor.
+- **What**: Add a "Camera hero" toggle to the per-area expansion in `RoomOverridesTab`, exposing the existing `areas_options.<area>.camera_hero` config knob in the editor.
 - **Why**: The feature exists in `RoomViewStrategy.ts` and is fully wired in the config types, but is YAML-only — violating [PRINCIPLES.md §1](PRINCIPLES.md) ("every advanced feature has an editor path"). Users who'd benefit from it can't discover or enable it without reading the type definitions.
-- **Shape**: Small fix / single PR. Pattern matches the existing per-area boolean toggles in `AreasTab`; the config field is already typed, the renderer is already wired, the mutator pattern is already established.
-- **Done when**: `AreasTab` shows a camera-hero toggle per area when at least one camera entity is in that area (no point surfacing the toggle when it would do nothing). Localized en + de. Toggle write produces the same YAML the manual path produces; existing YAML users see no behavior change. Unit test covers the mutator. Keyboard accessibility falls out of the existing `<ha-switch>` pattern — no new Playwright spec needed; the existing spec covers `<ha-switch>` activation generically.
+- **Shape**: Small fix / single PR. `RoomOverridesTab` already iterates every area with a per-area `<details>` expander, and the spread-based `areas_options` mutator pattern is established by the existing `append_default` toggle (see `updateSections` / `toggleAppend` in `RoomOverridesTab.ts`). The config field is already typed and the renderer in `RoomViewStrategy.ts` is already wired; the new toggle writes to `areas_options.<area>.camera_hero` directly — one level shallower than the existing `room_view_overrides.append_default` it sits next to.
+- **Done when**: `RoomOverridesTab` shows a camera-hero toggle per area when at least one camera entity is in that area (no point surfacing the toggle when it would do nothing). Localized en + de. Toggle write produces the same YAML the manual path produces; existing YAML users see no behavior change. Unit test covers the mutator. Keyboard accessibility falls out of the existing `<ha-switch>` pattern — no new Playwright spec needed; the existing spec covers `<ha-switch>` activation generically.
 
 ## 3. Deliberately deferred
 
@@ -59,6 +59,12 @@ Items that were considered during a review cycle and explicitly held back, with 
 - **What**: migrate the editor's CSS from legacy HA variable names (`--primary-color` family) to modern design tokens, matching the migration done for cards.
 - **Why deferred** (follow-up #2, partial migration): cards finished the migration in v4.7.0. The editor stays on legacy because the HA components it embeds (`ha-form`, `ha-switch`, `ha-combo-box`) still use the legacy names internally, and migrating only the editor's outer chrome would create token-inconsistency seams with the embedded HA components. The README claim about design-token coverage was qualified accordingly.
 - **Trigger to revisit**: HA's own theme system drops the legacy variable names, forcing all consumers to migrate together.
+
+### Live-preview visual rendering
+
+- **What**: render a sandboxed `<hui-view>` inside the live-preview pane so users see what the dashboard will actually look like, not just its structural outline.
+- **Why deferred** (`src/editor/LivePreview.ts:12-15`, v4.6.0): HA doesn't expose `<hui-view>` as an embeddable component. The structure-level preview (view/section/card counts + emitted YAML) was shipped as the pragmatic middle ground; a true visual preview would need either a public HA API change or a substantial reimplementation of HA's view rendering.
+- **Trigger to revisit**: HA exposes `<hui-view>` (or an equivalent embeddable component) as a public API, or a user reports that the text-only preview is insufficient for the decisions they're making in the editor.
 
 ## 4. Reactive next steps
 
