@@ -200,6 +200,25 @@ When PRs were created against the old codebase and cannot be merged directly:
 3. Close the original PR with a friendly comment + link to the release
 4. Issue reference in the commit (`Closes #XX`) automatically closes the issue on merge
 
+## How we work
+
+**Default to action within scope; pause at boundaries.** When a task has a clear spec — a [ROADMAP.md](ROADMAP.md) §2 entry, or explicit acceptance criteria — execute through implementation, testing, PR, and CI without intermediate check-ins. The PR is the review point.
+
+**The spec is the contract.** If the work fits the spec, execute it. If it doesn't, surface why before adapting.
+
+**Investigate before deciding.** When evidence is missing, gather it read-only and report findings — don't guess and ship.
+
+**Audits are how the docs stay honest.** Run them deliberately; treat findings as evidence, not action items.
+
+**The user picks direction. You pick implementation.**
+
+Stop and surface when:
+
+- Scope grew past the spec.
+- Two valid paths exist and the choice changes the product.
+- Evidence contradicts the spec.
+- A [PRINCIPLES.md](PRINCIPLES.md) principle would be violated to complete the task.
+
 ## Design Decisions
 
 Deliberate architecture decisions that should not be changed:
