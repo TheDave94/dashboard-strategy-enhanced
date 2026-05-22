@@ -1,44 +1,65 @@
 # Roadmap
 
-Reactive, not speculative — see [PRINCIPLES.md](PRINCIPLES.md) §5. What's listed here is either a known user-requested feature or a known internal gap. Things move from this list to GitHub issues when they're ready to ship; not every line item will get built.
+A current-state snapshot — not a list of aspirations. The project's working pattern is measured-and-reactive: features ship when a real signal justifies them. See [PRINCIPLES.md §5](PRINCIPLES.md) for the why.
 
-## Up next — likely v4.5
+## 1. Current state
 
-Decided based on actual signal (user feedback, editor gaps, real friction):
+Oriel Dashboard is a Home Assistant Lovelace strategy at **v4.9.0**. It auto-generates dashboards from areas, devices, and entities, and exposes every advanced feature through a visual editor instead of YAML. For "what changed" by version, read [CHANGELOG.md](CHANGELOG.md) or the [GitHub releases](https://github.com/TheDave94/oriel-dashboard/releases) page; this file does not duplicate that.
 
-- **Multi-step first-run stepper** — currently the Setup tab lists 8 personas directly. A 3-question modal that filters them would be friendlier for first-time users. Deferred from v4.4 to keep that ship focused.
-- **A11 camera-first room views — editor surface** — the YAML config exists (`areas_options.<area>.camera_hero`), but no editor exposure yet. Pattern matches the per-area expansions added in v4.4.
-- **Translation parity** — `de.json` has been keeping up with `en.json`, but the v4.4 strings (personas, hints, new editor tabs) added English-only fallbacks. Backfill the German translations.
+The strategy targets HA 2025.5+. The infrastructure-side state (release loop, branch hygiene, dependency posture) is documented in [docs/RELEASE-INFRASTRUCTURE.md](docs/RELEASE-INFRASTRUCTURE.md). The design principles every feature has to clear are in [PRINCIPLES.md](PRINCIPLES.md).
 
-## Worth considering — needs signal
+## 2. Near-term plan
 
-Mid-priority. Build when a real user asks for it or when the maintenance benefit justifies the work.
+Currently empty. See §4 Reactive next steps for how items get added.
 
-- **Persona "switch in place" affordance** — if a user already applied "Quick start" and switches to "Energy enthusiast", we should diff the configs and show a "this will change X, Y, Z" preview before committing. Defends against accidental config loss.
-- **Anomaly badge UI** — `src/utils/anomaly.ts` was shipped as a utility-only module and deleted as unused in v4.4 cleanup. Could revive with a real card / tile feature that surfaces "this entity is in an unusual state for this hour". Genuine work, low signal so far.
-- **Per-user editor: full override field set** — the current PerUserTab surfaces 8 common boolean flags. Power users can still write arbitrary fields via YAML and we preserve them. A "show every flag" view would close that gap.
-- **Drag-drop section reorder** — the per-mode editor uses up/down buttons. Drag-drop is nicer for >5 sections; the section-order tab already does drag-drop, the pattern could lift to `ModeOrderTab`.
+## 3. Deliberately deferred
 
-## Long-tail / blue-sky — won't build without strong signal
+Items that were considered during a review cycle and explicitly held back, with the reasoning recorded so the decision survives staff turnover. Each entry: **what** the item is, **why deferred** at the time it was considered, **trigger to revisit** — the concrete condition that would make it worth shipping.
 
-These come up periodically but the work / impact ratio is bad:
+### StrategyEditor file split
 
-- **AI dashboard assistant** — LLM that edits the strategy config via tool calls. Real value but ~2 weeks focused work, plus risky surfaces (hallucinated entity IDs, malformed configs). Wait for v4.x to have a real user base first.
-- **Floorplan SVG visual editor** — full WYSIWYG editor on top of the floorplan-card config. The current YAML textarea is the pragmatic middle ground; a true visual editor is weeks of work for a niche feature.
-- **3D / spatial floorplan** — would need user-supplied floorplan SVG + rendering of live entity overlays. The existing `floorplan-card` HACS plugin covers this; Oriel's `floorplan_view` config + emit is enough.
-- **Public preset marketplace** — users sharing strategy configs. Real value once there's a real userbase; useless before.
-- **WebGPU-accelerated charts** — for installs with millions of history points. Niche, and apexcharts-card already handles 99% of use cases via the section-card-registry.
+- **What**: decompose `src/editor/StrategyEditor.ts` along a three-axis split (state vs. rendering vs. config mutators).
+- **Why deferred** (follow-up #1): the file is 4140 lines / 148 cohesive methods, but extracting the per-tab render templates already captured the high-value ~40% of the win. The remaining split would require either ~80 lines of mixin plumbing or 100+ call-site changes for marginal benefit on the current scale.
+- **Trigger to revisit**: a specific tab needs independent reuse or testing in isolation from the rest of the editor.
 
-## Out of scope — explicitly not doing
+### Registry-rebuild perf mitigations
 
-- **Backend HA service integration** — Oriel is frontend-only. Things like `strategy.flash_view` would need a Python integration component; that's a different project.
-- **Backwards-compat layer for upstream simon42 identifiers** — clean break is intentional. Migration path is one YAML edit; see [MIGRATION.md](MIGRATION.md).
-- **Hard dependency on any HACS plugin** — every feature must work in a clean fallback path (see [PRINCIPLES.md](PRINCIPLES.md) §2).
+- **What**: optimizations (memoization, incremental rebuild, dirty-tracking) for the `Registry` rebuild path.
+- **Why deferred** (follow-up #2): the perf bench measured 2.2–5.6ms on a 300-entity fixture; the spec's original 250ms budget was overstated by ~50–100×. There is no real problem to solve at current scale.
+- **Trigger to revisit**: a user with a 1000+ entity install reports editor lag. The Registry-churn benchmark stays in CI as a regression guard against accidental slowdowns.
 
-## How items get added
+### Registry per-card render cost
 
-1. User reports a real friction (issue on this repo, comment on upstream simon42 that surfaces a pattern, direct feedback)
-2. Or an internal editor gap shows up (a YAML-only feature, a hardcoded value that should be configurable)
-3. The maintainer decides it's worth building → moves to a tracked GitHub issue with an estimate
+- **What**: optimizations for per-card render cost when HA pushes irrelevant `hass` updates (the `@property hass` decorator re-renders cards regardless of whether any entity they care about actually changed).
+- **Why deferred** (Registry.ts:115-125, v4.7.0): real cost but architecturally separate from Registry-rebuild. v4.7.0 shipped Registry-rebuild measurement + coalescing; this remaining axis was acknowledged but not actioned because there was no signal that it mattered in practice.
+- **Trigger to revisit**: stutter / dropped-frame report on a large install, or a profiler trace showing the render path dominates a real workload.
 
-Speculative items that look interesting but have no signal don't graduate. The principle is reactive, not aspirational.
+### Dashboard-level axe-core scan
+
+- **What**: an axe-core a11y sweep that covers the rendered dashboard (cards in their actual mount position) on top of the existing editor scan.
+- **Why deferred** (follow-up #3): cards live ~7 shadow boundaries deep inside HA's frontend (`home-assistant → home-assistant-main → ha-drawer → partial-panel-resolver → ha-panel-lovelace → hui-root → hui-view → hui-section → oriel-*-card`). axe's `.include()` API needs either a light-DOM selector or an exact shadow-piercing path, both brittle against HA frontend churn. Card a11y is already covered by `lit-a11y/click-events-have-key-events` at lint time and by the `keyboard-a11y.spec.ts` Playwright spec at runtime.
+- **Trigger to revisit**: axe gains a public API for HA-shadow-piercing scope, or a real a11y bug surfaces against a card that lit-a11y missed.
+
+### Editor color-token migration
+
+- **What**: migrate the editor's CSS from legacy HA variable names (`--primary-color` family) to modern design tokens, matching the migration done for cards.
+- **Why deferred** (follow-up #2, partial migration): cards finished the migration in v4.7.0. The editor stays on legacy because the HA components it embeds (`ha-form`, `ha-switch`, `ha-combo-box`) still use the legacy names internally, and migrating only the editor's outer chrome would create token-inconsistency seams with the embedded HA components. The README claim about design-token coverage was qualified accordingly.
+- **Trigger to revisit**: HA's own theme system drops the legacy variable names, forcing all consumers to migrate together.
+
+### Bubble Card full tile rewiring
+
+- **What**: when `use_bubble_drawers: true`, auto-rewrite per-tile `tap_action` to open the matching Bubble Card pop-up drawer instead of HA's default more-info dialog.
+- **Why deferred** (OverviewViewStrategy.ts:415): pop-up *registrations* ship today, but auto-rewiring every emitted tile's `tap_action` could break dashboards where the user has tested Bubble Card integration only partially. The conservative choice was to land the pop-up infrastructure without forcing the behavior change on existing installs.
+- **Trigger to revisit**: a user with `use_bubble_drawers: true` requests an opt-in "rewire all tiles" mode, or a signal that the feature is adopted broadly enough to justify changing the default.
+
+## 4. Reactive next steps
+
+Future work is driven by what surfaces — bug reports, feature requests on this repo or upstream simon42, deferred items above whose trigger condition fires, gaps revealed when the HA frontend evolves. There is no static roadmap, and items that look interesting in the abstract don't reach §2 unless something real has validated them. See [PRINCIPLES.md §5](PRINCIPLES.md) for the rationale; the previous shape of this file (long aspirational tiers) is exactly what that principle exists to discourage.
+
+## 5. Out of scope
+
+Explicit boundary statements — useful for setting expectations even when no one's asking. Each line is a thing this project has decided not to do, with the reason it stays decided.
+
+- **Backend HA service integration** — Oriel is frontend-only. Surfaces like `strategy.flash_view` would require a Python integration component; that's a different project.
+- **Backwards-compat layer for upstream simon42 identifiers** — the clean break is intentional. Migration is a one-shot YAML edit; see [MIGRATION.md](MIGRATION.md).
+- **Hard dependency on any HACS plugin** — every feature must work in a clean fallback path. See [PRINCIPLES.md §2](PRINCIPLES.md).
