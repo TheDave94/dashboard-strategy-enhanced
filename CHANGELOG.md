@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.9.1](https://github.com/TheDave94/oriel-dashboard/compare/v4.9.0...v4.9.1) (2026-05-22)
+
+
+### Bug Fixes
+
+* remove no-op use_apexcharts_sparklines dashboard toggle ([#40](https://github.com/TheDave94/oriel-dashboard/issues/40)) ([81b81cc](https://github.com/TheDave94/oriel-dashboard/commit/81b81ccd094d245da7ae7a19c5198daf4b96515f))
+
 ## [4.9.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.8.0...v4.9.0) (2026-05-22)
 
 
