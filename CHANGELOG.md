@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.9.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.8.0...v4.9.0) (2026-05-22)
+
+
+### Features
+
+* **editor:** keyboard-equivalent reorder for SectionOrderTab ([a2e9e37](https://github.com/TheDave94/oriel-dashboard/commit/a2e9e373db8dbbb46178d733c5222c2501bd16c8))
+
 ## [4.8.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.7.0...v4.8.0) (2026-05-21)
 
 
