@@ -202,7 +202,7 @@ When PRs were created against the old codebase and cannot be merged directly:
 
 ## How we work
 
-**Default to action within scope; pause at boundaries.** When a task has a clear spec — a [ROADMAP.md](ROADMAP.md) §2 entry, or explicit acceptance criteria — execute through implementation, testing, PR, and CI without intermediate check-ins. The PR is the review point.
+**Default to action within scope; pause at boundaries.** When a task has a clear spec — a [ROADMAP.md](ROADMAP.md) §2 entry, or explicit acceptance criteria — execute through implementation, testing, PR, CI, squash-merge, branch delete, and wait for release-please without intermediate check-ins. The release PR is the review point. Report when it's ready for the user's approval.
 
 **The spec is the contract.** If the work fits the spec, execute it. If it doesn't, surface why before adapting.
 
