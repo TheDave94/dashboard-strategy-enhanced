@@ -7,11 +7,12 @@
 // snapshot update.
 // ============================================================================
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { Registry } from '../../src/Registry';
 import { createCustomCardsSection, createOverviewSection } from '../../src/sections/OverviewSection';
 import { makeHass } from '../fixtures/hass';
+import { bubbleHashFor } from '../../src/utils/bubble-integration';
 
 beforeEach(() => {
   Registry.resetForTesting();
@@ -108,5 +109,129 @@ describe('createOverviewSection', () => {
       hass,
     });
     expect(section).toMatchSnapshot();
+  });
+
+  describe('favorites — Bubble Card tile tap_action rewiring (ROADMAP §2)', () => {
+    let spy: ReturnType<typeof vi.spyOn> | undefined;
+    function installBubbleCard(): void {
+      const realGet = customElements.get.bind(customElements);
+      spy = vi.spyOn(customElements, 'get').mockImplementation((tag) => {
+        if (tag === 'bubble-card') {
+          return HTMLElement as unknown as CustomElementConstructor;
+        }
+        return realGet(tag);
+      });
+    }
+    afterEach(() => {
+      spy?.mockRestore();
+      spy = undefined;
+    });
+
+    function favoriteTilesFromSection(section: { cards?: Array<Record<string, unknown>> } | null): Record<string, Record<string, unknown>> {
+      const out: Record<string, Record<string, unknown>> = {};
+      for (const card of section?.cards ?? []) {
+        if (card.type === 'tile' && typeof card.entity === 'string') {
+          out[card.entity] = card;
+        }
+      }
+      return out;
+    }
+
+    const favEntities = [
+      'light.fav_light',
+      'climate.fav_climate',
+      'cover.fav_cover',
+      'fan.fav_fan',
+      'media_player.fav_media',
+      'switch.fav_switch',
+      'sensor.fav_sensor',
+    ];
+
+    function buildHass(): ReturnType<typeof makeHass> {
+      return makeHass({
+        entities: favEntities.map((id) => ({ entity_id: id })),
+      });
+    }
+
+    it('rewrites tap_action for actionable-domain favorites; leaves non-actionable untouched', () => {
+      installBubbleCard();
+      const hass = buildHass();
+      Registry.initialize(hass, { use_bubble_drawers: true });
+      const section = createOverviewSection({
+        someSensorId: 'sensor.dummy',
+        showSearchCard: false,
+        config: {
+          use_bubble_drawers: true,
+          favorite_entities: favEntities,
+          // Suppress the entire summaries row so the favorites tiles
+          // are the only tile cards in this section, keeping the
+          // assertion focused.
+          show_light_summary: false,
+          show_covers_summary: false,
+          show_security_summary: false,
+          show_battery_summary: false,
+          show_clock_card: false,
+        },
+        hass,
+      });
+      const byEntity = favoriteTilesFromSection(section);
+      for (const id of ['light.fav_light', 'climate.fav_climate', 'cover.fav_cover', 'fan.fav_fan', 'media_player.fav_media']) {
+        expect(byEntity[id]?.tap_action, `actionable favorite ${id} missing bubble tap_action`).toEqual({
+          action: 'navigate',
+          navigation_path: bubbleHashFor(id),
+        });
+      }
+      for (const id of ['switch.fav_switch', 'sensor.fav_sensor']) {
+        expect(byEntity[id], `non-actionable favorite ${id} not emitted`).toBeDefined();
+        expect(byEntity[id]).not.toHaveProperty('tap_action');
+      }
+    });
+
+    it('emits without tap_action when use_bubble_drawers is false (even with bubble-card installed)', () => {
+      installBubbleCard();
+      const hass = buildHass();
+      Registry.initialize(hass, {});
+      const section = createOverviewSection({
+        someSensorId: 'sensor.dummy',
+        showSearchCard: false,
+        config: {
+          favorite_entities: favEntities,
+          show_light_summary: false,
+          show_covers_summary: false,
+          show_security_summary: false,
+          show_battery_summary: false,
+          show_clock_card: false,
+        },
+        hass,
+      });
+      const byEntity = favoriteTilesFromSection(section);
+      for (const id of favEntities) {
+        expect(byEntity[id]).not.toHaveProperty('tap_action');
+      }
+    });
+
+    it('emits without tap_action when bubble-card is uninstalled (toggle on)', () => {
+      // No installBubbleCard() — default happy-dom env: bubble-card unregistered.
+      const hass = buildHass();
+      Registry.initialize(hass, { use_bubble_drawers: true });
+      const section = createOverviewSection({
+        someSensorId: 'sensor.dummy',
+        showSearchCard: false,
+        config: {
+          use_bubble_drawers: true,
+          favorite_entities: favEntities,
+          show_light_summary: false,
+          show_covers_summary: false,
+          show_security_summary: false,
+          show_battery_summary: false,
+          show_clock_card: false,
+        },
+        hass,
+      });
+      const byEntity = favoriteTilesFromSection(section);
+      for (const id of favEntities) {
+        expect(byEntity[id]).not.toHaveProperty('tap_action');
+      }
+    });
   });
 });

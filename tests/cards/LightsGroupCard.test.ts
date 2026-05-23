@@ -2,13 +2,13 @@
 // LightsGroupCard — unit tests
 // ====================================================================
 // Coverage focus: setConfig validation, getStubConfig shape, picker
-// registration. Render-level tests would need a real <ha-tile-card>
-// shim — deferred to a later beta if useful.
+// registration, and the Bubble Card tile tap_action rewiring (ROADMAP §2).
 // ====================================================================
 
 import { describe, it, expect, beforeEach } from 'vitest';
 
 import '../../src/cards/LightsGroupCard';
+import { bubbleHashFor } from '../../src/utils/bubble-integration';
 
 type LightsGroupCardEl = HTMLElement & {
   setConfig(cfg: Record<string, unknown>): void;
@@ -17,6 +17,20 @@ type LightsGroupCardEl = HTMLElement & {
 
 function mount(): LightsGroupCardEl {
   return document.createElement('oriel-lights-group-card') as LightsGroupCardEl;
+}
+
+// Shim for HA's <hui-tile-card>: records the config passed to setConfig
+// so tests can interrogate what the LightsGroupCard would have rendered.
+class HuiTileCardShim extends HTMLElement {
+  public lastConfig: Record<string, unknown> | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public hass: any;
+  setConfig(cfg: Record<string, unknown>): void {
+    this.lastConfig = cfg;
+  }
+}
+if (!customElements.get('hui-tile-card')) {
+  customElements.define('hui-tile-card', HuiTileCardShim);
 }
 
 describe('oriel-lights-group-card', () => {
@@ -54,6 +68,63 @@ describe('oriel-lights-group-card', () => {
       expect(opts.columns).toBe(6);
       expect(opts.rows).toBe('auto');
       expect(opts.min_columns).toBe(6);
+    });
+  });
+
+  describe('bubble_drawers tile rewiring (ROADMAP §2)', () => {
+    function makeHassWithLight(entityId: string): unknown {
+      return {
+        states: {
+          [entityId]: {
+            entity_id: entityId,
+            state: 'on',
+            attributes: { supported_color_modes: ['brightness'] },
+            last_changed: '2026-01-01T00:00:00+00:00',
+            last_updated: '2026-01-01T00:00:00+00:00',
+          },
+        },
+        entities: {},
+        devices: {},
+        areas: {},
+        language: 'en',
+        locale: { language: 'en' },
+      };
+    }
+
+    it('applies navigate tap_action to emitted tile when bubble_drawers:true', () => {
+      const entityId = 'light.living_room';
+      const el = mount();
+      el.setConfig({ group_type: 'all', entities: [entityId], bubble_drawers: true });
+      (el as unknown as { hass: unknown }).hass = makeHassWithLight(entityId);
+      const tile = (
+        el as unknown as { _getOrCreateTileCard(id: string): HuiTileCardShim }
+      )._getOrCreateTileCard(entityId);
+      expect(tile.lastConfig?.tap_action).toEqual({
+        action: 'navigate',
+        navigation_path: bubbleHashFor(entityId),
+      });
+    });
+
+    it('emits without tap_action when bubble_drawers omitted', () => {
+      const entityId = 'light.bedroom';
+      const el = mount();
+      el.setConfig({ group_type: 'all', entities: [entityId] });
+      (el as unknown as { hass: unknown }).hass = makeHassWithLight(entityId);
+      const tile = (
+        el as unknown as { _getOrCreateTileCard(id: string): HuiTileCardShim }
+      )._getOrCreateTileCard(entityId);
+      expect(tile.lastConfig).not.toHaveProperty('tap_action');
+    });
+
+    it('emits without tap_action when bubble_drawers:false', () => {
+      const entityId = 'light.kitchen';
+      const el = mount();
+      el.setConfig({ group_type: 'all', entities: [entityId], bubble_drawers: false });
+      (el as unknown as { hass: unknown }).hass = makeHassWithLight(entityId);
+      const tile = (
+        el as unknown as { _getOrCreateTileCard(id: string): HuiTileCardShim }
+      )._getOrCreateTileCard(entityId);
+      expect(tile.lastConfig).not.toHaveProperty('tap_action');
     });
   });
 

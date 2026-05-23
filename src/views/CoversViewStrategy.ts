@@ -7,6 +7,7 @@ import type { LovelaceViewConfig } from '../types/lovelace';
 import type { OrielConfig } from '../types/strategy';
 import { localize } from '../utils/localize';
 import { resolveDensity } from '../utils/density';
+import { isBubbleCardInstalled } from '../utils/bubble-integration';
 
 interface CoversViewStrategyParams {
   entities?: string[];
@@ -30,10 +31,13 @@ class OrielViewCovers extends HTMLElement {
     const hasWindows = allDeviceClasses.includes('window');
 
     const density = resolveDensity(strategyConfig);
+    const bubbleEnabled =
+      strategyConfig.use_bubble_drawers === true && isBubbleCardInstalled();
     const baseConfig = {
       entities: config.entities,
       config: config.config,
       ...(density ? { density } : {}),
+      ...(bubbleEnabled ? { bubble_drawers: true } : {}),
     };
 
     // Rollos & Vorhänge
