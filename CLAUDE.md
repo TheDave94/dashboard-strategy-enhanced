@@ -210,6 +210,8 @@ When PRs were created against the old codebase and cannot be merged directly:
 - Evidence contradicts the spec.
 - A [PRINCIPLES.md](PRINCIPLES.md) principle would be violated to complete the task.
 
+**Cross-fork PR safety.** `TheDave94/oriel-dashboard` hosts head branches for open PRs in `TheRealSimon42/simon42-dashboard-strategy`. Deleting any such branch in this repo auto-closes the upstream PR. Before any **bulk** branch deletion — manual or automated — check [`docs/protected-branches.md`](docs/protected-branches.md) (the snapshot of currently-protected branches) and refresh it via the procedure in that file's header. **Single-branch** deletions during normal merge-and-cleanup flow only need the check if the branch name matches a pattern that could plausibly be an upstream PR head (e.g. `feat/*`, `fix/*`, `grouped/*`, `chore/*` are all in the protected set today; `release-please--*`, `docs/*`, `feature/*` (with the trailing `ure`), and `investigation/*` are not). The `.github/workflows/protect-upstream-pr-branches.yml` workflow is a smoke alarm that fails loudly post-deletion with a recovery command — it does not prevent the deletion, since GitHub doesn't expose pre-delete hooks on standard repos. Treat the alarm as a hard stop: recover and surface, don't proceed.
+
 ## Design Decisions
 
 Deliberate architecture decisions that should not be changed:
