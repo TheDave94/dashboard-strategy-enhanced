@@ -2,29 +2,19 @@
 
 A current-state snapshot — not a list of aspirations. The project's working pattern is measured-and-reactive: features ship when a real signal justifies them. See [PRINCIPLES.md §5](PRINCIPLES.md) for the why.
 
+> **Maintenance contract.** This file is updated at every release boundary: §1's version line must match the latest published tag, and §2 must not list items already shipped. Drift here is an audit finding — flag it as a violation when you spot it, don't paper over.
+
 ## 1. Current state
 
-Oriel Dashboard is a Home Assistant Lovelace strategy at **v4.9.0**. It auto-generates dashboards from areas, devices, and entities, and exposes every advanced feature through a visual editor instead of YAML. For "what changed" by version, read [CHANGELOG.md](CHANGELOG.md) or the [GitHub releases](https://github.com/TheDave94/oriel-dashboard/releases) page; this file does not duplicate that.
+Oriel Dashboard is a Home Assistant Lovelace strategy at **v4.10.0**. It auto-generates dashboards from areas, devices, and entities, and exposes every advanced feature through a visual editor instead of YAML. For "what changed" by version, read [CHANGELOG.md](CHANGELOG.md) or the [GitHub releases](https://github.com/TheDave94/oriel-dashboard/releases) page; this file does not duplicate that.
 
 The strategy targets HA 2025.5+. The infrastructure-side state (release loop, branch hygiene, dependency posture) is documented in [docs/RELEASE-INFRASTRUCTURE.md](docs/RELEASE-INFRASTRUCTURE.md). The design principles every feature has to clear are in [PRINCIPLES.md](PRINCIPLES.md).
 
 ## 2. Near-term plan
 
-Concrete items intended to ship, with acceptance criteria recorded so the work doesn't drift. Each entry: **what** changes, **why** it's worth shipping now, **shape** of the work (size only, not a date), and **done when** — what makes the work finished.
+Concrete items intended to ship, with acceptance criteria recorded so the work doesn't drift. Each entry would carry: **what** changes, **why** it's worth shipping now, **shape** of the work (size only, not a date), and **done when** — what makes the work finished.
 
-### Bubble Card tile `tap_action` rewiring
-
-- **What**: When `use_bubble_drawers: true` and Bubble Card is installed, rewrite every strategy-emitted tile's `tap_action` to open the matching Bubble Card pop-up drawer instead of falling through to HA's default more-info dialog. The `withBubbleTapAction` helper that does this already exists in `src/utils/bubble-integration.ts`; the work is wiring it into the tile-emit sites.
-- **Why**: The `use_bubble_drawers` editor toggle's own description promises "Tap a tile → a drawer slides up [...] Replaces the more-info dialog." That promise is currently unfulfilled — drawers register but tiles still open more-info. The toggle *is* the user's opt-in; the rewiring is the completion of what they were told they were enabling.
-- **Shape**: Single PR. One helper exists, several call sites need it. Identify the actionable domains (`light`, `climate`, `cover`, `fan`, `media_player` — same set Bubble pop-ups are emitted for), apply `withBubbleTapAction` at each tile-emit site, gate the application on `use_bubble_drawers === true && isBubbleCardInstalled()`. Update the deferral comment in `OverviewViewStrategy.ts:409-416` to record the closed state.
-- **Done when**: With `use_bubble_drawers: true` and Bubble Card installed, every emitted tile for the actionable domains has `tap_action` pointing at the correct Bubble hash. With `use_bubble_drawers: false` or Bubble Card not installed, tiles emit unchanged (no `tap_action` field, HA more-info default). Unit test pins the rewrite per domain. Playwright spec on the live install: enable the toggle, click a tile, assert the Bubble drawer opens rather than the more-info dialog.
-
-### `camera_hero` editor surface
-
-- **What**: Add a "Camera hero" toggle to the per-area expansion in `RoomOverridesTab`, exposing the existing `areas_options.<area>.camera_hero` config knob in the editor.
-- **Why**: The feature exists in `RoomViewStrategy.ts` and is fully wired in the config types, but is YAML-only — violating [PRINCIPLES.md §1](PRINCIPLES.md) ("every advanced feature has an editor path"). Users who'd benefit from it can't discover or enable it without reading the type definitions.
-- **Shape**: Small fix / single PR. `RoomOverridesTab` already iterates every area with a per-area `<details>` expander, and the spread-based `areas_options` mutator pattern is established by the existing `append_default` toggle (see `updateSections` / `toggleAppend` in `RoomOverridesTab.ts`). The config field is already typed and the renderer in `RoomViewStrategy.ts` is already wired; the new toggle writes to `areas_options.<area>.camera_hero` directly — one level shallower than the existing `room_view_overrides.append_default` it sits next to.
-- **Done when**: `RoomOverridesTab` shows a camera-hero toggle per area when at least one camera entity is in that area (no point surfacing the toggle when it would do nothing). Localized en + de. Toggle write produces the same YAML the manual path produces; existing YAML users see no behavior change. Unit test covers the mutator. Keyboard accessibility falls out of the existing `<ha-switch>` pattern — no new Playwright spec needed; the existing spec covers `<ha-switch>` activation generically.
+*Currently empty.* The two items that lived here through v4.9.x — Bubble Card tile `tap_action` rewiring and the `camera_hero` editor surface — both shipped in v4.10.0 (#50, #52). Nothing new is queued; future items surface from §4's reactive sources rather than getting backfilled here speculatively.
 
 ## 3. Deliberately deferred
 
