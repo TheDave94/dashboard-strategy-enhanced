@@ -26,11 +26,61 @@ export interface RoomOverridesTabContext {
   onChange: (areasOptions: NonNullable<OrielConfig['areas_options']>) => void;
 }
 
+/**
+ * Build a Set of area_ids that have at least one `camera.*` entity
+ * assigned (either directly or via the entity's device). Camera-hero
+ * is only meaningful for these areas — no point surfacing the knob
+ * elsewhere. Iterates the hass entity + device registries once.
+ */
+export function getAreasWithCameras(hass: HomeAssistant): Set<string> {
+  const out = new Set<string>();
+  const devices = hass.devices ?? {};
+  for (const entity of Object.values(hass.entities ?? {})) {
+    if (!entity.entity_id.startsWith('camera.')) continue;
+    let areaId: string | null | undefined = entity.area_id;
+    if (!areaId && entity.device_id) {
+      areaId = (devices[entity.device_id] as { area_id?: string | null } | undefined)?.area_id;
+    }
+    if (areaId) out.add(areaId);
+  }
+  return out;
+}
+
+/**
+ * Pure mutator — produces the next `areas_options` for toggling
+ * `camera_hero` on or off in a single area. Off (false) deletes the
+ * key so the YAML stays at the manual-config baseline (presence-only,
+ * matching the way the renderer reads `=== true`). When the area's
+ * options become an empty object as a result, the area entry is
+ * dropped too. Exported for unit tests.
+ */
+export function setCameraHero(
+  opts: NonNullable<OrielConfig['areas_options']>,
+  areaId: string,
+  on: boolean,
+): NonNullable<OrielConfig['areas_options']> {
+  const nextOpts: NonNullable<OrielConfig['areas_options']> = { ...opts };
+  const areaOpts = (opts[areaId] ?? {}) as Record<string, unknown>;
+  const nextArea: Record<string, unknown> = { ...areaOpts };
+  if (on) {
+    nextArea.camera_hero = true;
+  } else {
+    delete nextArea.camera_hero;
+  }
+  if (Object.keys(nextArea).length === 0) {
+    delete nextOpts[areaId];
+  } else {
+    nextOpts[areaId] = nextArea as NonNullable<OrielConfig['areas_options']>[string];
+  }
+  return nextOpts;
+}
+
 export function renderRoomOverridesTab(ctx: RoomOverridesTabContext): TemplateResult {
   const opts = (ctx.config.areas_options ?? {}) as NonNullable<OrielConfig['areas_options']>;
   const configuredAreas = Object.keys(opts).filter(
     (id) => (opts[id] as { room_view_overrides?: unknown })?.room_view_overrides,
   );
+  const areasWithCameras = getAreasWithCameras(ctx.hass);
 
   return html`
     <div class="section">
@@ -48,7 +98,7 @@ export function renderRoomOverridesTab(ctx: RoomOverridesTabContext): TemplateRe
           </div>`
         : nothing}
 
-      ${ctx.areas.map((area) => renderAreaOverride(area, opts, ctx))}
+      ${ctx.areas.map((area) => renderAreaOverride(area, opts, areasWithCameras, ctx))}
     </div>
   `;
 }
@@ -56,15 +106,19 @@ export function renderRoomOverridesTab(ctx: RoomOverridesTabContext): TemplateRe
 function renderAreaOverride(
   area: AreaRegistryEntry,
   opts: NonNullable<OrielConfig['areas_options']>,
+  areasWithCameras: Set<string>,
   ctx: RoomOverridesTabContext,
 ): TemplateResult {
   const areaOpts = (opts[area.area_id] ?? {}) as {
     room_view_overrides?: { sections?: unknown[]; append_default?: boolean };
+    camera_hero?: boolean;
   };
   const rvo = areaOpts.room_view_overrides;
   const hasOverride = !!rvo && Array.isArray(rvo.sections) && rvo.sections.length > 0;
   const sectionsYaml = rvo?.sections ? yaml.dump(rvo.sections, { noRefs: true, lineWidth: 100 }) : '';
   const appendDefault = rvo?.append_default !== false;
+  const cameraHero = areaOpts.camera_hero === true;
+  const hasCamera = areasWithCameras.has(area.area_id);
 
   const updateSections = (textarea: HTMLTextAreaElement): void => {
     const text = textarea.value;
@@ -111,19 +165,39 @@ function renderAreaOverride(
     ctx.onChange(nextOpts);
   };
 
+  const toggleCameraHero = (checked: boolean): void => {
+    ctx.onChange(setCameraHero(opts, area.area_id, checked));
+  };
+
+  // Summary status — concatenate the override + camera-hero hints so the
+  // user can scan the collapsed list and see what's configured per area.
+  const summaryParts: string[] = [];
+  if (hasOverride) {
+    summaryParts.push(
+      `${(rvo!.sections as unknown[]).length} custom sections${appendDefault ? ' (appended)' : ' (replacing default)'}`,
+    );
+  }
+  if (cameraHero) {
+    summaryParts.push(
+      localize('editor.camera_hero_summary') || 'camera hero',
+    );
+  }
+  const summaryText =
+    summaryParts.length > 0
+      ? summaryParts.join(' · ')
+      : (localize('editor.room_overrides_unset') || 'no override');
+
   return html`
     <details
       style="border: 1px solid var(--divider-color); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px;"
-      ?open=${hasOverride}
+      ?open=${hasOverride || cameraHero}
     >
       <summary
         style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;"
       >
         <span><strong>${area.name}</strong></span>
         <span style="color: var(--secondary-text-color); font-size: 0.85rem;">
-          ${hasOverride
-            ? `${(rvo!.sections as unknown[]).length} custom sections${appendDefault ? ' (appended)' : ' (replacing default)'}`
-            : (localize('editor.room_overrides_unset') || 'no override')}
+          ${summaryText}
         </span>
       </summary>
       <div style="margin-top: 8px;">
@@ -147,6 +221,24 @@ function renderAreaOverride(
                 />
                 ${localize('editor.room_overrides_append') ||
                   'Append to default room layout (uncheck to fully replace)'}
+              </label>
+            `
+          : nothing}
+        ${hasCamera
+          ? html`
+              <label
+                class="camera-hero-toggle"
+                data-area-id=${area.area_id}
+                style="display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px;"
+              >
+                <input
+                  type="checkbox"
+                  ?checked=${cameraHero}
+                  @change=${(e: Event) =>
+                    toggleCameraHero((e.target as HTMLInputElement).checked)}
+                />
+                ${localize('editor.camera_hero') ||
+                  'Camera hero (render the first area camera full-width at the top of the room view)'}
               </label>
             `
           : nothing}

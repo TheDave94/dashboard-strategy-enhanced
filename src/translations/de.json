@@ -433,6 +433,8 @@
     "room_camera_companion_motion": "Bewegungsmelder",
     "room_camera_companion_siren": "Sirene",
     "room_camera_companion_battery": "Akkustand",
-    "room_camera_companion_doorbell": "Türklingel"
+    "room_camera_companion_doorbell": "Türklingel",
+    "camera_hero": "Kamera als Hero (zeigt die erste Kamera des Bereichs in voller Breite oben in der Raum-Ansicht)",
+    "camera_hero_summary": "Kamera-Hero"
   }
 }

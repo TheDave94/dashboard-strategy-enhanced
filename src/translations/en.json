@@ -433,6 +433,8 @@
     "room_camera_companion_motion": "Motion sensor",
     "room_camera_companion_siren": "Siren",
     "room_camera_companion_battery": "Battery level",
-    "room_camera_companion_doorbell": "Doorbell"
+    "room_camera_companion_doorbell": "Doorbell",
+    "camera_hero": "Camera hero (render the first area camera full-width at the top of the room view)",
+    "camera_hero_summary": "camera hero"
   }
 }
