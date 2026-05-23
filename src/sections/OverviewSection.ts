@@ -13,6 +13,11 @@ import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelac
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 import { densityProp, resolveDensity } from '../utils/density';
+import {
+  isBubbleActionable,
+  isBubbleCardInstalled,
+  withBubbleTapAction,
+} from '../utils/bubble-integration';
 
 // --------------------------------------------------------------------
 // Helpers to surface room-section cards inside the favorites grid.
@@ -398,14 +403,22 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     if (showState) stateContent.push('state');
     if (!hideLastChanged) stateContent.push('last_changed');
 
+    const bubbleEnabled =
+      config.use_bubble_drawers === true && isBubbleCardInstalled();
+
     for (const entityId of favoriteEntities) {
-      cards.push({
+      const tile: LovelaceCardConfig = {
         type: 'tile',
         entity: entityId,
         show_entity_picture: true,
         vertical: false,
         ...(stateContent.length > 0 ? { state_content: stateContent } : {}),
-      });
+      };
+      cards.push(
+        bubbleEnabled && isBubbleActionable(entityId)
+          ? withBubbleTapAction(tile, entityId)
+          : tile,
+      );
     }
     cards.push(...pinnedCards);
     cards.push(...userFavoriteCards);

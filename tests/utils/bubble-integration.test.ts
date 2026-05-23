@@ -19,6 +19,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 import {
+  BUBBLE_ACTIONABLE_DOMAINS,
+  isBubbleActionable,
   isBubbleCardInstalled,
   bubbleHashFor,
   buildBubblePopupCards,
@@ -156,6 +158,47 @@ describe('buildBubblePopupCards()', () => {
   it('returns empty array when given empty input', () => {
     const hass = makeHass();
     expect(buildBubblePopupCards([], hass)).toEqual([]);
+  });
+});
+
+describe('BUBBLE_ACTIONABLE_DOMAINS', () => {
+  // Pin: every actionable domain stays in the set. A removal here would
+  // silently drop tile-rewriting for that domain across RoomView,
+  // ClimateView, LightsGroupCard, CoversGroupCard, and favorites.
+  it('contains exactly the documented actionable domains', () => {
+    expect([...BUBBLE_ACTIONABLE_DOMAINS].sort()).toEqual([
+      'climate',
+      'cover',
+      'fan',
+      'light',
+      'media_player',
+    ]);
+  });
+});
+
+describe('isBubbleActionable()', () => {
+  it.each(['light.kitchen', 'climate.bedroom', 'cover.shutter', 'fan.lounge', 'media_player.sonos'])(
+    'returns true for actionable entity %s',
+    (id) => {
+      expect(isBubbleActionable(id)).toBe(true);
+    },
+  );
+
+  it.each([
+    'switch.relay',
+    'lock.front_door',
+    'sensor.temp',
+    'binary_sensor.motion',
+    'alarm_control_panel.house',
+    'scene.movie_night',
+    'input_select.mode',
+  ])('returns false for non-actionable entity %s', (id) => {
+    expect(isBubbleActionable(id)).toBe(false);
+  });
+
+  it('returns false for malformed entity_id without a domain', () => {
+    expect(isBubbleActionable('')).toBe(false);
+    expect(isBubbleActionable('no_dot')).toBe(false);
   });
 });
 

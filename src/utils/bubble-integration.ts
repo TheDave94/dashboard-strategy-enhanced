@@ -5,12 +5,14 @@
 // hash-routed pop-ups: a `custom:bubble-card` with `card_type: pop-up`
 // and `hash: '#foo'` slides up when the dashboard URL contains `#foo`.
 //
-// We expose three helpers:
+// We expose these helpers:
 //
 // 1. `isBubbleCardInstalled()` — runtime detect via customElements
 // 2. `bubbleHashFor(entityId)` — canonical hash from entity_id
 // 3. `buildBubblePopupCards(entities, hass)` — pop-up section content
 // 4. `withBubbleTapAction(tile, entityId)` — tile tap-action override
+// 5. `isBubbleActionable(entityId)` — domain-in-actionable-set check
+//    (use at dynamic-domain emit sites: room_pins, favorites)
 //
 // Strategy code opts in via `dashboardConfig.use_bubble_drawers` AND
 // runtime presence of `bubble-card`. When either is false we no-op.
@@ -18,6 +20,26 @@
 
 import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceCardConfig } from '../types/lovelace';
+
+/**
+ * Entity domains for which we emit Bubble Card pop-ups and rewire tile
+ * tap_actions. Matches the domain set the Bubble drawers can render
+ * controls for — light brightness, climate hvac, cover position, fan
+ * speed, media playback. Other domains keep HA's default more-info.
+ */
+export const BUBBLE_ACTIONABLE_DOMAINS: readonly string[] = [
+  'light',
+  'climate',
+  'cover',
+  'fan',
+  'media_player',
+];
+
+/** True when entity_id's domain is in {@link BUBBLE_ACTIONABLE_DOMAINS}. */
+export function isBubbleActionable(entityId: string): boolean {
+  const domain = entityId.split('.')[0] ?? '';
+  return BUBBLE_ACTIONABLE_DOMAINS.includes(domain);
+}
 
 export function isBubbleCardInstalled(): boolean {
   try {
@@ -86,11 +108,9 @@ export function buildBubblePopupCards(
  * `hidden_by` flag).
  */
 export function collectBubbleCandidates(hass: HomeAssistant): string[] {
-  const supported = ['light', 'climate', 'cover', 'fan', 'media_player'];
   const out: string[] = [];
   for (const entityId of Object.keys(hass.states)) {
-    const domain = entityId.split('.')[0] ?? '';
-    if (supported.includes(domain)) {
+    if (isBubbleActionable(entityId)) {
       out.push(entityId);
     }
   }

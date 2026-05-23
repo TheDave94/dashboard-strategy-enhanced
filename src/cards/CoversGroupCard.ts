@@ -9,6 +9,7 @@ import type { AreaRegistryEntry } from '../types/registries';
 import { Registry } from '../Registry';
 import { trackHassUpdate } from '../utils/debug';
 import { localize } from '../utils/localize';
+import { withBubbleTapAction } from '../utils/bubble-integration';
 
 interface LovelaceCardElement extends HTMLElement {
   hass?: HomeAssistant;
@@ -37,6 +38,13 @@ interface CoversGroupConfig {
   group_by_floors?: boolean;
   /** Density variant — drives the --oriel-* CSS tokens. */
   density?: 'comfortable' | 'compact';
+  /**
+   * Set by the parent strategy after gating on
+   * `use_bubble_drawers && isBubbleCardInstalled()`. When true, the
+   * card rewrites each emitted tile's tap_action to navigate to the
+   * matching Bubble Card pop-up hash.
+   */
+  bubble_drawers?: boolean;
 }
 
 interface CoversFloorGroup {
@@ -390,7 +398,7 @@ class OrielCoversGroupCard extends LitElement {
 
     card = document.createElement('hui-tile-card');
     card.hass = this.hass;
-    card.setConfig({
+    let tileConfig: Record<string, unknown> = {
       type: 'tile',
       entity: entityId,
       name: this._stripCoverType(entityId),
@@ -398,7 +406,11 @@ class OrielCoversGroupCard extends LitElement {
       vertical: false,
       features_position: 'inline',
       state_content: ['current_position', 'last_changed'],
-    });
+    };
+    if (this._config.bubble_drawers === true) {
+      tileConfig = withBubbleTapAction(tileConfig, entityId);
+    }
+    card.setConfig(tileConfig);
     this._tileCards.set(entityId, card);
     return card;
   }

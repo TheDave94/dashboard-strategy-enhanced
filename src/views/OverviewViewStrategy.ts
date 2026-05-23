@@ -410,10 +410,12 @@ class OrielViewOverview extends HTMLElement {
     // enabled AND `bubble-card` is loaded, emit one pop-up definition
     // per actionable entity (light / climate / cover / fan / media_player).
     // Pop-ups are invisible until their hash is active, so adding them
-    // here doesn't change the visible overview. The strategy's emitted
-    // tiles keep their existing tap_action (more-info) — full tile
-    // rewiring is deferred to a later patch to avoid breaking users
-    // who haven't tested bubble-card with the rest of their dashboard.
+    // here doesn't change the visible overview. Tile tap_actions for
+    // these domains are rewired at the emit sites (RoomViewStrategy,
+    // ClimateViewStrategy, LightsGroupCard, CoversGroupCard, and the
+    // favorites loop in OverviewSection) via `withBubbleTapAction`,
+    // gated on the same `use_bubble_drawers && isBubbleCardInstalled()`
+    // pair — see `BUBBLE_ACTIONABLE_DOMAINS` in utils/bubble-integration.
     if (dashboardConfig.use_bubble_drawers === true) {
       const { isBubbleCardInstalled, buildBubblePopupCards, collectBubbleCandidates } =
         await import('../utils/bubble-integration');

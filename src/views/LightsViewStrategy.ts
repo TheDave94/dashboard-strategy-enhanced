@@ -6,6 +6,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import type { LovelaceViewConfig } from '../types/lovelace';
 import type { OrielConfig } from '../types/strategy';
 import { resolveDensity } from '../utils/density';
+import { isBubbleCardInstalled } from '../utils/bubble-integration';
 
 interface LightsViewStrategyParams {
   entities?: string[];
@@ -30,6 +31,8 @@ class OrielViewLights extends HTMLElement {
     // for its inline lights section. Users can override.
     const defaultExpanded = dashboardConfig.light_groups_default_expanded !== false;
     const density = resolveDensity(dashboardConfig);
+    const bubbleEnabled =
+      dashboardConfig.use_bubble_drawers === true && isBubbleCardInstalled();
 
     const card = (group_type: 'on' | 'off') => ({
       type: 'custom:oriel-lights-group-card',
@@ -41,6 +44,7 @@ class OrielViewLights extends HTMLElement {
       default_expanded: defaultExpanded,
       sort_by: sortBy,
       ...(density ? { density } : {}),
+      ...(bubbleEnabled ? { bubble_drawers: true } : {}),
     });
 
     return {

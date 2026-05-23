@@ -10,6 +10,7 @@ import { Registry } from '../Registry';
 import { trackHassUpdate } from '../utils/debug';
 import { localize } from '../utils/localize';
 import { stripAreaName } from '../utils/name-utils';
+import { withBubbleTapAction } from '../utils/bubble-integration';
 
 declare global {
   interface Window {
@@ -31,6 +32,13 @@ interface LightsGroupConfig {
   default_expanded?: boolean;
   /** Density variant — drives the --oriel-* CSS tokens. */
   density?: 'comfortable' | 'compact';
+  /**
+   * Set by the parent strategy after gating on
+   * `use_bubble_drawers && isBubbleCardInstalled()`. When true, the
+   * card rewrites each emitted tile's tap_action to navigate to the
+   * matching Bubble Card pop-up hash.
+   */
+  bubble_drawers?: boolean;
 }
 
 interface FloorGroup {
@@ -508,7 +516,7 @@ class OrielLightsGroupCard extends LitElement {
 
     const card = document.createElement('hui-tile-card') as LovelaceCardElement;
     card.hass = this.hass;
-    const cardConfig: any = { type: 'tile', entity: entityId, vertical: false, state_content: 'last_changed' };
+    let cardConfig: Record<string, unknown> = { type: 'tile', entity: entityId, vertical: false, state_content: 'last_changed' };
     const displayName = this._getDisplayName(entityId);
     if (displayName) {
       cardConfig.name = displayName;
@@ -521,6 +529,9 @@ class OrielLightsGroupCard extends LitElement {
       // HA handles disabled/irrelevant controls for unsupported runtime states.
       cardConfig.features = [{ type: 'light-brightness' }];
       cardConfig.features_position = 'inline';
+    }
+    if (this._config.bubble_drawers === true) {
+      cardConfig = withBubbleTapAction(cardConfig, entityId);
     }
     card.setConfig(cardConfig);
     card.dataset.entityId = entityId;

@@ -7,6 +7,7 @@ import type { LovelaceViewConfig, LovelaceSectionConfig } from '../types/lovelac
 import type { OrielConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
+import { isBubbleCardInstalled, withBubbleTapAction } from '../utils/bubble-integration';
 
 interface ClimateViewStrategyParams {
   config?: OrielConfig;
@@ -18,7 +19,11 @@ class OrielViewClimate extends HTMLElement {
     hass: HomeAssistant,
   ): Promise<LovelaceViewConfig> {
     // Ensure Registry is initialized (idempotent — no-op if already done)
-    Registry.initialize(hass, config.config || {});
+    const dashboardConfig: OrielConfig = config.config || {};
+    Registry.initialize(hass, dashboardConfig);
+
+    const bubbleEnabled =
+      dashboardConfig.use_bubble_drawers === true && isBubbleCardInstalled();
 
     const climateIds = Registry.getVisibleEntityIdsForDomain('climate').filter(
       (id) => hass.states[id] !== undefined
@@ -65,14 +70,17 @@ class OrielViewClimate extends HTMLElement {
             heading_style: 'title',
             icon,
           },
-          ...entities.map((e) => ({
-            type: 'tile',
-            entity: e,
-            vertical: false,
-            features: [{ type: 'climate-hvac-modes' }],
-            features_position: 'inline',
-            state_content: ['hvac_action', 'current_temperature'],
-          })),
+          ...entities.map((e) => {
+            const tile = {
+              type: 'tile',
+              entity: e,
+              vertical: false,
+              features: [{ type: 'climate-hvac-modes' }],
+              features_position: 'inline',
+              state_content: ['hvac_action', 'current_temperature'],
+            };
+            return bubbleEnabled ? withBubbleTapAction(tile, e) : tile;
+          }),
         ],
       });
     };

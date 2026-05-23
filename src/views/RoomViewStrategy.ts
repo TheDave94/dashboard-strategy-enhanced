@@ -23,6 +23,11 @@ import {
   hasAnyCompanion,
   sanitizeCompanionList,
 } from '../utils/camera-companions';
+import {
+  isBubbleActionable,
+  isBubbleCardInstalled,
+  withBubbleTapAction,
+} from '../utils/bubble-integration';
 
 // HA supported_features bitmask values
 const FAN_SET_SPEED = 1;
@@ -496,6 +501,17 @@ class OrielViewRoom extends HTMLElement {
       roomEntities.lights.sort((a, b) => sortByLastChanged(a, b, hass));
     }
 
+    // Bubble Card tile rewiring — when `use_bubble_drawers: true` AND
+    // bubble-card is installed, every actionable-domain tile's
+    // tap_action is rewritten to navigate to the matching pop-up hash
+    // (registered in OverviewViewStrategy). Computed once per room.
+    const bubbleEnabled =
+      dashboardConfig.use_bubble_drawers === true && isBubbleCardInstalled();
+    const maybeBubble = <T extends Record<string, unknown>>(
+      tile: T,
+      entityId: string,
+    ): T => (bubbleEnabled ? withBubbleTapAction(tile, entityId) : tile);
+
     // Helper: create a domain section
     const domainSection = (
       entities: string[],
@@ -526,6 +542,7 @@ class OrielViewRoom extends HTMLElement {
             nested_groups: dashboardConfig.nested_light_groups === true,
             sort_by: dashboardConfig.lights_sort_by === 'name' ? 'name' : 'last_changed',
             ...(lightsDensity ? { density: lightsDensity } : {}),
+            ...(bubbleEnabled ? { bubble_drawers: true } : {}),
           },
         ],
       });
@@ -547,60 +564,74 @@ class OrielViewRoom extends HTMLElement {
       ),
     );
 
-    domainSection(roomEntities.climate, localize('room.climate'), 'mdi:thermostat', (e) => ({
-      type: 'tile',
-      entity: e,
-      name: stripAreaName(e, area, hass),
-      features: [{ type: 'climate-hvac-modes' }],
-      features_position: 'inline',
-      vertical: false,
-      state_content: ['hvac_action', 'current_temperature'],
-    }));
-
-    domainSection(roomEntities.covers, localize('room.covers'), 'mdi:window-shutter', (e) =>
-      applyStateIcon(
+    domainSection(roomEntities.climate, localize('room.climate'), 'mdi:thermostat', (e) =>
+      maybeBubble(
         {
           type: 'tile',
           entity: e,
           name: stripAreaName(e, area, hass),
-          features: [{ type: 'cover-open-close' }],
-          vertical: false,
+          features: [{ type: 'climate-hvac-modes' }],
           features_position: 'inline',
-          state_content: ['current_position', 'last_changed'],
+          vertical: false,
+          state_content: ['hvac_action', 'current_temperature'],
         },
-        hass,
+        e,
+      ),
+    );
+
+    domainSection(roomEntities.covers, localize('room.covers'), 'mdi:window-shutter', (e) =>
+      maybeBubble(
+        applyStateIcon(
+          {
+            type: 'tile',
+            entity: e,
+            name: stripAreaName(e, area, hass),
+            features: [{ type: 'cover-open-close' }],
+            vertical: false,
+            features_position: 'inline',
+            state_content: ['current_position', 'last_changed'],
+          },
+          hass,
+          e,
+        ),
         e,
       ),
     );
 
     domainSection(roomEntities.covers_curtain, localize('room.curtains'), 'mdi:curtains', (e) =>
-      applyStateIcon(
-        {
-          type: 'tile',
-          entity: e,
-          name: stripAreaName(e, area, hass),
-          features: [{ type: 'cover-open-close' }],
-          vertical: false,
-          features_position: 'inline',
-          state_content: ['current_position', 'last_changed'],
-        },
-        hass,
+      maybeBubble(
+        applyStateIcon(
+          {
+            type: 'tile',
+            entity: e,
+            name: stripAreaName(e, area, hass),
+            features: [{ type: 'cover-open-close' }],
+            vertical: false,
+            features_position: 'inline',
+            state_content: ['current_position', 'last_changed'],
+          },
+          hass,
+          e,
+        ),
         e,
       ),
     );
 
     domainSection(roomEntities.covers_window, localize('room.windows'), 'mdi:window-open-variant', (e) =>
-      applyStateIcon(
-        {
-          type: 'tile',
-          entity: e,
-          name: stripAreaName(e, area, hass),
-          features: [{ type: 'cover-open-close' }],
-          vertical: false,
-          features_position: 'inline',
-          state_content: ['current_position', 'last_changed'],
-        },
-        hass,
+      maybeBubble(
+        applyStateIcon(
+          {
+            type: 'tile',
+            entity: e,
+            name: stripAreaName(e, area, hass),
+            features: [{ type: 'cover-open-close' }],
+            vertical: false,
+            features_position: 'inline',
+            state_content: ['current_position', 'last_changed'],
+          },
+          hass,
+          e,
+        ),
         e,
       ),
     );
@@ -608,14 +639,17 @@ class OrielViewRoom extends HTMLElement {
     domainSection(roomEntities.media_player, localize('room.media'), 'mdi:speaker', (e) => {
       const state = hass.states[e];
       const hasPlayback = state && mediaPlayerSupportsPlayback(state);
-      return {
-        type: 'tile',
-        entity: e,
-        name: stripAreaName(e, area, hass),
-        vertical: false,
-        ...(hasPlayback ? { features: [{ type: 'media-player-playback' }], features_position: 'inline' } : {}),
-        state_content: ['media_title', 'media_artist'],
-      };
+      return maybeBubble(
+        {
+          type: 'tile',
+          entity: e,
+          name: stripAreaName(e, area, hass),
+          vertical: false,
+          ...(hasPlayback ? { features: [{ type: 'media-player-playback' }], features_position: 'inline' } : {}),
+          state_content: ['media_title', 'media_artist'],
+        },
+        e,
+      );
     });
 
     domainSection(roomEntities.scenes, localize('room.scenes'), 'mdi:palette', (e) => ({
@@ -641,14 +675,19 @@ class OrielViewRoom extends HTMLElement {
     for (const e of roomEntities.fan) {
       const state = hass.states[e];
       const hasSpeed = state && fanSupportsSpeed(state);
-      miscCards.push({
-        type: 'tile',
-        entity: e,
-        name: stripAreaName(e, area, hass),
-        ...(hasSpeed ? { features: [{ type: 'fan-speed' }], features_position: 'inline' } : {}),
-        vertical: false,
-        state_content: 'last_changed',
-      });
+      miscCards.push(
+        maybeBubble(
+          {
+            type: 'tile',
+            entity: e,
+            name: stripAreaName(e, area, hass),
+            ...(hasSpeed ? { features: [{ type: 'fan-speed' }], features_position: 'inline' } : {}),
+            vertical: false,
+            state_content: 'last_changed',
+          },
+          e,
+        ),
+      );
     }
     for (const e of roomEntities.switches)
       miscCards.push({
@@ -743,13 +782,14 @@ class OrielViewRoom extends HTMLElement {
             const pinStateContent: string[] = [];
             if (dashboardConfig.room_pins_show_state === true) pinStateContent.push('state');
             if (dashboardConfig.room_pins_hide_last_changed !== true) pinStateContent.push('last_changed');
-            return {
+            const tile: LovelaceCardConfig = {
               type: 'tile',
               entity: e,
               name: stripAreaName(e, area, hass),
               vertical: false,
               ...(pinStateContent.length > 0 ? { state_content: pinStateContent } : {}),
             };
+            return bubbleEnabled && isBubbleActionable(e) ? withBubbleTapAction(tile, e) : tile;
           }),
         ],
       };

@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
 import '../../src/cards/CoversGroupCard';
+import { bubbleHashFor } from '../../src/utils/bubble-integration';
 
 type CoversGroupCardEl = HTMLElement & {
   setConfig(cfg: Record<string, unknown>): void;
@@ -13,6 +14,20 @@ type CoversGroupCardEl = HTMLElement & {
 
 function mount(): CoversGroupCardEl {
   return document.createElement('oriel-covers-group-card') as CoversGroupCardEl;
+}
+
+// <hui-tile-card> shim — records setConfig calls so tests can assert on
+// what the CoversGroupCard would have rendered.
+class HuiTileCardShim extends HTMLElement {
+  public lastConfig: Record<string, unknown> | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public hass: any;
+  setConfig(cfg: Record<string, unknown>): void {
+    this.lastConfig = cfg;
+  }
+}
+if (!customElements.get('hui-tile-card')) {
+  customElements.define('hui-tile-card', HuiTileCardShim);
 }
 
 describe('oriel-covers-group-card', () => {
@@ -41,6 +56,52 @@ describe('oriel-covers-group-card', () => {
       const opts = el.getGridOptions();
       expect(opts.columns).toBe(6);
       expect(opts.rows).toBe('auto');
+    });
+  });
+
+  describe('bubble_drawers tile rewiring (ROADMAP §2)', () => {
+    function makeHassWithCover(entityId: string): unknown {
+      return {
+        states: {
+          [entityId]: {
+            entity_id: entityId,
+            state: 'open',
+            attributes: { current_position: 100, device_class: 'shutter' },
+            last_changed: '2026-01-01T00:00:00+00:00',
+            last_updated: '2026-01-01T00:00:00+00:00',
+          },
+        },
+        entities: {},
+        devices: {},
+        areas: {},
+        language: 'en',
+        locale: { language: 'en' },
+      };
+    }
+
+    it('applies navigate tap_action to emitted tile when bubble_drawers:true', () => {
+      const entityId = 'cover.kitchen';
+      const el = mount();
+      el.setConfig({ group_type: 'open', bubble_drawers: true });
+      (el as unknown as { hass: unknown }).hass = makeHassWithCover(entityId);
+      const tile = (
+        el as unknown as { _getOrCreateTileCard(id: string): HuiTileCardShim }
+      )._getOrCreateTileCard(entityId);
+      expect(tile.lastConfig?.tap_action).toEqual({
+        action: 'navigate',
+        navigation_path: bubbleHashFor(entityId),
+      });
+    });
+
+    it('emits without tap_action when bubble_drawers omitted', () => {
+      const entityId = 'cover.bedroom';
+      const el = mount();
+      el.setConfig({ group_type: 'open' });
+      (el as unknown as { hass: unknown }).hass = makeHassWithCover(entityId);
+      const tile = (
+        el as unknown as { _getOrCreateTileCard(id: string): HuiTileCardShim }
+      )._getOrCreateTileCard(entityId);
+      expect(tile.lastConfig).not.toHaveProperty('tap_action');
     });
   });
 
