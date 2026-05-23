@@ -16,12 +16,18 @@ Companion to [ROADMAP.md](ROADMAP.md). The Roadmap's §3 covers product-side def
 
 **Reasoning**: Diagnostic ran 2026-05-23, verdict (b) — *"config identical to siblings; failure is environmental"*. Bundle-size is the last job in the workflow file and may land on a different runner pool segment than its siblings; that's the most plausible structural hypothesis but unfalsifiable at N=2.
 
+## Closed / historical record
+
+Entries that have since been resolved. Kept for context — useful when future work touches the same area and someone wants the "why" thread.
+
 ### Branch deletion in this repo silently closes cross-fork PRs upstream — establish a safety check
 
-**Decision**: Before any bulk branch-deletion automation runs in `TheDave94/oriel-dashboard`, check whether any of the target branches are the head of an open PR in a forked-to upstream repo (currently: `TheRealSimon42/simon42-dashboard-strategy`). If yes, refuse to delete and surface for review. Mechanism likely: `gh api "repos/{upstream}/pulls?head=TheDave94:{branch}&state=open"` per branch — fast enough for any reasonable cleanup batch size.
+**Status**: Closed 2026-05-23. Protection landed in #59 (L1 `docs/protected-branches.md` snapshot + L3 `CLAUDE.md` discipline rule) and #60 (L2 delete-event CI guard at `.github/workflows/protect-upstream-pr-branches.yml`). Smoke alarm on accidental deletion — not a lock, since GitHub doesn't expose pre-delete hooks on standard repos. The guard fails the run with a pre-formed recovery command (read from the upstream PR's `head.sha`) so the next cascade surfaces immediately instead of being discovered days later.
 
-**Why deferred**: No automation today is queued to run; the safety check matters before the next bulk cleanup, not retroactively. The damage from the previous cleanups has been fully recovered (49 PRs reopened across Cluster C + #250).
+**Original decision** (when this was Open): Before any bulk branch-deletion automation runs in `TheDave94/oriel-dashboard`, check whether any of the target branches are the head of an open PR in a forked-to upstream repo (currently: `TheRealSimon42/simon42-dashboard-strategy`). If yes, refuse to delete and surface for review. Mechanism likely: `gh api "repos/{upstream}/pulls?head=TheDave94:{branch}&state=open"` per branch — fast enough for any reasonable cleanup batch size.
 
-**Trigger to revisit**: When any branch-deletion automation is added or modified in this repo, or before any manual bulk branch-deletion. Whichever comes first.
+**Why deferred at the time**: No automation today is queued to run; the safety check matters before the next bulk cleanup, not retroactively. The damage from the previous cleanups has been fully recovered (49 PRs reopened across Cluster C + #250).
+
+**Trigger that had been recorded**: When any branch-deletion automation is added or modified in this repo, or before any manual bulk branch-deletion. Whichever comes first.
 
 **Reasoning**: Bulk branch deletion on 2026-05-19 and 2026-05-22 silently closed 49 cross-fork PRs upstream. Pattern confirmed twice. Mechanism: GitHub auto-closes a PR when its head branch is deleted, recording the deleting account as the close actor — looks like manual closure to the maintainer, isn't.
