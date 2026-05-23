@@ -6,6 +6,14 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.10.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.9.1...v4.10.0) (2026-05-23)
+
+
+### Features
+
+* complete Bubble Card tile tap_action rewiring ([#50](https://github.com/TheDave94/oriel-dashboard/issues/50)) ([beec2c1](https://github.com/TheDave94/oriel-dashboard/commit/beec2c19a11083508f72fe7f9873b6fb8004cf09))
+* expose camera_hero per-area knob in the editor ([#52](https://github.com/TheDave94/oriel-dashboard/issues/52)) ([fb018fc](https://github.com/TheDave94/oriel-dashboard/commit/fb018fc64ed3fe331d749f02e6d53416072f44e3))
+
 ## [4.9.1](https://github.com/TheDave94/oriel-dashboard/compare/v4.9.0...v4.9.1) (2026-05-22)
 
 
