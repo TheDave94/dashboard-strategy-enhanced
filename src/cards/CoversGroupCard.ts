@@ -157,7 +157,8 @@ class OrielCoversGroupCard extends LitElement {
     }
   }
 
-  // Same shape as LightsGroupCard — half-section, content-measured.
+  // Full-width, content-measured — see LightsGroupCard.getGridOptions for
+  // why (half-width + max_rows cap caused tall groups to overlap neighbors).
   getGridOptions(): {
     columns: number | 'full';
     rows: number | 'auto';
@@ -165,7 +166,7 @@ class OrielCoversGroupCard extends LitElement {
     min_rows?: number;
     max_rows?: number;
   } {
-    return { columns: 6, rows: 'auto', min_columns: 6, min_rows: 1, max_rows: 12 };
+    return { columns: 'full', rows: 'auto' };
   }
 
   protected willUpdate(changedProps: PropertyValues): void {

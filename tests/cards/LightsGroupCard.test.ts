@@ -61,13 +61,16 @@ describe('oriel-lights-group-card', () => {
   });
 
   describe('LovelaceCard contract', () => {
-    it('getGridOptions reflects content-measured shape', () => {
+    it('getGridOptions is full-width, content-measured (no row cap → no overlap)', () => {
       const el = mount();
       el.setConfig({ group_type: 'all' });
       const opts = el.getGridOptions();
-      expect(opts.columns).toBe(6);
+      // Full-width so multiple group cards stack vertically instead of
+      // tiling half-width and overlapping when tall (root fix for the
+      // covers/lights overlap). No max_rows cap.
+      expect(opts.columns).toBe('full');
       expect(opts.rows).toBe('auto');
-      expect(opts.min_columns).toBe(6);
+      expect(opts.max_rows).toBeUndefined();
     });
   });
 

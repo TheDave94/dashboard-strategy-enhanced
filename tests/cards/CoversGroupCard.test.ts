@@ -50,12 +50,13 @@ describe('oriel-covers-group-card', () => {
   });
 
   describe('LovelaceCard contract', () => {
-    it('getGridOptions reflects content-measured shape', () => {
+    it('getGridOptions is full-width, content-measured (no row cap → no overlap)', () => {
       const el = mount();
       el.setConfig({ group_type: 'open' });
       const opts = el.getGridOptions();
-      expect(opts.columns).toBe(6);
+      expect(opts.columns).toBe('full');
       expect(opts.rows).toBe('auto');
+      expect(opts.max_rows).toBeUndefined();
     });
   });
 

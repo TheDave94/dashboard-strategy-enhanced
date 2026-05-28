@@ -203,9 +203,13 @@ class OrielLightsGroupCard extends LitElement {
     }
   }
 
-  // Tile-card-style: half-section, content-measured height. Lights group
-  // can grow indefinitely (10+ rows in a packed home); bound max_rows to
-  // prevent runaway, min_columns=6 keeps the per-tile readable.
+  // Full-width, content-measured height. This previously returned a
+  // half-width layout (columns:6) with a max_rows:12 cap — but when a group
+  // grew past 12 rows its content overflowed the capped grid cell and
+  // overlapped the adjacent half-width card (Lights On/Off side-by-side, and
+  // the multi-group Covers view). Full-width cards stack vertically and size
+  // to their content, so they can't overlap. Root fix — replaces the
+  // per-view grid_options overrides that were patching this symptom.
   getGridOptions(): {
     columns: number | 'full';
     rows: number | 'auto';
@@ -213,7 +217,7 @@ class OrielLightsGroupCard extends LitElement {
     min_rows?: number;
     max_rows?: number;
   } {
-    return { columns: 6, rows: 'auto', min_columns: 6, min_rows: 1, max_rows: 12 };
+    return { columns: 'full', rows: 'auto' };
   }
 
   protected willUpdate(changedProps: PropertyValues): void {
