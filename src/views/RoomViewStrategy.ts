@@ -10,7 +10,7 @@ import type {
   LovelaceBadgeConfig,
 } from '../types/lovelace';
 import type { AreaRegistryEntry } from '../types/registries';
-import type { RoomEntities, SensorEntities, RoomSectionKey } from '../types/strategy';
+import type { RoomEntities, SensorEntities, RoomSectionKey, CustomCard } from '../types/strategy';
 import { DEFAULT_ROOM_SECTION_ORDER } from '../types/strategy';
 import { stripAreaName, tileName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
@@ -950,6 +950,24 @@ class OrielViewRoom extends HTMLElement {
           ],
         });
       }
+    }
+
+    // Custom cards targeting this area (#210/#222): a `custom_cards` entry
+    // with `target_area === this area` renders here, at the bottom of the
+    // room view, instead of in an overview section. Optional title → heading.
+    const areaCustomCards = ((dashboardConfig.custom_cards || []) as CustomCard[]).filter(
+      (cc: CustomCard) => cc.target_area === area.area_id && cc.parsed_config,
+    );
+    for (const cc of areaCustomCards) {
+      const inner = Array.isArray(cc.parsed_config)
+        ? (cc.parsed_config as LovelaceCardConfig[])
+        : [cc.parsed_config as LovelaceCardConfig];
+      const cards: LovelaceCardConfig[] = [];
+      if (cc.title) {
+        cards.push({ type: 'heading', heading: cc.title, heading_style: 'title' });
+      }
+      cards.push(...inner);
+      sections.push({ type: 'grid', cards });
     }
 
     // Per-area room view overrides (v3.4.0). When the user has set

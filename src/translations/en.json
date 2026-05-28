@@ -39,6 +39,7 @@
   },
   "sections": {
     "overview": "Overview",
+    "overview_top": "Overview (top)",
     "summaries": "Summaries",
     "favorites": "Favorites",
     "custom_cards": "Custom Cards",
@@ -216,6 +217,8 @@
     "show_updates_badge": "Show pending updates count badge",
     "show_updates_badge_desc": "Adds a small orange badge to the overview header showing the count of update.* entities in state \"on\" (pending). Tap navigates to Settings → Updates. Auto-hidden when no updates are pending. Required integration: none — the update.* domain is HA-native.",
     "target_section": "Show in",
+    "target_area": "Target room",
+    "target_area_none": "(overview — no room)",
     "section_overview": "Overview",
     "show_clock_card": "Show clock card",
     "show_clock_card_desc": "Shows the clock card on the overview.",

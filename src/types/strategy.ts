@@ -12,6 +12,8 @@ import type { LovelaceCardConfig } from './lovelace';
 
 export type SectionKey =
   | 'overview'
+  | 'overview_top' // custom_cards target: prepend to the overview section (above clock/search) — #63
+  | 'summaries' // custom_cards target: insert right after the summary tiles — #153
   | 'custom_cards'
   | 'areas'
   | 'weather'
@@ -833,6 +835,9 @@ export interface CustomCard {
   /** Target section where this card appears (default: 'custom_cards').
    *  Accepts built-in SectionKeys OR a user-defined custom_sections[].key. */
   target_section?: SectionKey | string;
+  /** Target area_id — render this card inside that area's room view instead
+   *  of an overview section (#210/#222). When set, overrides target_section. */
+  target_area?: string;
   /** Raw YAML string entered by the user in the editor */
   yaml?: string;
   /** Parsed Lovelace card config (generated from yaml) */
