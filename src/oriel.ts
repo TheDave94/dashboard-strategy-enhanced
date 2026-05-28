@@ -7,7 +7,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from './types/homeassistant';
-import type { OrielConfig } from './types/strategy';
+import type { OrielConfig, OrielBackgroundConfig } from './types/strategy';
 import type { LovelaceConfig, LovelaceViewConfig } from './types/lovelace';
 
 // Injected at build time by webpack DefinePlugin from package.json#version.
@@ -113,6 +113,29 @@ async function resolveReferencedView(
   const idx = Number(refView);
   if (!Number.isNaN(idx) && views[idx]) return views[idx];
   return null;
+}
+
+/**
+ * Compose the native HA view `background` value from Oriel's config
+ * (simon42#188). Image present → object form (round-trips with HA's own
+ * view-background editor); else color/gradient → string form; else
+ * undefined (inherit the theme's --lovelace-background).
+ */
+function composeViewBackground(
+  bg?: OrielBackgroundConfig,
+): string | Record<string, unknown> | undefined {
+  if (!bg) return undefined;
+  if (bg.image) {
+    const out: Record<string, unknown> = { image: bg.image };
+    if (typeof bg.opacity === 'number') out.opacity = bg.opacity;
+    if (bg.size) out.size = bg.size;
+    if (bg.alignment) out.alignment = bg.alignment;
+    if (bg.repeat) out.repeat = bg.repeat;
+    if (bg.attachment) out.attachment = bg.attachment;
+    return out;
+  }
+  if (bg.color) return bg.color;
+  return undefined;
 }
 
 class Oriel extends HTMLElement {
@@ -376,16 +399,24 @@ class Oriel extends HTMLElement {
     // forward it verbatim so users can reference templates by name
     // from custom_cards / custom_views.
     const decluttering = config.decluttering_templates;
-    // Apply the configured HA theme to every view (#74) — colors +
-    // background, like HA's native per-dashboard theme. Unset → views
-    // inherit the user's global theme.
-    const themedViews = config.theme
-      ? views.map((v) => ({ ...v, theme: config.theme }))
-      : views;
+    // Apply the configured HA theme (#74) and background (simon42#188) to
+    // every generated view. Theme = colors + the theme's default
+    // background; the per-view `background` (object for images, string for
+    // color/gradient) overrides that, mirroring HA's native precedence.
+    const viewBackground = composeViewBackground(config.background);
+    const styledViews =
+      config.theme || viewBackground !== undefined
+        ? views.map((v) => {
+            const out: LovelaceViewConfig & { theme?: string; background?: unknown } = { ...v };
+            if (config.theme) out.theme = config.theme;
+            if (viewBackground !== undefined) out.background = viewBackground;
+            return out;
+          })
+        : views;
 
     return {
       title: localize('dashboard.title'),
-      views: themedViews,
+      views: styledViews,
       ...(decluttering && Object.keys(decluttering).length > 0
         ? { decluttering_templates: decluttering }
         : {}),
