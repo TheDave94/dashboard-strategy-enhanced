@@ -200,8 +200,17 @@ class OrielViewOverview extends HTMLElement {
     }
     const customSectionKeys = customSections.map((s) => s.key);
 
-    // Build built-in sections
-    const overviewSection = createOverviewSection({ someSensorId, showSearchCard, config: dashboardConfig, hass });
+    // Build built-in sections. Custom cards targeting the in-overview
+    // positions (#63 overview_top, #153 summaries) are consumed here rather
+    // than by the generic per-section append loop below.
+    const overviewSection = createOverviewSection({
+      someSensorId,
+      showSearchCard,
+      config: dashboardConfig,
+      hass,
+      topCards: renderCustomCards(customCardsBySection.get('overview_top') || []),
+      summariesCards: renderCustomCards(customCardsBySection.get('summaries') || []),
+    });
     const customCardsSection = createCustomCardsSection(
       customCardsBySection.get('custom_cards') || [],
       dashboardConfig.custom_cards_heading,

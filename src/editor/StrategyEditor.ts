@@ -1702,6 +1702,8 @@ class OrielEditor extends LitElement {
 
   private static _sectionMeta = new Map<SectionKey, { icon: string; labelKey: string }>([
     ['overview', { icon: 'mdi:home-outline', labelKey: 'sections.overview' }],
+    ['overview_top', { icon: 'mdi:arrow-up-box', labelKey: 'sections.overview_top' }],
+    ['summaries', { icon: 'mdi:view-grid', labelKey: 'sections.summaries' }],
     ['custom_cards', { icon: 'mdi:cards', labelKey: 'sections.custom_cards' }],
     ['areas', { icon: 'mdi:floor-plan', labelKey: 'sections.areas' }],
     ['weather', { icon: 'mdi:weather-partly-cloudy', labelKey: 'sections.weather' }],
@@ -2536,6 +2538,7 @@ class OrielEditor extends LitElement {
     if (!this._hass) return html``;
     return renderCustomCardsTab({
       config: this._config,
+      hass: this._hass,
       sectionMeta: OrielEditor._sectionMeta,
       onHeadingChange: (value) => this._customCardsHeadingChanged({ target: { value } } as unknown as Event),
       onIconChange: (value) => this._customCardsIconChanged({ target: { value } } as unknown as Event),

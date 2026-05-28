@@ -12,6 +12,8 @@ import type { LovelaceCardConfig } from './lovelace';
 
 export type SectionKey =
   | 'overview'
+  | 'overview_top' // custom_cards target: prepend to the overview section (above clock/search) — #63
+  | 'summaries' // custom_cards target: insert right after the summary tiles — #153
   | 'custom_cards'
   | 'areas'
   | 'weather'
@@ -100,6 +102,30 @@ export const ALL_HEADING_KEYS: HeadingKey[] = [
   'maintenance',
   'presence',
 ];
+
+// -- Background customization (simon42#188) ---------------------------
+// Mirrors HA's native LovelaceViewBackgroundConfig (frontend
+// src/data/lovelace/config/view.ts) so it round-trips with HA's own
+// view-background editor, plus a `color` escape hatch (the native object
+// has no color field — solid color / gradient go via the string form).
+
+export type BackgroundAlignment =
+  | 'top left' | 'top center' | 'top right'
+  | 'center left' | 'center' | 'center right'
+  | 'bottom left' | 'bottom center' | 'bottom right';
+
+export interface OrielBackgroundConfig {
+  /** Image URL, `/local/...` path, or HA MediaSelectorValue object. */
+  image?: string | Record<string, unknown>;
+  /** CSS color or gradient — used (string form) when no image is set. */
+  color?: string;
+  /** 0–100 (percent); applies to the image layer only. */
+  opacity?: number;
+  size?: 'auto' | 'cover' | 'contain';
+  alignment?: BackgroundAlignment;
+  repeat?: 'repeat' | 'no-repeat';
+  attachment?: 'scroll' | 'fixed';
+}
 
 // -- Main Strategy Config ---------------------------------------------
 
@@ -270,6 +296,20 @@ export interface OrielConfig {
    * built-in cards (tile, area, weather-forecast) are unaffected.
    */
   dashboard_density?: 'compact' | 'comfortable';
+  /**
+   * HA theme applied to every generated view (#74). Changes colors +
+   * background like HA's native per-dashboard theme. Unset → inherit
+   * the user's global theme. Value is an installed HA theme name.
+   */
+  theme?: string;
+  /**
+   * Dashboard-wide background, stamped onto every generated view's native
+   * HA `background` field (simon42#188). Emits the object form for images
+   * (round-trips with HA's own view-background editor) and the string form
+   * for solid color / gradient. Unset → inherit the theme's
+   * --lovelace-background. A per-view background still overrides this.
+   */
+  background?: OrielBackgroundConfig;
   /**
    * Strategy-wide layout density preset. Distinct from
    * `dashboard_density` (which is the per-card token override):
@@ -835,6 +875,9 @@ export interface CustomCard {
   /** Target section where this card appears (default: 'custom_cards').
    *  Accepts built-in SectionKeys OR a user-defined custom_sections[].key. */
   target_section?: SectionKey | string;
+  /** Target area_id — render this card inside that area's room view instead
+   *  of an overview section (#210/#222). When set, overrides target_section. */
+  target_area?: string;
   /** Raw YAML string entered by the user in the editor */
   yaml?: string;
   /** Parsed Lovelace card config (generated from yaml) */

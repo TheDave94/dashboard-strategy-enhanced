@@ -4,10 +4,12 @@
 
 import { html, nothing, type TemplateResult } from 'lit';
 import type { OrielConfig, CustomCard, SectionKey } from '../../types/strategy';
+import type { HomeAssistant } from '../../types/homeassistant';
 import { localize } from '../../utils/localize';
 
 export interface CustomCardsTabContext {
   config: OrielConfig;
+  hass: HomeAssistant;
   sectionMeta: Map<SectionKey, { icon: string; labelKey: string }>;
   onHeadingChange: (value: string) => void;
   onIconChange: (value: string) => void;
@@ -55,6 +57,24 @@ function renderCardItem(
                 </option>
               `,
             )}
+          </select>
+        </div>
+        <div class="custom-card-target">
+          <label>${localize('editor.target_area')}:</label>
+          <select
+            @change=${(e: Event) =>
+              ctx.onUpdateField(index, 'target_area', (e.target as HTMLSelectElement).value)}
+          >
+            <option value="" ?selected=${!card.target_area}>${localize('editor.target_area_none')}</option>
+            ${Object.values(ctx.hass.areas)
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map(
+                (area) => html`
+                  <option value=${area.area_id} ?selected=${card.target_area === area.area_id}>
+                    ${area.name}
+                  </option>
+                `,
+              )}
           </select>
         </div>
         <textarea

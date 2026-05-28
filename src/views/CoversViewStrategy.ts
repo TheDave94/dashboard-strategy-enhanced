@@ -36,6 +36,12 @@ class OrielViewCovers extends HTMLElement {
     const baseConfig = {
       entities: config.entities,
       config: config.config,
+      // Force each group card full-width so the (up to 9) open/partial/closed
+      // groups stack vertically instead of tiling half-width — the half-width
+      // layout overlaps when a bucket is taller than its grid row-span (#64).
+      // Card-level grid_options overrides the card's getGridOptions() default,
+      // so room-view usage of the card is unaffected.
+      grid_options: { columns: 'full' },
       ...(density ? { density } : {}),
       ...(bubbleEnabled ? { bubble_drawers: true } : {}),
     };

@@ -146,6 +146,10 @@ export interface OverviewSectionParams {
   showSearchCard: boolean;
   config: OrielConfig;
   hass: HomeAssistant;
+  /** Custom cards targeting 'overview_top' — prepended above clock/search (#63). */
+  topCards?: LovelaceCardConfig[];
+  /** Custom cards targeting 'summaries' — inserted right after the summary tiles (#153). */
+  summariesCards?: LovelaceCardConfig[];
 }
 
 /**
@@ -153,7 +157,7 @@ export interface OverviewSectionParams {
  * optional search card, and favorites.
  */
 export function createOverviewSection(data: OverviewSectionParams): LovelaceSectionConfig | null {
-  const { showSearchCard, config, hass } = data;
+  const { showSearchCard, config, hass, topCards, summariesCards } = data;
   const showClockCard = config.show_clock_card !== false;
   const hidden = new Set(config.hidden_section_headings || []);
 
@@ -319,6 +323,12 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     }
   }
 
+  // Custom cards targeting 'summaries' — render right after the summary
+  // tiles, before light-favorites/favorites (#153).
+  if (summariesCards && summariesCards.length > 0) {
+    cards.push(...summariesCards);
+  }
+
   // Light favorites — quick toggle row using HA's native glance card
   const lightFavs = (config.light_favorite_entities || []).filter(
     (id) => id.startsWith('light.') && Reflect.get(hass.states as Record<string, unknown>, id) !== undefined
@@ -422,6 +432,13 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     }
     cards.push(...pinnedCards);
     cards.push(...userFavoriteCards);
+  }
+
+  // Custom cards targeting 'overview_top' — prepend above everything else
+  // (above the Übersicht heading / clock / search) (#63). Counted toward the
+  // visibility check below so a top-cards-only overview still renders.
+  if (topCards && topCards.length > 0) {
+    cards.unshift(...topCards);
   }
 
   // If nothing is visible, skip the entire section
