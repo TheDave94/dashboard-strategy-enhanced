@@ -183,6 +183,9 @@ export interface OrielConfig {
   room_camera_companions?: Array<'light' | 'motion' | 'siren' | 'battery' | 'doorbell'>;
   show_window_contacts_in_rooms?: boolean; // default: true (opt-out — set false to hide window contact badges)
   show_door_contacts_in_rooms?: boolean; // default: true (opt-out — set false to hide door contact badges)
+  use_entity_name?: boolean; // default: false — emit name:{type:entity} on
+  // room tiles so they show the entity name only, suppressing HA 2026.02's
+  // "Device › Entity" scheme. See issue #208.
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
   show_person_badges?: boolean; // default: true — set false to suppress the

@@ -61,6 +61,7 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
   const showCamerasInRooms = c.show_cameras_in_rooms !== false;
   const showWindowContactsInRooms = c.show_window_contacts_in_rooms !== false;
   const showDoorContactsInRooms = c.show_door_contacts_in_rooms !== false;
+  const useEntityName = c.use_entity_name === true;
   const useDefaultAreaSort = c.use_default_area_sort === true;
 
   const allAreas = Object.values(ctx.hass.areas).sort((a, b) => a.name.localeCompare(b.name));
@@ -152,6 +153,14 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
         (checked) => ctx.onToggleChange('show_door_contacts_in_rooms', checked, true),
       )}
       <div class="description">${localize('editor.show_door_contacts_in_rooms_desc')}</div>
+
+      ${ctx.renderCheckbox(
+        'use-entity-name',
+        localize('editor.use_entity_name'),
+        useEntityName,
+        (checked) => ctx.onToggleChange('use_entity_name', checked, false),
+      )}
+      <div class="description">${localize('editor.use_entity_name_desc')}</div>
 
       ${ctx.renderCheckbox(
         'hide-unavailable-in-rooms',

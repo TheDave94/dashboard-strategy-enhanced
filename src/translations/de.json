@@ -314,6 +314,8 @@
     "show_window_contacts_in_rooms_desc": "Zeigt Fensterkontakte als Badges in den jeweiligen Raum-Ansichten an.",
     "show_door_contacts_in_rooms": "Türkontakte in Raum-Ansichten anzeigen",
     "show_door_contacts_in_rooms_desc": "Zeigt Türkontakte als Badges in den jeweiligen Raum-Ansichten an.",
+    "use_entity_name": "Nur Entitätsname",
+    "use_entity_name_desc": "Zeigt auf Raum-Kacheln nur den Entitätsnamen an, statt HAs Schema „Gerät › Entität“ (HA 2026.02+). Praktisch bei kryptischen Gerätenamen — z. B. wird aus „Plug Washing Machine Washing Machine“ einfach „Washing Machine“.",
     "use_default_area_sort": "Home Assistant Sortierung verwenden",
     "use_default_area_sort_desc": "Verwendet die Sortierung der Bereiche aus Home Assistant anstelle der hier konfigurierten Reihenfolge.",
     "areas_manage_desc": "Wähle aus, welche Bereiche im Dashboard angezeigt werden sollen und in welcher Reihenfolge. Klappe Bereiche auf, um einzelne Entitäten zu verwalten.",

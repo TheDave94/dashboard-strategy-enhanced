@@ -90,6 +90,23 @@ export function stripAreaName(entityId: string, area: AreaRegistryEntry, hass: H
 }
 
 /**
+ * Resolves the `name` to emit on a room tile. Default behaviour is the
+ * area-stripped friendly name (stripAreaName). When `use_entity_name` is
+ * set, returns HA's name object `{ type: 'entity' }` instead, so the tile
+ * renders the entity name only — suppressing HA 2026.02's "Device › Entity"
+ * scheme (verified honored on the tile card). See issue #208.
+ */
+export function tileName(
+  entityId: string,
+  area: AreaRegistryEntry,
+  hass: HomeAssistant,
+  config: { use_entity_name?: boolean },
+): string | { type: 'entity' } {
+  if (config?.use_entity_name) return { type: 'entity' };
+  return stripAreaName(entityId, area, hass);
+}
+
+/**
  * Strips cover type terms (Rollo, Jalousie, Shutter, etc.) from an entity's
  * friendly name. Uses pre-compiled RegExps for performance.
  */

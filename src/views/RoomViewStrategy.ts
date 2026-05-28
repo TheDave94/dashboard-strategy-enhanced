@@ -11,7 +11,7 @@ import type {
 } from '../types/lovelace';
 import type { AreaRegistryEntry } from '../types/registries';
 import type { RoomEntities, SensorEntities } from '../types/strategy';
-import { stripAreaName, sortByLastChanged } from '../utils/name-utils';
+import { stripAreaName, tileName, sortByLastChanged } from '../utils/name-utils';
 import { Registry } from '../Registry';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 import { localize } from '../utils/localize';
@@ -553,7 +553,7 @@ class OrielViewRoom extends HTMLElement {
         {
           type: 'tile',
           entity: e,
-          name: stripAreaName(e, area, hass),
+          name: tileName(e, area, hass, dashboardConfig),
           features: [{ type: 'lock-commands' }],
           features_position: 'inline',
           vertical: false,
@@ -569,7 +569,7 @@ class OrielViewRoom extends HTMLElement {
         {
           type: 'tile',
           entity: e,
-          name: stripAreaName(e, area, hass),
+          name: tileName(e, area, hass, dashboardConfig),
           features: [{ type: 'climate-hvac-modes' }],
           features_position: 'inline',
           vertical: false,
@@ -585,7 +585,7 @@ class OrielViewRoom extends HTMLElement {
           {
             type: 'tile',
             entity: e,
-            name: stripAreaName(e, area, hass),
+            name: tileName(e, area, hass, dashboardConfig),
             features: [{ type: 'cover-open-close' }],
             vertical: false,
             features_position: 'inline',
@@ -604,7 +604,7 @@ class OrielViewRoom extends HTMLElement {
           {
             type: 'tile',
             entity: e,
-            name: stripAreaName(e, area, hass),
+            name: tileName(e, area, hass, dashboardConfig),
             features: [{ type: 'cover-open-close' }],
             vertical: false,
             features_position: 'inline',
@@ -623,7 +623,7 @@ class OrielViewRoom extends HTMLElement {
           {
             type: 'tile',
             entity: e,
-            name: stripAreaName(e, area, hass),
+            name: tileName(e, area, hass, dashboardConfig),
             features: [{ type: 'cover-open-close' }],
             vertical: false,
             features_position: 'inline',
@@ -643,7 +643,7 @@ class OrielViewRoom extends HTMLElement {
         {
           type: 'tile',
           entity: e,
-          name: stripAreaName(e, area, hass),
+          name: tileName(e, area, hass, dashboardConfig),
           vertical: false,
           ...(hasPlayback ? { features: [{ type: 'media-player-playback' }], features_position: 'inline' } : {}),
           state_content: ['media_title', 'media_artist'],
@@ -655,7 +655,7 @@ class OrielViewRoom extends HTMLElement {
     domainSection(roomEntities.scenes, localize('room.scenes'), 'mdi:palette', (e) => ({
       type: 'tile',
       entity: e,
-      name: stripAreaName(e, area, hass),
+      name: tileName(e, area, hass, dashboardConfig),
       vertical: false,
       state_content: 'last_changed',
     }));
@@ -666,7 +666,7 @@ class OrielViewRoom extends HTMLElement {
       miscCards.push({
         type: 'tile',
         entity: e,
-        name: stripAreaName(e, area, hass),
+        name: tileName(e, area, hass, dashboardConfig),
         features: [{ type: 'vacuum-commands' }],
         features_position: 'inline',
         vertical: false,
@@ -680,7 +680,7 @@ class OrielViewRoom extends HTMLElement {
           {
             type: 'tile',
             entity: e,
-            name: stripAreaName(e, area, hass),
+            name: tileName(e, area, hass, dashboardConfig),
             ...(hasSpeed ? { features: [{ type: 'fan-speed' }], features_position: 'inline' } : {}),
             vertical: false,
             state_content: 'last_changed',
@@ -693,7 +693,7 @@ class OrielViewRoom extends HTMLElement {
       miscCards.push({
         type: 'tile',
         entity: e,
-        name: stripAreaName(e, area, hass),
+        name: tileName(e, area, hass, dashboardConfig),
         vertical: false,
         state_content: 'last_changed',
       });
@@ -701,7 +701,7 @@ class OrielViewRoom extends HTMLElement {
       miscCards.push({
         type: 'tile',
         entity: e,
-        name: stripAreaName(e, area, hass),
+        name: tileName(e, area, hass, dashboardConfig),
         features: [{ type: 'humidifier-toggle' }],
         features_position: 'inline',
         vertical: false,
@@ -711,7 +711,7 @@ class OrielViewRoom extends HTMLElement {
       miscCards.push({
         type: 'tile',
         entity: e,
-        name: stripAreaName(e, area, hass),
+        name: tileName(e, area, hass, dashboardConfig),
         features: [{ type: 'valve-open-close' }],
         features_position: 'inline',
         vertical: false,
@@ -721,7 +721,7 @@ class OrielViewRoom extends HTMLElement {
       miscCards.push({
         type: 'tile',
         entity: e,
-        name: stripAreaName(e, area, hass),
+        name: tileName(e, area, hass, dashboardConfig),
         features: [{ type: 'water-heater-operation-modes' }],
         features_position: 'inline',
         vertical: false,
@@ -748,7 +748,7 @@ class OrielViewRoom extends HTMLElement {
     domainSection(roomEntities.automations, localize('room.automations'), 'mdi:robot', (e) => ({
       type: 'tile',
       entity: e,
-      name: stripAreaName(e, area, hass),
+      name: tileName(e, area, hass, dashboardConfig),
       vertical: false,
       state_content: 'last_changed',
     }));
@@ -756,7 +756,7 @@ class OrielViewRoom extends HTMLElement {
     domainSection(roomEntities.scripts, localize('room.scripts'), 'mdi:script-text', (e) => ({
       type: 'tile',
       entity: e,
-      name: stripAreaName(e, area, hass),
+      name: tileName(e, area, hass, dashboardConfig),
       vertical: false,
     }));
 
@@ -785,7 +785,7 @@ class OrielViewRoom extends HTMLElement {
             const tile: LovelaceCardConfig = {
               type: 'tile',
               entity: e,
-              name: stripAreaName(e, area, hass),
+              name: tileName(e, area, hass, dashboardConfig),
               vertical: false,
               ...(pinStateContent.length > 0 ? { state_content: pinStateContent } : {}),
             };
