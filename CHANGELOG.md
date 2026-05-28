@@ -6,6 +6,26 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.11.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.10.0...v4.11.0) (2026-05-28)
+
+
+### Features
+
+* camera overview view ([#68](https://github.com/TheDave94/oriel-dashboard/issues/68)) ([b175efe](https://github.com/TheDave94/oriel-dashboard/commit/b175efe15f3c3eb13408c97eac43a0233a2115de))
+* custom_cards placement — overview top, summaries, and per-room ([#76](https://github.com/TheDave94/oriel-dashboard/issues/76)) ([186c348](https://github.com/TheDave94/oriel-dashboard/commit/186c3484d7977710417dc6a94b0970d50e0870a4))
+* dynamic house_mode vocabulary in adaptive hint ([#54](https://github.com/TheDave94/oriel-dashboard/issues/54)) ([7d729bf](https://github.com/TheDave94/oriel-dashboard/commit/7d729bf4c42ae41946c1d1a1861e830d675e97bb))
+* **editor:** reorder custom views with move up/down controls ([#66](https://github.com/TheDave94/oriel-dashboard/issues/66)) ([35d7f7b](https://github.com/TheDave94/oriel-dashboard/commit/35d7f7bd2980852ed747a35d1f75550d46df850d))
+* entity-name-only naming toggle for room tiles ([#69](https://github.com/TheDave94/oriel-dashboard/issues/69)) ([4a53e08](https://github.com/TheDave94/oriel-dashboard/commit/4a53e08df5d217dffdff819fec69901d03d007a1))
+* humidity summary view ([#65](https://github.com/TheDave94/oriel-dashboard/issues/65)) ([930cf17](https://github.com/TheDave94/oriel-dashboard/commit/930cf1762337e3728f43237976fd669ac327e59b))
+* include heat detectors in the Security view ([#73](https://github.com/TheDave94/oriel-dashboard/issues/73)) ([5ca2e7a](https://github.com/TheDave94/oriel-dashboard/commit/5ca2e7a7d23a361f1575164caa6ac9f647fd99ac))
+* live-reference views from other dashboards ([#67](https://github.com/TheDave94/oriel-dashboard/issues/67)) ([f366f05](https://github.com/TheDave94/oriel-dashboard/commit/f366f057ea550dd0623fcd2064da37bbe436e087))
+* reorderable section order within room views ([#71](https://github.com/TheDave94/oriel-dashboard/issues/71)) ([ba438aa](https://github.com/TheDave94/oriel-dashboard/commit/ba438aa6d924d47557d6b4412e16772f58e6bdd2))
+
+
+### Bug Fixes
+
+* covers view groups overlap when a bucket exceeds its grid rows ([#75](https://github.com/TheDave94/oriel-dashboard/issues/75)) ([e1b3470](https://github.com/TheDave94/oriel-dashboard/commit/e1b347014c6e7356ce718798368ededb134cb0cd))
+
 ## [4.10.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.9.1...v4.10.0) (2026-05-23)
 
 
