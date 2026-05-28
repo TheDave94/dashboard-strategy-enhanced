@@ -54,7 +54,7 @@ describe('oriel-covers-group-card', () => {
       const el = mount();
       el.setConfig({ group_type: 'open' });
       const opts = el.getGridOptions();
-      expect(opts.columns).toBe(6);
+      expect(opts.columns).toBe('full');
       expect(opts.rows).toBe('auto');
       expect(opts.max_rows).toBeUndefined();
     });

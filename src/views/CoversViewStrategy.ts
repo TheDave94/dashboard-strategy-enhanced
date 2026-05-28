@@ -147,9 +147,13 @@ class OrielViewCovers extends HTMLElement {
       });
     }
 
+    // One group card per SECTION — HA lays sections out side-by-side
+    // (responsive, wrapping on narrow), each at full section width. Putting
+    // multiple group cards in a single width-capped section squeezed and
+    // overlapped them; separate sections give each group its own column.
     return {
       type: 'sections',
-      sections: [{ type: 'grid', cards }],
+      sections: cards.map((c) => ({ type: 'grid', cards: [c] })),
     };
   }
 }

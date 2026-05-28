@@ -157,9 +157,9 @@ class OrielCoversGroupCard extends LitElement {
     }
   }
 
-  // Half-width, content-measured, NO max_rows cap — see
-  // LightsGroupCard.getGridOptions for why (the cap, not the half-width,
-  // caused tall groups to overflow and overlap neighbours).
+  // Full-width, content-measured — see LightsGroupCard.getGridOptions. Two
+  // half-width (columns:6) group cards overlap horizontally in HA's sections
+  // grid, so the covers buckets stack full-width.
   getGridOptions(): {
     columns: number | 'full';
     rows: number | 'auto';
@@ -167,7 +167,7 @@ class OrielCoversGroupCard extends LitElement {
     min_rows?: number;
     max_rows?: number;
   } {
-    return { columns: 6, rows: 'auto', min_columns: 6, min_rows: 1 };
+    return { columns: 'full', rows: 'auto' };
   }
 
   protected willUpdate(changedProps: PropertyValues): void {

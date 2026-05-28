@@ -203,13 +203,11 @@ class OrielLightsGroupCard extends LitElement {
     }
   }
 
-  // Half-width (columns:6) so groups sit side-by-side (e.g. Lights On/Off,
-  // and the Covers buckets) — content-measured height, NO max_rows cap. The
-  // cap was the overlap cause: a group taller than 12 rows overflowed its
-  // capped grid cell onto the neighbour. Without the cap the cell sizes to
-  // its content, so 2-up groups of differing heights no longer overlap
-  // (matching ZonePresenceCard, which is columns:6 + uncapped and never
-  // overlapped).
+  // Full-width, content-measured. When this card needs to sit beside another
+  // (Lights On/Off), the view wraps them in a horizontal-stack — two
+  // half-width sections-grid cards (columns:6) overlap horizontally in HA's
+  // grid, so the card itself defaults to full-width (correct for the single
+  // card in a room view, and harmless inside a horizontal-stack).
   getGridOptions(): {
     columns: number | 'full';
     rows: number | 'auto';
@@ -217,7 +215,7 @@ class OrielLightsGroupCard extends LitElement {
     min_rows?: number;
     max_rows?: number;
   } {
-    return { columns: 6, rows: 'auto', min_columns: 6, min_rows: 1 };
+    return { columns: 'full', rows: 'auto' };
   }
 
   protected willUpdate(changedProps: PropertyValues): void {

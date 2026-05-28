@@ -67,7 +67,7 @@ describe('oriel-lights-group-card', () => {
       const opts = el.getGridOptions();
       // Half-width so groups sit side-by-side; NO max_rows cap so a tall
       // group sizes to content instead of overflowing onto its neighbour.
-      expect(opts.columns).toBe(6);
+      expect(opts.columns).toBe('full');
       expect(opts.rows).toBe('auto');
       expect(opts.max_rows).toBeUndefined();
     });

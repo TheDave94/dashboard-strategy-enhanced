@@ -47,13 +47,15 @@ class OrielViewLights extends HTMLElement {
       ...(bubbleEnabled ? { bubble_drawers: true } : {}),
     });
 
+    // One group per SECTION. HA's sections view lays sections out side-by-side
+    // (responsive, wrapping on narrow), each at full section width — so On and
+    // Off sit beside each other without being squeezed into one width-capped
+    // section, which crammed the wide tiles together and overlapped them.
     return {
       type: 'sections',
       sections: [
-        {
-          type: 'grid',
-          cards: [card('on'), card('off')],
-        },
+        { type: 'grid', cards: [card('on')] },
+        { type: 'grid', cards: [card('off')] },
       ],
     };
   }
