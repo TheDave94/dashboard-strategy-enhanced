@@ -257,6 +257,30 @@ All custom cards (SummaryCard, LightsGroupCard, CoversGroupCard) use LitElement 
 ### Climate Summary Default: Off
 `show_climate_summary` defaults to `false` because not every user has thermostats. All other summaries (lights, covers, security, batteries) default to on.
 
+## Credentials and HA API access
+
+*Based on `/opt/autocoder/CREDENTIAL_CONVENTIONS_TEMPLATE.md` (canonical), adapted for this repo.*
+
+**Scope.** Only the test layer needs credentials. `npm run build`, `npm run build-dev`, `npm run watch`, `npm run lint`, type-checks — none of these touch the HA API. Playwright (`tests/e2e/*.ts`, `tests/e2e-browser/*.spec.ts`) and the strategy-API test use HA_URL + HA_TOKEN to hit the live HA instance.
+
+**Where credentials live.** `.env.local` in this repo (gitignored). Values: `HA_URL`, `HA_TOKEN`, optionally `HA_DASHBOARD_URL_PATH` (path string, not a credential). Schema documented in `.env.example` (committed).
+
+**Loading.** `source .env.local` before running tests. `playwright.config.ts` reads `process.env.HA_URL` (defaults to `http://localhost:8123` if unset, so unloaded tests fail informatively rather than hanging).
+
+**Verifying without echoing.** Length-check or API round-trip:
+
+```bash
+node -e "const t=process.env.HA_TOKEN||''; console.log('HA_TOKEN loaded: len='+t.length+', expect 183')"
+# Or hit HA's /api/ endpoint to confirm auth works:
+node -e "fetch(process.env.HA_URL+'/api/',{headers:{Authorization:'Bearer '+process.env.HA_TOKEN}}).then(r=>console.log('HA API status='+r.status))"
+```
+
+**Token scope.** HA 2026.5.x does not support fine-grained access tokens — `HA_TOKEN` is full admin scope. The same long-lived token also lives in `~/.hermes/.env` and `/opt/repos/homeassistant-config/.env.local`. When HA upstream gains per-token scoping, this repo's copy can become read-only (Oriel's tests only need entity-state reads + dashboard-render verification; no writes).
+
+**Rotation.** Central runbook lives at `/opt/autocoder/ROTATION_RUNBOOK.md`. For HA-token rotation, the runbook lists the three holder files. **Rotation triggers** beyond scheduled cadence: any time a CC transcript may have been shared externally, rotate `HA_TOKEN`.
+
+**Conventions for credentialed work in this session.** Never `cat`, `echo`, `od`, `xxd`, `head`, or otherwise render credential bytes to stdout. Values flow through process memory (Node `process.env`, shell `$VAR` expansion) only. Verify by length or by API round-trip success, not by inspection.
+
 ## Knowledge map
 
 In-repo docs and when to load each. Inline references to these files elsewhere in CLAUDE.md remain authoritative for context-specific use; the table below is the index.
