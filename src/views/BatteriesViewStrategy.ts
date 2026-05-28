@@ -8,6 +8,7 @@ import type { OrielConfig } from '../types/strategy';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
 import { getBatteryEntities } from '../utils/entity-filter';
+import { phoneFullWidth } from '../utils/viewport';
 
 interface BatteriesViewStrategyParams {
   config?: OrielConfig;
@@ -53,6 +54,7 @@ function createBatterySection(
           vertical: false,
           state_content: ['state', 'last_changed'],
           color,
+          ...phoneFullWidth(),
         };
         if (showArea) {
           const areaName = getAreaNameForEntity(e, hass);
