@@ -761,6 +761,16 @@ export interface CustomView {
   parsed_config?: Record<string, any> | null;
   /** YAML parse error message, if any */
   _yaml_error?: string;
+  /**
+   * Reference mode: url_path of another Lovelace dashboard to pull a
+   * view from at runtime. When set together with `ref_view`, the view
+   * is resolved live via the `lovelace/config` WS command instead of
+   * from `parsed_config`, so edits to the source propagate without
+   * re-pasting YAML.
+   */
+  ref_dashboard?: string;
+  /** Reference mode: path (or numeric index) of the view within `ref_dashboard`. */
+  ref_view?: string;
 }
 
 // -- Custom Badges ----------------------------------------------------

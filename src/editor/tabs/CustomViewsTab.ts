@@ -12,6 +12,7 @@ export interface CustomViewsTabContext {
   onRemove: (index: number) => void;
   onUpdateField: (index: number, field: 'title' | 'path' | 'icon', value: string) => void;
   onUpdateYaml: (index: number, yamlString: string) => void;
+  onUpdateRefField: (index: number, field: 'ref_dashboard' | 'ref_view', value: string) => void;
 }
 
 function renderViewItem(
@@ -66,6 +67,25 @@ function renderViewItem(
           @change=${(e: Event) => ctx.onUpdateYaml(index, (e.target as HTMLTextAreaElement).value)}
         ></textarea>
         <div class="custom-item-validation">${validationMsg}</div>
+        <div class="custom-item-row" style="margin-top: 8px;">
+          <input
+            type="text"
+            .value=${view.ref_dashboard || ''}
+            placeholder=${localize('editor.custom_view_ref_dashboard')}
+            style="flex: 1;"
+            @change=${(e: Event) =>
+              ctx.onUpdateRefField(index, 'ref_dashboard', (e.target as HTMLInputElement).value)}
+          />
+          <input
+            type="text"
+            .value=${view.ref_view || ''}
+            placeholder=${localize('editor.custom_view_ref_view')}
+            style="flex: 1;"
+            @change=${(e: Event) =>
+              ctx.onUpdateRefField(index, 'ref_view', (e.target as HTMLInputElement).value)}
+          />
+        </div>
+        <div class="description">${localize('editor.custom_view_ref_help')}</div>
       </div>
     </div>
   `;

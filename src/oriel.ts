@@ -76,6 +76,43 @@ const modulesPromise = Promise.all([
 
 void modulesPromise.then(() => { t('all chunks loaded'); });
 
+// Live view references (custom_views ref mode). Fetches another
+// dashboard's config via the `lovelace/config` WS command and returns
+// the referenced view (matched by path, then by numeric index). The
+// per-dashboard promise is cached by the caller so N references to one
+// dashboard cost a single round-trip. Wrapped in a timeout so a slow or
+// unreachable dashboard can never stall dashboard generation; any
+// failure resolves to null and the caller emits a fallback card.
+async function resolveReferencedView(
+  hass: HomeAssistant,
+  cache: Map<string, Promise<{ views?: Array<Record<string, unknown>> } | null>>,
+  refDashboard: string,
+  refView: string,
+): Promise<Record<string, unknown> | null> {
+  let pending = cache.get(refDashboard);
+  if (!pending) {
+    const fetchPromise = hass
+      .callWS<{ views?: Array<Record<string, unknown>> }>({
+        type: 'lovelace/config',
+        url_path: refDashboard || null,
+      })
+      .catch(() => null);
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000));
+    pending = Promise.race([fetchPromise, timeout]);
+    cache.set(refDashboard, pending);
+  }
+  const dashConfig = await pending;
+  const views = dashConfig?.views;
+  // A strategy-based source dashboard returns { strategy } with no
+  // `views` array — nothing to reference; fall through to the fallback.
+  if (!Array.isArray(views)) return null;
+  const byPath = views.find((v) => v && v.path === refView);
+  if (byPath) return byPath;
+  const idx = Number(refView);
+  if (!Number.isNaN(idx) && views[idx]) return views[idx];
+  return null;
+}
+
 class Oriel extends HTMLElement {
   static async generate(rawConfig: OrielConfig, hass: HomeAssistant): Promise<LovelaceConfig> {
     generateCallCount++;
@@ -234,12 +271,58 @@ class Oriel extends HTMLElement {
     ];
 
     const customViews = config.custom_views || [];
+    const usedPaths = new Set<string>(
+      views.map((v) => (v as { path?: string }).path).filter((p): p is string => !!p),
+    );
+    const ensureUniquePath = (path: string): string => {
+      if (!usedPaths.has(path)) { usedPaths.add(path); return path; }
+      let i = 2;
+      while (usedPaths.has(`${path}-${i}`)) i++;
+      const unique = `${path}-${i}`;
+      usedPaths.add(unique);
+      return unique;
+    };
+    const refCache = new Map<string, Promise<{ views?: Array<Record<string, unknown>> } | null>>();
     for (const cv of customViews) {
-      if (cv.parsed_config && cv.title && cv.path) {
+      if (!cv.title || !cv.path) continue;
+
+      // Reference mode takes precedence when both ref fields are set.
+      if (cv.ref_dashboard && cv.ref_view) {
+        const referenced = await resolveReferencedView(hass, refCache, cv.ref_dashboard, cv.ref_view);
+        if (referenced) {
+          // We own the identity fields; strip the source's so they don't
+          // override the user's title/path/icon.
+          const { path: _p, title: _t, icon: _i, ...rest } = referenced;
+          void _p; void _t; void _i;
+          views.push(densityOverlay({
+            ...(rest as LovelaceViewConfig),
+            title: cv.title,
+            path: ensureUniquePath(cv.path),
+            icon: cv.icon || 'mdi:card-text-outline',
+          }));
+        } else {
+          // Graceful fallback — source missing / unreachable / a strategy
+          // dashboard. PRINCIPLE 2: degrade visibly, never crash generate().
+          views.push({
+            title: cv.title,
+            path: ensureUniquePath(cv.path),
+            icon: cv.icon || 'mdi:alert-circle-outline',
+            cards: [{
+              type: 'markdown',
+              content:
+                `### ⚠️ ${cv.title}\n\nReferenced view \`${cv.ref_view}\` from dashboard ` +
+                `\`${cv.ref_dashboard}\` could not be loaded. Check that the dashboard and view still exist.`,
+            }],
+          } as LovelaceViewConfig);
+        }
+        continue;
+      }
+
+      if (cv.parsed_config) {
         views.push({
           ...cv.parsed_config,
           title: cv.title,
-          path: cv.path,
+          path: ensureUniquePath(cv.path),
           icon: cv.icon || 'mdi:card-text-outline',
         });
       }
