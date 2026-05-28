@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.12.3](https://github.com/TheDave94/oriel-dashboard/compare/v4.12.2...v4.12.3) (2026-05-28)
+
+
+### Bug Fixes
+
+* one section per group in Lights/Covers views (side-by-side, no overlap) ([#85](https://github.com/TheDave94/oriel-dashboard/issues/85)) ([4b340f3](https://github.com/TheDave94/oriel-dashboard/commit/4b340f31c0b837e829e8ff9ac8305e26f7d4b463))
+
 ## [4.12.2](https://github.com/TheDave94/oriel-dashboard/compare/v4.12.1...v4.12.2) (2026-05-28)
 
 
