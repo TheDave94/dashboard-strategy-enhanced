@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.12.2](https://github.com/TheDave94/oriel-dashboard/compare/v4.12.1...v4.12.2) (2026-05-28)
+
+
+### Bug Fixes
+
+* keep group cards side-by-side — drop the row cap, not the columns ([#83](https://github.com/TheDave94/oriel-dashboard/issues/83)) ([3ee5ca4](https://github.com/TheDave94/oriel-dashboard/commit/3ee5ca492348d630a4faf39799de75c255d8509b))
+
 ## [4.12.1](https://github.com/TheDave94/oriel-dashboard/compare/v4.12.0...v4.12.1) (2026-05-28)
 
 
