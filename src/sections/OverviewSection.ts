@@ -8,7 +8,7 @@
 // ====================================================================
 
 import type { HomeAssistant } from '../types/homeassistant';
-import type { OrielConfig, CustomCard } from '../types/strategy';
+import type { OrielConfig, CustomCard, FavoriteEntityEntry, FavoriteEntityConfig } from '../types/strategy';
 import type { LovelaceCardConfig, LovelaceSectionConfig } from '../types/lovelace';
 import { Registry } from '../Registry';
 import { localize } from '../utils/localize';
@@ -368,20 +368,23 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
   // The legacy string[] shape still works. Detection runs once at
   // generate() time using window.innerWidth.
   const rawFavorites = config.favorite_entities;
-  let favoriteEntities: string[];
+  let favoriteList: FavoriteEntityEntry[];
   if (Array.isArray(rawFavorites)) {
-    favoriteEntities = rawFavorites;
+    favoriteList = rawFavorites;
   } else if (rawFavorites && typeof rawFavorites === 'object') {
-    // Lazy-import so the legacy single-list path doesn't pull the
-    // viewport detector into its closure.
+    // Viewport-keyed map — pick the matching list at generate() time.
     const w = typeof window !== 'undefined' ? window.innerWidth : 1024;
     const vp = w < 640 ? 'phone' : w < 1280 ? 'tablet' : 'wall';
-    const rec = rawFavorites as Record<string, string[]>;
-    favoriteEntities = rec[vp] ?? rec.default ?? [];
+    const rec = rawFavorites as Record<string, FavoriteEntityEntry[]>;
+    favoriteList = rec[vp] ?? rec.default ?? [];
   } else {
-    favoriteEntities = [];
+    favoriteList = [];
   }
-  favoriteEntities = favoriteEntities.filter((entityId) => hass.states[entityId] !== undefined);
+  // Normalize bare ids → { entity }; drop entries whose entity doesn't exist.
+  const favoriteEntities: FavoriteEntityConfig[] = favoriteList
+    .map((e) => (typeof e === 'string' ? { entity: e } : e))
+    .filter((e): e is FavoriteEntityConfig =>
+      !!e && typeof e.entity === 'string' && hass.states[e.entity] !== undefined);
 
   const pinnedCards: LovelaceCardConfig[] = [];
   for (const [areaId, areaOpts] of Object.entries(config.areas_options || {})) {
@@ -416,7 +419,8 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
     const bubbleEnabled =
       config.use_bubble_drawers === true && isBubbleCardInstalled();
 
-    for (const entityId of favoriteEntities) {
+    for (const fav of favoriteEntities) {
+      const entityId = fav.entity;
       const tile: LovelaceCardConfig = {
         type: 'tile',
         entity: entityId,
@@ -424,6 +428,14 @@ export function createOverviewSection(data: OverviewSectionParams): LovelaceSect
         vertical: false,
         ...(stateContent.length > 0 ? { state_content: stateContent } : {}),
       };
+      // State-gated favorites (simon42#131): raw `visibility` wins; otherwise
+      // `show_when` becomes a self-state condition. HA evaluates `visibility`
+      // reactively, so the tile shows/hides itself without any custom code.
+      const visibility = fav.visibility
+        ?? (fav.show_when !== undefined
+          ? [{ condition: 'state', entity: entityId, state: fav.show_when }]
+          : undefined);
+      if (visibility) (tile as { visibility?: unknown }).visibility = visibility;
       cards.push(
         bubbleEnabled && isBubbleActionable(entityId)
           ? withBubbleTapAction(tile, entityId)
