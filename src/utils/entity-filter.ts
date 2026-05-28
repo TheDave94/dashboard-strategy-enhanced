@@ -123,3 +123,19 @@ export function getBatteryEntities(hass: HomeAssistant, config: OrielConfig): st
     return !deviceId || !sensorDeviceIds.has(deviceId);
   })
 }
+
+export function getHumidityEntities(hass: HomeAssistant): string[] {
+  const sensorIds = Registry.getEntityIdsForDomain('sensor');
+  return sensorIds.filter((entityId) => {
+    const state = hass.states[entityId];
+    if (!state) return false;
+    if (Registry.isExcludedByLabel(entityId)) return false;
+    if (Registry.isHiddenByConfig(entityId)) return false;
+    const entry = Registry.getEntity(entityId);
+    if (entry?.hidden) return false;
+    return (
+      state.attributes?.device_class === 'humidity' &&
+      state.attributes?.unit_of_measurement === '%'
+    );
+  });
+}

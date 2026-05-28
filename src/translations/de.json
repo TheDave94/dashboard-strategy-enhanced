@@ -33,7 +33,9 @@
     "covers": "Rollos & Abdeckungen",
     "security": "Sicherheit",
     "batteries": "Batterien",
-    "climate": "Klima"
+    "climate": "Klima",
+    "cameras": "Kameras",
+    "humidity": "Luftfeuchtigkeit"
   },
   "sections": {
     "overview": "Übersicht",
@@ -122,6 +124,16 @@
     "idle": "Bereitschaft",
     "off": "Aus"
   },
+  "camera": {
+    "no_area": "Ohne Bereich"
+  },
+  "humidity": {
+    "dry": "Trocken",
+    "comfortable": "Komfortabel",
+    "humid": "Feucht",
+    "sensor_one": "Sensor",
+    "sensor_many": "Sensoren"
+  },
   "room": {
     "cameras": "Kameras",
     "lighting": "Beleuchtung",
@@ -158,6 +170,8 @@
     "section_hidden": "ausgeblendet",
     "move_section_up": "Abschnitt nach oben verschieben",
     "move_section_down": "Abschnitt nach unten verschieben",
+    "move_view_up": "Ansicht nach oben verschieben",
+    "move_view_down": "Ansicht nach unten verschieben",
     "energy_link_dashboard": "Energie-Dashboard verlinken",
     "show_weather_forecast_card": "Eingebaute Wetter-Karte anzeigen",
     "show_energy_distribution_card": "Eingebaute Energie-Karte anzeigen",
@@ -261,6 +275,14 @@
     "unavailable_batteries_critical": "Als kritisch anzeigen (macht defekte Sensoren sichtbar)",
     "unavailable_batteries_good": "Als gut anzeigen (versteckt Offline-Geräte)",
     "unavailable_batteries_bucket_desc": "Wohin Batterie-Entitäten mit Status „unavailable“, „unknown“ oder nicht-numerischem Wert sortiert werden. „Kritisch“ macht defekte Sensoren sichtbar; „Gut“ versteckt sie, damit sie den Kritisch-Zähler nicht aufblähen.",
+    "show_camera_view": "Kamera-Übersicht anzeigen",
+    "show_camera_view_desc": "Fügt eine Kamera-Ansicht hinzu, die alle Kameras auf einem Bildschirm nach Bereich gruppiert. Standardmäßig aus. Kameras erscheinen unabhängig davon weiterhin in ihren Raum-Ansichten.",
+    "show_humidity_summary": "Luftfeuchtigkeits-Übersicht anzeigen",
+    "show_humidity_summary_desc": "Fügt eine Luftfeuchtigkeits-Ansicht hinzu, die Sensoren in Trocken / Komfortabel / Feucht gruppiert. Standardmäßig aus — aktiviere sie, wenn du Feuchtigkeitssensoren hast. Leere Gruppen werden automatisch ausgeblendet.",
+    "humidity_low_threshold": "Trocken unter",
+    "humidity_low_threshold_desc": "Messwerte unter diesem Prozentwert werden als „Trocken“ gruppiert.",
+    "humidity_high_threshold": "Feucht über",
+    "humidity_high_threshold_desc": "Messwerte über diesem Prozentwert werden als „Feucht“ gruppiert; dazwischen liegt „Komfortabel“.",
     "section_info_cards": "Info-Karten",
     "show_weather": "Wetter-Karte anzeigen",
     "show_weather_desc": "Zeigt die Wettervorhersage-Karte in der Übersicht an, wenn eine Wetter-Entität verfügbar ist.",
@@ -300,6 +322,8 @@
     "show_door_contacts_in_rooms_desc": "Zeigt Türkontakte als Badges in den jeweiligen Raum-Ansichten an.",
     "room_section_order": "Reihenfolge der Raum-Abschnitte",
     "room_section_order_desc": "Ordne die Entitäts-Gruppen-Abschnitte in jeder Raum-Ansicht neu an (z. B. Szenen über Beleuchtung). Kamera, Raum-Modus, Pins und Anwesenheit behalten ihre feste Position. Leere Gruppen werden ausgeblendet.",
+    "use_entity_name": "Nur Entitätsname",
+    "use_entity_name_desc": "Zeigt auf Raum-Kacheln nur den Entitätsnamen an, statt HAs Schema „Gerät › Entität“ (HA 2026.02+). Praktisch bei kryptischen Gerätenamen — z. B. wird aus „Plug Washing Machine Washing Machine“ einfach „Washing Machine“.",
     "use_default_area_sort": "Home Assistant Sortierung verwenden",
     "use_default_area_sort_desc": "Verwendet die Sortierung der Bereiche aus Home Assistant anstelle der hier konfigurierten Reihenfolge.",
     "areas_manage_desc": "Wähle aus, welche Bereiche im Dashboard angezeigt werden sollen und in welcher Reihenfolge. Klappe Bereiche auf, um einzelne Entitäten zu verwalten.",
@@ -338,6 +362,9 @@
     "section_custom_views": "Custom Views",
     "add_custom_view": "+ Neue View hinzufügen",
     "custom_views_help": "Erstelle eigene Views mit beliebigen Cards. Tipp: Erstelle die View zuerst in einem normalen Dashboard, kopiere den YAML-Code und füge ihn hier ein.",
+    "custom_view_ref_dashboard": "Referenz-Dashboard (URL-Pfad)",
+    "custom_view_ref_view": "Referenz-View (Pfad oder Index)",
+    "custom_view_ref_help": "Referenz-Modus: Bindet eine View live aus einem anderen Dashboard ein. Sind beide Felder gesetzt, spiegelt diese View zur Laufzeit die View des anderen Dashboards — das YAML oben wird ignoriert. Änderungen an der Quelle werden automatisch übernommen.",
     "no_favorites": "Keine Favoriten hinzugefügt",
     "no_room_pins": "Keine Raum-Pins hinzugefügt",
     "no_results": "Keine Ergebnisse gefunden",

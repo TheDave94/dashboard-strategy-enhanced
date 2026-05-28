@@ -41,6 +41,8 @@ const OVERRIDE_FLAGS: OverrideFlag[] = [
   { configKey: 'show_security_summary', label: 'Show security summary', defaultValue: true },
   { configKey: 'show_battery_summary', label: 'Show battery summary', defaultValue: true },
   { configKey: 'show_climate_summary', label: 'Show climate summary', defaultValue: false },
+  { configKey: 'show_camera_view', label: 'Show camera overview', defaultValue: false },
+  { configKey: 'show_humidity_summary', label: 'Show humidity summary', defaultValue: false },
   { configKey: 'show_routines_section', label: 'Show routines section', defaultValue: false },
   { configKey: 'show_voice_fab', label: 'Show voice FAB', defaultValue: false },
   { configKey: 'panel_mode', label: 'Wall-panel mode', defaultValue: false }, // wall when true, normal when unset

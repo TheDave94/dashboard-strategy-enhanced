@@ -194,6 +194,10 @@ export interface OrielConfig {
   battery_low_threshold?: number; // default: 50
   show_area_in_battery_view?: boolean; // default: false
   unavailable_batteries_bucket?: 'critical' | 'good'; // default: 'good'
+  show_camera_view?: boolean; // default: false
+  show_humidity_summary?: boolean; // default: false
+  humidity_low_threshold?: number; // default: 30 (below = Dry)
+  humidity_high_threshold?: number; // default: 60 (above = Humid)
   show_locks_in_rooms?: boolean; // default: false
   show_automations_in_rooms?: boolean; // default: false
   show_scripts_in_rooms?: boolean; // default: false
@@ -214,6 +218,9 @@ export interface OrielConfig {
   show_door_contacts_in_rooms?: boolean; // default: true (opt-out — set false to hide door contact badges)
   room_section_order?: RoomSectionKey[]; // default: DEFAULT_ROOM_SECTION_ORDER — order of
   // reorderable entity-group sections within room views (#293)
+  use_entity_name?: boolean; // default: false — emit name:{type:entity} on
+  // room tiles so they show the entity name only, suppressing HA 2026.02's
+  // "Device › Entity" scheme. See issue #208.
   show_switches_on_areas?: boolean; // default: false
   show_alerts_on_areas?: boolean; // default: false
   show_person_badges?: boolean; // default: true — set false to suppress the
@@ -795,6 +802,16 @@ export interface CustomView {
   parsed_config?: Record<string, any> | null;
   /** YAML parse error message, if any */
   _yaml_error?: string;
+  /**
+   * Reference mode: url_path of another Lovelace dashboard to pull a
+   * view from at runtime. When set together with `ref_view`, the view
+   * is resolved live via the `lovelace/config` WS command instead of
+   * from `parsed_config`, so edits to the source propagate without
+   * re-pasting YAML.
+   */
+  ref_dashboard?: string;
+  /** Reference mode: path (or numeric index) of the view within `ref_dashboard`. */
+  ref_view?: string;
 }
 
 // -- Custom Badges ----------------------------------------------------

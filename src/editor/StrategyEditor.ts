@@ -2574,8 +2574,10 @@ class OrielEditor extends LitElement {
       config: this._config,
       onAdd: () => this._addCustomView(),
       onRemove: (index) => this._removeCustomView(index),
+      onMove: (index, direction) => this._moveCustomView(index, direction),
       onUpdateField: (index, field, value) => this._updateCustomViewField(index, field, value),
       onUpdateYaml: (index, yamlString) => this._updateCustomViewYaml(index, yamlString),
+      onUpdateRefField: (index, field, value) => this._updateCustomViewRefField(index, field, value),
     });
   }
 
@@ -3260,11 +3262,41 @@ class OrielEditor extends LitElement {
     this._fireConfigChanged(newConfig);
   }
 
+  private _moveCustomView(index: number, direction: 'up' | 'down'): void {
+    const customViews: CustomView[] = this._config.custom_views || [];
+    const next = (direction === 'up' ? swapAdjacentUp : swapAdjacentDown)(customViews, index);
+    if (next === customViews) return; // out-of-range — no-op, no re-render
+
+    const newConfig: OrielConfig = { ...this._config, custom_views: next as CustomView[] };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
   private _updateCustomViewField(index: number, field: string, value: string): void {
     const customViews: CustomView[] = [...(this._config.custom_views || [])];
     if (!customViews[index]) return;
 
     customViews[index] = { ...customViews[index], [field]: value };
+
+    const newConfig: OrielConfig = { ...this._config, custom_views: customViews };
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  private _updateCustomViewRefField(
+    index: number,
+    field: 'ref_dashboard' | 'ref_view',
+    value: string,
+  ): void {
+    const customViews: CustomView[] = [...(this._config.custom_views || [])];
+    if (!customViews[index]) return;
+
+    const updated: CustomView = { ...customViews[index] };
+    const trimmed = value.trim();
+    // Keep YAML sparse — strip the key entirely when cleared.
+    if (trimmed) updated[field] = trimmed;
+    else delete updated[field];
+    customViews[index] = updated;
 
     const newConfig: OrielConfig = { ...this._config, custom_views: customViews };
     this._config = newConfig;

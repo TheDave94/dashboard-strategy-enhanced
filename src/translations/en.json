@@ -33,7 +33,9 @@
     "covers": "Blinds & Covers",
     "security": "Security",
     "batteries": "Batteries",
-    "climate": "Climate"
+    "climate": "Climate",
+    "cameras": "Cameras",
+    "humidity": "Humidity"
   },
   "sections": {
     "overview": "Overview",
@@ -122,6 +124,16 @@
     "idle": "Idle",
     "off": "Off"
   },
+  "camera": {
+    "no_area": "Unassigned"
+  },
+  "humidity": {
+    "dry": "Dry",
+    "comfortable": "Comfortable",
+    "humid": "Humid",
+    "sensor_one": "sensor",
+    "sensor_many": "sensors"
+  },
   "room": {
     "cameras": "Cameras",
     "lighting": "Lighting",
@@ -158,6 +170,8 @@
     "section_hidden": "hidden",
     "move_section_up": "Move section up",
     "move_section_down": "Move section down",
+    "move_view_up": "Move view up",
+    "move_view_down": "Move view down",
     "energy_link_dashboard": "Link to energy dashboard",
     "show_weather_forecast_card": "Show built-in forecast card",
     "show_energy_distribution_card": "Show built-in energy distribution card",
@@ -261,6 +275,14 @@
     "unavailable_batteries_critical": "Show as critical (alerts you to broken sensors)",
     "unavailable_batteries_good": "Show as good (silences offline devices)",
     "unavailable_batteries_bucket_desc": "Where to bucket battery entities whose state is unavailable, unknown, or non-numeric. \"Critical\" makes broken sensors visible; \"Good\" hides them so they don't inflate the critical count.",
+    "show_camera_view": "Show camera overview",
+    "show_camera_view_desc": "Adds a Cameras view collecting every camera onto one screen, grouped by area. Off by default. Cameras still appear in their room views regardless of this setting.",
+    "show_humidity_summary": "Show humidity summary",
+    "show_humidity_summary_desc": "Adds a Humidity overview view grouping humidity sensors into Dry / Comfortable / Humid buckets. Off by default — enable it if you have humidity sensors. Buckets with no sensors are auto-hidden.",
+    "humidity_low_threshold": "Dry below",
+    "humidity_low_threshold_desc": "Humidity readings below this percentage are grouped as \"Dry\".",
+    "humidity_high_threshold": "Humid above",
+    "humidity_high_threshold_desc": "Humidity readings above this percentage are grouped as \"Humid\"; in between is \"Comfortable\".",
     "section_info_cards": "Info Cards",
     "show_weather": "Show weather card",
     "show_weather_desc": "Shows the weather forecast card on the overview when a weather entity is available.",
@@ -300,6 +322,8 @@
     "show_door_contacts_in_rooms_desc": "Shows door contacts as badges in the respective room views.",
     "room_section_order": "Room section order",
     "room_section_order_desc": "Reorder the entity-group sections within every room view (e.g. put Scenes above Lighting). Camera, room-mode, pins, and presence keep their fixed positions. Empty groups auto-hide.",
+    "use_entity_name": "Entity name only",
+    "use_entity_name_desc": "Shows the entity name only on room tiles, instead of HA's \"Device › Entity\" scheme (HA 2026.02+). Useful when devices have cryptic names — e.g. \"Plug Washing Machine Washing Machine\" becomes \"Washing Machine\".",
     "use_default_area_sort": "Use Home Assistant sorting",
     "use_default_area_sort_desc": "Uses the area sorting from Home Assistant instead of the order configured here.",
     "areas_manage_desc": "Choose which areas should be shown on the dashboard and in what order. Expand areas to manage individual entities.",
@@ -338,6 +362,9 @@
     "section_custom_views": "Custom Views",
     "add_custom_view": "+ Add new view",
     "custom_views_help": "Create custom views with any cards. Tip: Create the view in a regular dashboard first, copy the YAML code, and paste it here.",
+    "custom_view_ref_dashboard": "Reference dashboard (url path)",
+    "custom_view_ref_view": "Reference view (path or index)",
+    "custom_view_ref_help": "Reference mode: pull a view live from another dashboard. When both fields are set, this view mirrors that dashboard's view at runtime and the YAML above is ignored. Edits to the source propagate automatically.",
     "no_favorites": "No favorites added",
     "no_room_pins": "No room pins added",
     "no_results": "No results found",
