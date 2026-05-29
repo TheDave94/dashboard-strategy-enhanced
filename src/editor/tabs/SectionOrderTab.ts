@@ -58,6 +58,8 @@ export interface SectionOrderTabContext {
   onPowerBadgeEntityChange: (ev: Event) => void;
   onToggleSectionVisibility: (key: SectionKey, visible: boolean) => void;
   onToggleHiddenHeading: (key: string, hide: boolean) => void;
+  /** Set the shared staleness threshold (minutes). */
+  onStaleAfterChange: (minutes: number) => void;
   onSectionVisibilityChange: (
     key: string,
     field: 'entity' | 'state' | 'role' | 'time_after' | 'time_before' | 'mode_entity' | 'mode_is',
@@ -91,6 +93,7 @@ const HIDDEN_HEADING_KEYS = [
 
 const BADGE_TOGGLE_KEYS = [
   'show_unavailable_alert_badge',
+  'show_staleness_alert_badge',
   'show_now_playing_badge',
   'show_sun_badge',
   'show_updates_badge',
@@ -501,6 +504,40 @@ function renderBadgeToggles(ctx: SectionOrderTabContext): TemplateResult {
   `;
 }
 
+/**
+ * Shared staleness threshold (minutes). Only shown once staleness is
+ * enabled somewhere — the overview badge toggle (right above) or
+ * `mark_stale_in_rooms` (Areas tab) — so it isn't dead clutter for the
+ * common case where the feature is off.
+ */
+function renderStalenessThreshold(ctx: SectionOrderTabContext): TemplateResult | typeof nothing {
+  const enabled =
+    ctx.config.show_staleness_alert_badge === true || ctx.config.mark_stale_in_rooms === true;
+  if (!enabled) return nothing;
+  const minutes =
+    typeof ctx.config.stale_after === 'number' && ctx.config.stale_after > 0
+      ? ctx.config.stale_after
+      : 60;
+  return html`
+    <div style="margin-top: 12px;">
+      <div class="form-row">
+        <label for="stale-after" style="min-width: 80px;">${localize('editor.stale_after')}</label>
+        <input
+          type="number"
+          id="stale-after"
+          min="5"
+          max="1440"
+          step="5"
+          .value=${String(minutes)}
+          @change=${(e: Event) =>
+            ctx.onStaleAfterChange(Number((e.target as HTMLInputElement).value))}
+        />
+      </div>
+      <div class="description">${localize('editor.stale_after_desc')}</div>
+    </div>
+  `;
+}
+
 function renderVisibilityRules(ctx: SectionOrderTabContext): TemplateResult {
   return html`
     <details style="margin-top: 12px;">
@@ -682,7 +719,8 @@ export function renderSectionOrderTab(ctx: SectionOrderTabContext): TemplateResu
       <div class="section-order-list" id="section-order-list">
         ${ctx.order.map((key, idx) => renderSectionRow(ctx, key, idx, ctx.order.length))}
       </div>
-      ${renderHiddenHeadings(ctx)} ${renderBadgeToggles(ctx)} ${renderVisibilityRules(ctx)}
+      ${renderHiddenHeadings(ctx)} ${renderBadgeToggles(ctx)}
+      ${renderStalenessThreshold(ctx)} ${renderVisibilityRules(ctx)}
     </div>
   `;
 }

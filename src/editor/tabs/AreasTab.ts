@@ -230,6 +230,14 @@ export function renderAreasTab(ctx: AreasTabContext): TemplateResult {
       <div class="description">${localize('editor.hide_unavailable_in_rooms_desc')}</div>
 
       ${ctx.renderCheckbox(
+        'mark-stale-in-rooms',
+        localize('editor.mark_stale_in_rooms'),
+        c.mark_stale_in_rooms === true,
+        (checked) => ctx.onToggleChange('mark_stale_in_rooms', checked, false),
+      )}
+      <div class="description">${localize('editor.mark_stale_in_rooms_desc')}</div>
+
+      ${ctx.renderCheckbox(
         'use-default-area-sort',
         localize('editor.use_default_area_sort'),
         useDefaultAreaSort,

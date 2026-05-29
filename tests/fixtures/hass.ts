@@ -23,6 +23,9 @@ interface EntityFixture {
   disabled_by?: string | null;
   platform?: string;
   labels?: string[];
+  /** State timestamps (ISO 8601). Default to a fixed past instant. */
+  last_updated?: string;
+  last_changed?: string;
 }
 
 interface DeviceFixture {
@@ -76,8 +79,8 @@ export function makeHass(spec: HassFixtureSpec = {}): HomeAssistant {
       entity_id: e.entity_id,
       state: e.state ?? 'on',
       attributes: e.attributes ?? {},
-      last_changed: '2026-05-19T00:00:00+00:00',
-      last_updated: '2026-05-19T00:00:00+00:00',
+      last_changed: e.last_changed ?? e.last_updated ?? '2026-05-19T00:00:00+00:00',
+      last_updated: e.last_updated ?? '2026-05-19T00:00:00+00:00',
     };
   }
   for (const d of spec.devices ?? []) {

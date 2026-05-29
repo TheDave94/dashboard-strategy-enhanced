@@ -1865,6 +1865,7 @@ class OrielEditor extends LitElement {
       onPowerBadgeEntityChange: (e) => this._powerBadgeEntityChanged(e),
       onToggleSectionVisibility: (k, v) => this._toggleSectionVisibility(k, v),
       onToggleHiddenHeading: (k, h) => this._toggleHiddenHeading(k, h),
+      onStaleAfterChange: (m) => this._setStaleAfter(m),
       onSectionVisibilityChange: (k, f, v) => this._sectionVisibilityChanged(k, f, v),
       onDragStart: this._handleSectionDragStart,
       onDragEnd: this._handleSectionDragEnd,
@@ -2981,6 +2982,17 @@ class OrielEditor extends LitElement {
       delete (newConfig as any)[key];
     }
 
+    this._config = newConfig;
+    this._fireConfigChanged(newConfig);
+  }
+
+  private _setStaleAfter(minutes: number): void {
+    if (!this._hass) return;
+    const clamped = Number.isFinite(minutes) ? Math.min(1440, Math.max(5, Math.round(minutes))) : 60;
+    const newConfig: OrielConfig = { ...this._config };
+    // Strip when it matches the default (60) to keep YAML sparse.
+    if (clamped === 60) delete newConfig.stale_after;
+    else newConfig.stale_after = clamped;
     this._config = newConfig;
     this._fireConfigChanged(newConfig);
   }

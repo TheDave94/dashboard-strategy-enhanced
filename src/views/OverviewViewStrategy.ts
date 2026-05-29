@@ -25,6 +25,7 @@ import { createVacuumsSection } from '../sections/VacuumsSection';
 import { createMaintenanceSection } from '../sections/MaintenanceSection';
 import { createPresenceZonesSection } from '../sections/PresenceZonesSection';
 import { createOverviewView } from '../utils/view-builder';
+import { collectStaleSensors, staleThresholdMs } from '../utils/staleness';
 import { timeStart, timeEnd, debugLog } from '../utils/debug';
 import { localize } from '../utils/localize';
 
@@ -538,6 +539,24 @@ class OrielViewOverview extends HTMLElement {
           name: String(count),
           icon: 'mdi:alert-circle-outline',
           color: 'red',
+          show_state: false,
+        });
+      }
+    }
+
+    // Optional "stale sensors" alert badge — count sensor-domain entities
+    // still reporting an old value (last_updated past stale_after) that
+    // never went unavailable, so the unavailable badge misses them. Same
+    // hidden-entity filtering as the unavailable badge. Auto-hide at zero.
+    if (dashboardConfig.show_staleness_alert_badge === true) {
+      const { count, sampleId } = collectStaleSensors(hass, staleThresholdMs(dashboardConfig));
+      if (count > 0 && sampleId) {
+        alertBadges.push({
+          type: 'entity',
+          entity: sampleId,
+          name: String(count),
+          icon: 'mdi:clock-alert-outline',
+          color: 'orange',
           show_state: false,
         });
       }

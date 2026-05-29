@@ -573,6 +573,26 @@ export interface OrielConfig {
    */
   favorites_cards?: LovelaceCardConfig[];
   show_unavailable_alert_badge?: boolean; // default: false (auto-hides at zero)
+  /**
+   * Overview header badge counting `sensor`-domain entities that are
+   * "available but stale" — still reporting an old value, `last_updated`
+   * older than `stale_after`, never going `unavailable`. Auto-hides at
+   * zero. Respects the no_dboard label and per-entity hidden flags.
+   * Default: false.
+   */
+  show_staleness_alert_badge?: boolean;
+  /**
+   * Freshness window in minutes shared by the staleness alert badge and
+   * `mark_stale_in_rooms`. A sensor whose `last_updated` is older than
+   * this is treated as stale. Default: 60.
+   */
+  stale_after?: number;
+  /**
+   * Visibly degrade stale `sensor`-domain badges in room views (muted
+   * colour + clock-alert icon) instead of showing the frozen reading as
+   * if fresh. Never blanks the value. Default: false.
+   */
+  mark_stale_in_rooms?: boolean;
   show_now_playing_badge?: boolean; // default: false (auto-hides when nothing's playing)
   show_vacuums_section?: boolean; // default: false (auto-hides without vacuum/mower)
   show_sun_badge?: boolean; // default: false (requires HA sun integration / sun.sun entity)

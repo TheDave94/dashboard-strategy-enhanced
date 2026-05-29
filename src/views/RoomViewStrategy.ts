@@ -19,6 +19,7 @@ import { localize } from '../utils/localize';
 import { resolveDensity } from '../utils/density';
 import { BADGE_COLOR_MAP, getColorForEntity, isDefaultShowName, resolveShowName } from '../utils/badge-utils';
 import { applyStateIcon } from '../utils/state-iconography';
+import { isStateStale, isMeasurementSensor, staleThresholdMs } from '../utils/staleness';
 import {
   extractCameraCompanions,
   hasAnyCompanion,
@@ -374,10 +375,24 @@ class OrielViewRoom extends HTMLElement {
     const namesVisible = hasBadgeConfig ? new Set<string>(badgeOpts.names_visible || []) : null;
     const namesHidden = hasBadgeConfig ? new Set<string>(badgeOpts.names_hidden || []) : null;
 
+    // Stale-sensor degradation (mark_stale_in_rooms): a sensor still
+    // reporting an old value (last_updated past stale_after) keeps its
+    // frozen reading visible but gets a muted colour + clock-alert icon,
+    // so it reads as "stale" rather than current. Sensor-domain only —
+    // event-driven badges (motion, window/door) idle legitimately.
+    const markStale = dashboardConfig.mark_stale_in_rooms === true;
+    const staleMs = markStale ? staleThresholdMs(dashboardConfig) : 0;
+    const staleProps = (entityId: string): { color?: string; icon?: string } => {
+      if (!markStale || !entityId.startsWith('sensor.')) return {};
+      const state = hass.states[entityId];
+      if (!isMeasurementSensor(state) || !isStateStale(state, staleMs)) return {};
+      return { color: 'grey', icon: 'mdi:clock-alert-outline' };
+    };
+
     // Convert to LovelaceBadgeConfig
     const badges: LovelaceBadgeConfig[] = [];
-    if (primaryTemp) badges.push({ type: 'entity', entity: primaryTemp, color: 'red', tap_action: { action: 'more-info' } });
-    if (primaryHumidity) badges.push({ type: 'entity', entity: primaryHumidity, color: 'indigo', tap_action: { action: 'more-info' } });
+    if (primaryTemp) badges.push({ type: 'entity', entity: primaryTemp, color: 'red', tap_action: { action: 'more-info' }, ...staleProps(primaryTemp) });
+    if (primaryHumidity) badges.push({ type: 'entity', entity: primaryHumidity, color: 'indigo', tap_action: { action: 'more-info' }, ...staleProps(primaryHumidity) });
     for (const b of filteredCandidates) {
       const showName = resolveShowName(b.entity, !!b.showName, namesVisible, namesHidden);
       badges.push({
@@ -386,6 +401,7 @@ class OrielViewRoom extends HTMLElement {
         color: b.color,
         tap_action: { action: 'more-info' },
         ...(showName ? { show_name: true } : {}),
+        ...staleProps(b.entity),
       });
     }
 
