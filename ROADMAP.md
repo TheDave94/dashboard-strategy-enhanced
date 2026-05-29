@@ -56,12 +56,6 @@ Items that were considered during a review cycle and explicitly held back, with 
 - **Why deferred** (`src/editor/LivePreview.ts:12-15`, v4.6.0): HA doesn't expose `<hui-view>` as an embeddable component. The structure-level preview (view/section/card counts + emitted YAML) was shipped as the pragmatic middle ground; a true visual preview would need either a public HA API change or a substantial reimplementation of HA's view rendering.
 - **Trigger to revisit**: HA exposes `<hui-view>` (or an equivalent embeddable component) as a public API, or a user reports that the text-only preview is insufficient for the decisions they're making in the editor.
 
-### Source-staleness degraded states (external-seed review, 2026-05)
-
-- **What**: a "data stale since X" / visibly-degraded indicator when a source stops updating, instead of the value silently hiding or showing a frozen number.
-- **Why deferred**: a real but *partial* gap, not built reflexively. Oriel already handles the **unavailable** case — `hide_unavailable_in_rooms` skips them, `show_unavailable_alert_badge` counts them on the overview, the unavailable-batteries bucket sorts them — and tiles already render `last_changed` ("4 hours ago") as a passive freshness hint. The uncovered case is **stale-but-available**: a sensor still reporting an old value (last_updated past a threshold) that no `unavailable` check catches. Held pending a freshness-threshold design that doesn't add per-card cost to the reactive `willUpdate` path.
-- **Trigger to revisit**: a recurrence of a silent-sensor failure on a *user* install (motivated by a local env-sensor going silent), or a request for proactive staleness alerting. If built: a `stale_after` threshold feeding the reactive cards (summary inputs + room sensor badges), optionally a staleness alert badge mirroring `show_unavailable_alert_badge` — degrade visibly, never blank.
-
 ### Priority / precedence "status headline" element (external-seed review, 2026-05)
 
 - **What**: a single glanceable element resolving the home's top-priority state via a configured precedence (e.g. security > window-open-in-rain > air-quality > climate > all-clear), showing only the winner instead of the flat equal-weight summary row.
