@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.15.1](https://github.com/TheDave94/oriel-dashboard/compare/v4.15.0...v4.15.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* emit standalone bubble pop-ups (cards: array) for Bubble Card v3.2+ ([#97](https://github.com/TheDave94/oriel-dashboard/issues/97)) ([7d250fb](https://github.com/TheDave94/oriel-dashboard/commit/7d250fbcef5b25fa598367c7d4d3f340f1739f42))
+
 ## [4.15.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.14.0...v4.15.0) (2026-05-30)
 
 
