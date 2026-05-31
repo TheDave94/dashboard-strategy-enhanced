@@ -190,46 +190,172 @@ describe('pollenLevel — analytics (v2 enum: none/low/high/mixed)', () => {
   });
 });
 
-describe('pollenLevel — polleninformation (0–4)', () => {
-  it('buckets the Austrian scale into none/low/high', () => {
+// ----------------------------------------------------------------------------
+// Stopgap-mirror lockdown
+// ----------------------------------------------------------------------------
+// The tests below pin pollenLevel() to PollenWatch v2 analytics.py's tables
+// verbatim. Any test failure here means EITHER our mirror has drifted from
+// PollenWatch (then update both in tandem with a PollenWatch release pin)
+// OR PollenWatch itself moved (same answer). The TEMPORARY banner in
+// pollen.ts spells out why this duplication exists and when it retires
+// (PollenWatch v3 — TheDave94/pollenwatch#2). Until then this file is the
+// mirror's safety net.
+// ----------------------------------------------------------------------------
+
+describe('pollenLevel — polleninformation (analytics.py _INDEX_TO_LEVEL)', () => {
+  // _INDEX_TO_LEVEL = {0:0, 1:1, 2:1, 3:2, 4:2}
+  it('buckets the Austrian 0-4 index exactly per analytics.py', () => {
     expect(pollenLevel('polleninformation', st('x', '0'))).toBe('none');
     expect(pollenLevel('polleninformation', st('x', '1'))).toBe('low');
-    expect(pollenLevel('polleninformation', st('x', '2'))).toBe('high');
+    expect(pollenLevel('polleninformation', st('x', '2'))).toBe('low');
     expect(pollenLevel('polleninformation', st('x', '3'))).toBe('high');
     expect(pollenLevel('polleninformation', st('x', '4'))).toBe('high');
   });
+
+  it('clamps out-of-range like analytics.py (max(0, min(4, int(idx))))', () => {
+    expect(pollenLevel('polleninformation', st('x', '-1'))).toBe('none');
+    expect(pollenLevel('polleninformation', st('x', '5'))).toBe('high');
+    expect(pollenLevel('polleninformation', st('x', '99'))).toBe('high');
+  });
+
+  it('floors fractional values toward the integer bucket', () => {
+    // analytics.py uses int() which truncates toward zero. 2.9 → 2 → low.
+    expect(pollenLevel('polleninformation', st('x', '2.9'))).toBe('low');
+    expect(pollenLevel('polleninformation', st('x', '3.0'))).toBe('high');
+  });
 });
 
-describe('pollenLevel — google (0–5)', () => {
-  it('buckets the Google scale into none/low/high', () => {
+describe('pollenLevel — google UPI (analytics.py _UPI_TO_LEVEL)', () => {
+  // _UPI_TO_LEVEL = {0:0, 1:1, 2:1, 3:1, 4:2, 5:2}
+  // Note: Moderate (3) stays at LOW per analytics.py — Google reserves
+  // High/Very High for the elevated tier; the health-conservative bias
+  // lives once in consensus take-the-higher, not here.
+  it('buckets UPI 0-5 exactly per analytics.py', () => {
     expect(pollenLevel('google', st('x', '0'))).toBe('none');
     expect(pollenLevel('google', st('x', '1'))).toBe('low');
     expect(pollenLevel('google', st('x', '2'))).toBe('low');
-    expect(pollenLevel('google', st('x', '3'))).toBe('high');
+    expect(pollenLevel('google', st('x', '3'))).toBe('low');
     expect(pollenLevel('google', st('x', '4'))).toBe('high');
     expect(pollenLevel('google', st('x', '5'))).toBe('high');
   });
-});
 
-describe('pollenLevel — dwd (0–3 ordinal)', () => {
-  it('buckets DWD ordinal levels', () => {
-    expect(pollenLevel('dwd', st('x', '0'))).toBe('none');
-    expect(pollenLevel('dwd', st('x', '1'))).toBe('low');
-    expect(pollenLevel('dwd', st('x', '1.5'))).toBe('low');
-    expect(pollenLevel('dwd', st('x', '2'))).toBe('high');
-    expect(pollenLevel('dwd', st('x', '3'))).toBe('high');
+  it('returns null for out-of-range UPI (matches `.get(upi)` semantics)', () => {
+    // analytics.py's google_collapse returns None when upi is not in the
+    // 0..5 keyset. We mirror that with `null` so downstream renders as
+    // unknown rather than guessing.
+    expect(pollenLevel('google', st('x', '6'))).toBe(null);
+    expect(pollenLevel('google', st('x', '-1'))).toBe(null);
   });
 });
 
-describe('pollenLevel — grains/m³ sources (open_meteo / meteoswiss / epin)', () => {
+describe('pollenLevel — dwd (analytics.py _DWD_TO_LEVEL ∘ _STR_TO_FLOAT)', () => {
+  // _STR_TO_FLOAT: "0"→0.0, "0-1"→0.5, "1"→1.0, "1-2"→1.5, "2"→2.0,
+  //                "2-3"→2.5, "3"→3.0
+  // _DWD_TO_LEVEL: "0","0-1"→0; "1","1-2","2"→1; "2-3","3"→2
+  it('low band stops at 2.0; high begins at 2.5 (the "2-3" string)', () => {
+    expect(pollenLevel('dwd', st('x', '0'))).toBe('none');
+    expect(pollenLevel('dwd', st('x', '0.5'))).toBe('none');
+    expect(pollenLevel('dwd', st('x', '1'))).toBe('low');
+    expect(pollenLevel('dwd', st('x', '1.5'))).toBe('low');
+    expect(pollenLevel('dwd', st('x', '2'))).toBe('low');
+    expect(pollenLevel('dwd', st('x', '2.5'))).toBe('high');
+    expect(pollenLevel('dwd', st('x', '3'))).toBe('high');
+  });
+
+  it('returns null for floats outside the seven canonical _STR_TO_FLOAT values', () => {
+    // analytics.py's dwd_collapse looks up by the categorical *string*;
+    // anything that didn't come from _STR_TO_FLOAT (e.g. an interpolated
+    // 1.7 from some hypothetical future source) has no level entry, so
+    // we omit rather than guess.
+    expect(pollenLevel('dwd', st('x', '0.7'))).toBe(null);
+    expect(pollenLevel('dwd', st('x', '1.7'))).toBe(null);
+    expect(pollenLevel('dwd', st('x', '2.7'))).toBe(null);
+  });
+});
+
+describe('pollenLevel — grains/m³ (analytics.py bucket_level + _THRESHOLDS)', () => {
+  // _THRESHOLDS bracket A (trees + mugwort): (10, 100)
+  // _THRESHOLDS bracket B (grass + herbs):   (3, 50)
+  // bucket_level: >= peak → 2 (high); >= onset → 1 (low); else 0 (none).
+
+  describe('tree bracket (onset=10, peak=100)', () => {
+    it.each([
+      'alder',
+      'birch',
+      'olive',
+      'mugwort',
+      'hazel',
+      'ash',
+      'oak',
+      'holm_oak',
+      'beech',
+      'elm',
+      'carpinus',
+      'plane_tree',
+      'cypress_family',
+      'juglans',
+    ] as const)('%s uses 10/100', (sp) => {
+      expect(pollenLevel('open_meteo', st('x', '0', 'grains/m³'), sp)).toBe('none');
+      expect(pollenLevel('open_meteo', st('x', '9', 'grains/m³'), sp)).toBe('none');
+      expect(pollenLevel('open_meteo', st('x', '10', 'grains/m³'), sp)).toBe('low');
+      expect(pollenLevel('open_meteo', st('x', '50', 'grains/m³'), sp)).toBe('low');
+      expect(pollenLevel('open_meteo', st('x', '99', 'grains/m³'), sp)).toBe('low');
+      expect(pollenLevel('open_meteo', st('x', '100', 'grains/m³'), sp)).toBe('high');
+      expect(pollenLevel('open_meteo', st('x', '500', 'grains/m³'), sp)).toBe('high');
+    });
+
+    it('peak boundary belongs to high (>= peak, not >)', () => {
+      // Pin: peak is INCLUSIVE in analytics.py — `if grains >= peak`.
+      // This was the v4.16 tree-band drift (50-99 wrongly rendered high
+      // in Oriel) being corrected — keep an explicit guard around it.
+      expect(pollenLevel('meteoswiss', st('x', '100', 'grains/m³'), 'birch')).toBe('high');
+      expect(pollenLevel('meteoswiss', st('x', '99.99', 'grains/m³'), 'birch')).toBe('low');
+    });
+  });
+
+  describe('grass + herb bracket (onset=3, peak=50)', () => {
+    it.each([
+      'grass',
+      'ragweed',
+      'rye',
+      'plantago',
+      'urtica',
+      'nettle_family',
+      'chenopodium',
+      'rumex',
+      'asteraceae',
+    ] as const)('%s uses 3/50', (sp) => {
+      expect(pollenLevel('epin', st('x', '0', 'grains/m³'), sp)).toBe('none');
+      expect(pollenLevel('epin', st('x', '2.9', 'grains/m³'), sp)).toBe('none');
+      expect(pollenLevel('epin', st('x', '3', 'grains/m³'), sp)).toBe('low');
+      expect(pollenLevel('epin', st('x', '49', 'grains/m³'), sp)).toBe('low');
+      expect(pollenLevel('epin', st('x', '50', 'grains/m³'), sp)).toBe('high');
+      expect(pollenLevel('epin', st('x', '999', 'grains/m³'), sp)).toBe('high');
+    });
+  });
+
+  it('returns null for grains/m³ + alternaria (no _THRESHOLDS entry)', () => {
+    // analytics.py's bucket_level returns None for species not in the
+    // table; alternaria is the only such species in v2 (it travels the
+    // polleninformation 0-4 index path upstream, never grains/m³).
+    expect(pollenLevel('open_meteo', st('x', '50', 'grains/m³'), 'alternaria')).toBe(null);
+    expect(pollenLevel('meteoswiss', st('x', '100', 'grains/m³'), 'alternaria')).toBe(null);
+    expect(pollenLevel('epin', st('x', '10', 'grains/m³'), 'alternaria')).toBe(null);
+  });
+
+  it('returns null for grains/m³ when species is not supplied', () => {
+    // Callers in src/cards/PollenCard.ts always pass the species; this
+    // pins the defensive fall-through used elsewhere.
+    expect(pollenLevel('open_meteo', st('x', '50', 'grains/m³'))).toBe(null);
+  });
+
   it.each(['open_meteo', 'meteoswiss', 'epin'] as const)(
-    '%s uses the grains/m³ heuristic',
+    '%s respects the per-species bracket (grass on tree-source still uses 3/50)',
     (src) => {
-      expect(pollenLevel(src, st('x', '0', 'grains/m³'))).toBe('none');
-      expect(pollenLevel(src, st('x', '5', 'grains/m³'))).toBe('low');
-      expect(pollenLevel(src, st('x', '49', 'grains/m³'))).toBe('low');
-      expect(pollenLevel(src, st('x', '50', 'grains/m³'))).toBe('high');
-      expect(pollenLevel(src, st('x', '500', 'grains/m³'))).toBe('high');
+      // The source is unrelated to the bracket — bracket is per species.
+      // 4 grains/m³ on grass is "low" (>=3); 4 on birch is "none" (<10).
+      expect(pollenLevel(src, st('x', '4', 'grains/m³'), 'grass')).toBe('low');
+      expect(pollenLevel(src, st('x', '4', 'grains/m³'), 'birch')).toBe('none');
     },
   );
 });

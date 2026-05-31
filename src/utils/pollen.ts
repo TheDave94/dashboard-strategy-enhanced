@@ -122,21 +122,149 @@ export function resolvePollenTypes(
   return configured.filter((t) => availableSet.has(t));
 }
 
+// ====================================================================
+// TEMPORARY — duplicates PollenWatch analytics.py thresholds AND those
+// threshold values are themselves unverified
+// ====================================================================
+// Every numeric bucket below is a manually-mirrored copy of the
+// corresponding table in PollenWatch's `custom_components/pollenwatch/
+// analytics.py` (v2.0):
+//
+//   - GRAINS_THRESHOLDS  ↔ `_THRESHOLDS`
+//   - PI_INDEX_TO_LEVEL  ↔ `_INDEX_TO_LEVEL`
+//   - UPI_TO_LEVEL       ↔ `_UPI_TO_LEVEL`
+//   - DWD_FLOAT_TO_LEVEL ↔ `_DWD_TO_LEVEL` composed with dwd._STR_TO_FLOAT
+//
+// **This is a colour-agreement tourniquet ONLY.** It makes Oriel match
+// the bundled PollenWatch card; it does NOT make severity "correct".
+// Two distinct problems travel together here and both retire together:
+//
+//   1. The duplication itself is the known root cause of drift between
+//      Oriel and the PollenWatch card. v4.16 shipped with Oriel-side
+//      thresholds that disagreed — PI ≥2 rendered "high" in Oriel while
+//      the card showed "low" on the same reading, with parallel gaps
+//      for Google UPI, DWD, and the tree grains/m³ band 50-99.
+//
+//   2. The threshold *values* themselves (trees 10/100, grasses 3/50,
+//      and the PI/Google/DWD cutoffs) are family-borrowed EAACI
+//      brackets currently under provenance review upstream — only 9 of
+//      the 24 species have exact-species cutoffs; the rest borrow from
+//      the family analogue. Matching analytics.py keeps us agreeing
+//      with the card we're co-deployed with — it does NOT mean the
+//      cutoffs themselves are settled. Do not treat them as such.
+//
+// Both retire the moment PollenWatch v3 exposes an authoritative
+// severity attribute on every per-source sensor (Oriel collapses to a
+// thin attribute reader, and the brackets debate moves entirely into
+// the integration where the data lives). Tracked upstream:
+//
+//   https://github.com/TheDave94/pollenwatch/issues/2
+//
+// While this banner is in the file, treat the thresholds as a hard
+// mirror of analytics.py — any change goes through PollenWatch first.
+// ====================================================================
+
+/** Trees + mugwort: EAACI (onset, peak) per analytics.py `_THRESHOLDS`. */
+const _GRAINS_TREE_BRACKET: ReadonlySet<PollenType> = new Set<PollenType>([
+  'alder',
+  'birch',
+  'olive',
+  // mugwort is bracketed with trees in analytics.py "by analogy (birch/olive)".
+  'mugwort',
+  'hazel',
+  'ash',
+  'oak',
+  'holm_oak',
+  'beech',
+  'elm',
+  'carpinus',
+  'plane_tree',
+  'cypress_family',
+  'juglans',
+]);
+
+/** Grasses + herbs: EAACI (onset, peak) per analytics.py `_THRESHOLDS`. */
+const _GRAINS_GRASS_HERB_BRACKET: ReadonlySet<PollenType> = new Set<PollenType>([
+  'grass',
+  'ragweed',
+  'rye',
+  'plantago',
+  'urtica',
+  'nettle_family',
+  'chenopodium',
+  'rumex',
+  'asteraceae',
+]);
+
+// Tuples below are `(onset, peak)` exactly as in analytics.py. Boundary
+// convention matches `bucket_level`: `>= peak` → high, `>= onset` → low,
+// else none (i.e. the threshold itself belongs to the higher level).
+const _GRAINS_THRESHOLDS_TREE: readonly [number, number] = [10, 100];
+const _GRAINS_THRESHOLDS_GRASS_HERB: readonly [number, number] = [3, 50];
+
+/** polleninformation 0-4 → 3-level scale, per analytics.py `_INDEX_TO_LEVEL`. */
+const _PI_INDEX_TO_LEVEL: Readonly<Record<number, 0 | 1 | 2>> = {
+  0: 0, 1: 1, 2: 1, 3: 2, 4: 2,
+};
+
+/** Google UPI 0-5 → 3-level scale, per analytics.py `_UPI_TO_LEVEL`. */
+const _UPI_TO_LEVEL: Readonly<Record<number, 0 | 1 | 2>> = {
+  0: 0, 1: 1, 2: 1, 3: 1, 4: 2, 5: 2,
+};
+
+/**
+ * DWD float → 3-level scale. PollenWatch's source emits the categorical
+ * string mapped through `dwd._STR_TO_FLOAT` (0=0.0, 0-1=0.5, 1=1.0,
+ * 1-2=1.5, 2=2.0, 2-3=2.5, 3=3.0); analytics.py then collapses the
+ * STRING to a level via `_DWD_TO_LEVEL`. Here we go directly from the
+ * float (the entity's `state`) to the same level — only the exact float
+ * values produced by `_STR_TO_FLOAT` are valid keys.
+ *
+ *   {"0", "0-1"}       → none (floats 0.0, 0.5)
+ *   {"1", "1-2", "2"}  → low  (floats 1.0, 1.5, 2.0)
+ *   {"2-3", "3"}       → high (floats 2.5, 3.0)
+ */
+function _dwdFloatToLevel(n: number): 0 | 1 | 2 | null {
+  // Match analytics.py's `_DWD_TO_LEVEL` exactly: any float not produced
+  // by `_STR_TO_FLOAT` returns null (the source omits a level rather
+  // than guess). We can't trust a free-form float — only these seven.
+  if (n === 0.0 || n === 0.5) return 0;
+  if (n === 1.0 || n === 1.5 || n === 2.0) return 1;
+  if (n === 2.5 || n === 3.0) return 2;
+  return null;
+}
+
+const _LEVEL_TO_POLLEN_LEVEL: Readonly<Record<0 | 1 | 2, PollenLevel>> = {
+  0: 'none',
+  1: 'low',
+  2: 'high',
+};
+
 /**
  * Map a raw entity state into a normalised severity level. The mapping
- * is source-specific because the underlying scales differ:
+ * mirrors PollenWatch v2 `analytics.py` exactly — see the TEMPORARY
+ * banner above for the duplication caveat.
  *
- *   - analytics         — enum string, direct passthrough (none/low/high/mixed)
- *   - polleninformation — 0–4 Austrian scale (≥2 = high)
- *   - google            — 0–5 Google scale (≥3 = high, 1–2 = low)
- *   - dwd               — 0–3 ordinal (≥2 = high)
- *   - open_meteo / meteoswiss / epin — grains/m³ (≥50 = high)
+ *   - analytics         — enum passthrough (none/low/high/mixed; nodata→null)
+ *   - polleninformation — `_INDEX_TO_LEVEL`  (0=none, 1-2=low, 3-4=high)
+ *   - google            — `_UPI_TO_LEVEL`    (0=none, 1-3=low, 4-5=high)
+ *   - dwd               — `_DWD_TO_LEVEL` ∘ `_STR_TO_FLOAT` (≥2.5=high)
+ *   - open_meteo / meteoswiss / epin — `bucket_level` (grains/m³ per species)
  *
- * Returns null when the state is missing / unavailable / unparseable.
+ * Returns null when the state is missing / unavailable / unparseable,
+ * or — for grains/m³ — when the species has no `_THRESHOLDS` entry
+ * (alternaria is the only such species, since it's reported by PI as a
+ * 0-4 index and never travels the grains/m³ path upstream).
+ *
+ * @param type — required when `source` is a numeric raw source so the
+ *   correct per-species bracket is picked. Passing `undefined` for a
+ *   grains/m³ source collapses to "no bracket" → returns null. For
+ *   analytics / PI / Google / DWD the species is ignored.
  */
 export function pollenLevel(
   source: PollenSource,
   state: HassEntity | undefined,
+  type?: PollenType,
 ): PollenLevel | null {
   if (!state) return null;
   const raw = state.state;
@@ -152,29 +280,43 @@ export function pollenLevel(
 
   // Non-analytics state must be numeric; categorical raw values (e.g.
   // DWD's "0-1" strings) are exposed via `attributes.native_value`, but
-  // the sensor's primary `state` is always the midpoint float.
+  // the sensor's primary `state` is always the float from _STR_TO_FLOAT.
   if (raw === 'none') return 'none';
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
 
   if (source === 'polleninformation') {
-    if (n <= 0) return 'none';
-    if (n >= 2) return 'high';
-    return 'low';
+    // Match _INDEX_TO_LEVEL: clamp to 0..4, integer floor (analytics.py
+    // does `int(index)` after clamping). 1.7 → 1 → low (matches the
+    // PI index semantics: a value lives in the bucket of its integer
+    // floor, just like Python's `int(...)`).
+    const idx = Math.max(0, Math.min(4, Math.trunc(n)));
+    const lvl = _PI_INDEX_TO_LEVEL[idx];
+    return lvl === undefined ? null : _LEVEL_TO_POLLEN_LEVEL[lvl];
   }
   if (source === 'google') {
-    if (n <= 0) return 'none';
-    if (n >= 3) return 'high';
-    return 'low';
+    const upi = Math.trunc(n);
+    const lvl = _UPI_TO_LEVEL[upi];
+    return lvl === undefined ? null : _LEVEL_TO_POLLEN_LEVEL[lvl];
   }
   if (source === 'dwd') {
-    if (n <= 0) return 'none';
-    if (n >= 2) return 'high';
-    return 'low';
+    const lvl = _dwdFloatToLevel(n);
+    return lvl === null ? null : _LEVEL_TO_POLLEN_LEVEL[lvl];
   }
-  // grains/m³ sources: open_meteo, meteoswiss, epin
-  if (n <= 0) return 'none';
-  if (n >= 50) return 'high';
+
+  // grains/m³ sources: open_meteo, meteoswiss, epin. Per-species
+  // thresholds — picked by tree vs grass+herb bracket.
+  if (!type) return null;
+  let bounds: readonly [number, number] | null = null;
+  if (_GRAINS_TREE_BRACKET.has(type)) bounds = _GRAINS_THRESHOLDS_TREE;
+  else if (_GRAINS_GRASS_HERB_BRACKET.has(type)) bounds = _GRAINS_THRESHOLDS_GRASS_HERB;
+  // No entry → no bucket (matches `bucket_level` returning None for
+  // species not in `_THRESHOLDS`; alternaria is the only such species
+  // since it travels the PI index path upstream, never grains/m³).
+  if (!bounds) return null;
+  const [onset, peak] = bounds;
+  if (n < onset) return 'none';
+  if (n >= peak) return 'high';
   return 'low';
 }
 
