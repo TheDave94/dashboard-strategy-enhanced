@@ -6,6 +6,13 @@ Full release notes with diffs and asset bundles: [GitHub releases](https://githu
 
 ---
 
+## [4.16.0](https://github.com/TheDave94/oriel-dashboard/compare/v4.15.1...v4.16.0) (2026-05-31)
+
+
+### Features
+
+* align pollen card with PollenWatch v2 (24 species, 6 sources, mixed state) ([#99](https://github.com/TheDave94/oriel-dashboard/issues/99)) ([939c764](https://github.com/TheDave94/oriel-dashboard/commit/939c764b7831eeaf540a41c2fdf3984fb877eb7d))
+
 ## [4.15.1](https://github.com/TheDave94/oriel-dashboard/compare/v4.15.0...v4.15.1) (2026-05-30)
 
 
