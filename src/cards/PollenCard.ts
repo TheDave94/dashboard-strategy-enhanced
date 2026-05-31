@@ -189,7 +189,7 @@ class OrielPollenCard extends LitElement {
     const allRows = types.map((type) => {
       const id = pollenSensorId(source, type);
       const state = this.hass!.states[id];
-      const level = pollenLevel(source, state, type);
+      const level = pollenLevel(source, state);
       return { type, id, level };
     });
     // When show_inactive is off (default), drop species currently at
