@@ -45,62 +45,27 @@ These four entities are the HA-side surface Oriel reads, either by hardcoded ref
 
 ---
 
-## The PollenWatch severity-bucketing duplication (TEMPORARY)
+## PollenWatch severity attribute (thin reader)
 
-Separate from the entity-name contract above: Oriel's pollen card
-duplicates PollenWatch's severity-bucketing tables to colour raw-source
-sensors. This duplication is a known root cause of visual drift, and is
-itself currently a **colour-agreement tourniquet** — not the cure.
+Oriel reads PollenWatch's authoritative `level_label` attribute on every
+raw per-source sensor — no severity bucketing on the Oriel side.
 
-### What's mirrored
+- **Raw sources** (`open_meteo`, `meteoswiss`, `epin`, `polleninformation`,
+  `google`, `dwd`): `state.attributes.level_label` is one of `"none"`,
+  `"low"`, `"high"`, or `null`. PollenWatch v2.1+ writes it via
+  `analytics.level_for_source()` — the integration owns the thresholds.
+- **Analytics consensus** sensors keep the existing path: parse the
+  sensor's STATE string (`none`/`low`/`high`/`mixed`). The consensus
+  sensor doesn't carry `level_label`, and `mixed` exists only on the
+  consensus state.
+- **Pre-v2.1 PollenWatch installs** lack the attribute on raw sensors;
+  Oriel renders those as unknown until the user updates. Deliberate —
+  the reader is one-way, with no fallback bucketing.
 
-`src/utils/pollen.ts::pollenLevel()` mirrors four tables from
-PollenWatch v2 `custom_components/pollenwatch/analytics.py`:
-
-- `_THRESHOLDS` (per-species grains/m³ onset/peak; consumed by
-  `bucket_level`) — Oriel's `_GRAINS_THRESHOLDS_TREE` (10/100) and
-  `_GRAINS_THRESHOLDS_GRASS_HERB` (3/50) + the bracket-membership sets.
-- `_INDEX_TO_LEVEL` (polleninformation 0-4 collapse) — Oriel's
-  `_PI_INDEX_TO_LEVEL`.
-- `_UPI_TO_LEVEL` (Google UPI 0-5 collapse) — Oriel's `_UPI_TO_LEVEL`.
-- `_DWD_TO_LEVEL` composed with `dwd._STR_TO_FLOAT` (DWD categorical →
-  float → level) — Oriel's `_dwdFloatToLevel`.
-
-### Why this is a tourniquet, not a fix
-
-Two distinct problems travel together here and both retire together:
-
-1. **The duplication itself.** v4.16 shipped with Oriel-side thresholds
-   that disagreed with PollenWatch — Polleninformation ≥2 rendered
-   "high" in Oriel while the bundled PollenWatch card showed "low" on
-   the same reading, with parallel gaps for Google UPI, DWD, and the
-   tree grains/m³ band 50-99. Any future analytics.py threshold change
-   silently drifts again until manually mirrored.
-2. **The threshold values themselves are unverified.** Trees 10/100,
-   grasses 3/50, and the PI/Google/DWD cutoffs are **family-borrowed
-   EAACI brackets currently under provenance review upstream** — only
-   9 of the 24 species have exact-species cutoffs; the rest borrow
-   from the family analogue. Matching analytics.py keeps Oriel
-   agreeing with the card we're co-deployed with — it does NOT mean
-   the cutoffs themselves are settled. Do not treat them as such.
-
-### Retirement plan
-
-Both retire the moment PollenWatch v3 exposes an authoritative severity
-attribute on every per-source sensor (Oriel collapses to a thin
-attribute reader, and the brackets debate moves entirely into the
-integration where the data lives). Tracked upstream:
-[TheDave94/pollenwatch#2](https://github.com/TheDave94/pollenwatch/issues/2).
-
-### Until then
-
-- Any change to a `_THRESHOLDS` / `_INDEX_TO_LEVEL` / `_UPI_TO_LEVEL` /
-  `_DWD_TO_LEVEL` table in PollenWatch must be mirrored into
-  `src/utils/pollen.ts` in the same release cycle. Treat the Oriel
-  side as a hard mirror — the source of truth is analytics.py.
-- The `TEMPORARY` banner in `src/utils/pollen.ts` says all of this in
-  the code itself. Don't remove the banner until issue #2 is resolved
-  and the pollenLevel() pathway is gone.
+History: v4.15 → v4.16.1 mirrored PollenWatch's threshold tables locally
+and drifted (same reading lit different colours in Oriel's card vs. the
+bundled card). v4.16.2 deleted the duplication; the source of truth is
+now PollenWatch alone.
 
 ---
 
